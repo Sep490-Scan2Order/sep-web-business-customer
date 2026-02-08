@@ -1,0 +1,1 @@
+//file tạo lưu hằng số dùng chung trong project

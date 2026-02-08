@@ -1,0 +1,1 @@
+//# Định nghĩa interface/type từ API .NET
