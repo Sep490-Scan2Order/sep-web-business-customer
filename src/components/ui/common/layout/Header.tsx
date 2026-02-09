@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { User } from "lucide-react";
 import logoDefault from "@/src/images/logo/logo_removebg.png";
+import { ROUTES } from "@/src/constants/routes";
 
 interface HeaderProps {
   className?: string;
@@ -41,7 +42,7 @@ const Header: React.FC<HeaderProps> = ({ className = "" }) => {
             Tính năng
           </Link>
           <Link
-            href="#"
+            href={ROUTES.PAGES.PUBLIC.PLAN}
             className="text-white/90 hover:text-white font-medium text-base"
           >
             Bảng giá
