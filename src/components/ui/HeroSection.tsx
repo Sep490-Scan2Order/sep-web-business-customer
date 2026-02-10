@@ -6,17 +6,17 @@ import Image from "next/image";
 
 export default function HeroSection() {
   return (
-    <section className="bg-[#f6f3ec] border-t border-emerald-800/40">
+    <section className="bg-[rgb(var(--color-secondary))] border-t border-[rgb(var(--color-primary)/0.4)]">
       <div className="max-w-6xl mx-auto px-6 py-14">
         <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-10 items-center">
           <div>
-            <p className="text-emerald-800 font-semibold tracking-wide">
+            <p className="text-[rgb(var(--color-primary))] font-semibold tracking-wide">
               QUẢN LÝ NHÀ HÀNG THÔNG MINH
             </p>
             <h1 className="mt-2 text-3xl md:text-4xl font-extrabold leading-tight text-gray-900">
               TỐI ƯU VẬN HÀNH
               <br />
-              <span className="text-emerald-800">VỚI QR CODE</span>
+              <span className="text-[rgb(var(--color-primary))]">VỚI QR CODE</span>
             </h1>
             <p className="mt-4 text-sm md:text-base text-gray-600 max-w-md">
               Loại bỏ menu giấy, giảm nhân sự, tăng tốc phục vụ với hệ thống
@@ -24,7 +24,7 @@ export default function HeroSection() {
             </p>
             <Link
               href="#"
-              className="inline-flex mt-6 items-center justify-center rounded-xl bg-emerald-700 px-6 py-3 text-white font-semibold hover:bg-emerald-800 transition-colors"
+              className="inline-flex mt-6 items-center justify-center rounded-xl bg-[rgb(var(--color-accent-dark))] px-6 py-3 text-white font-semibold hover:bg-[rgb(var(--color-primary))] transition-colors"
             >
               Dùng thử miễn phí
             </Link>

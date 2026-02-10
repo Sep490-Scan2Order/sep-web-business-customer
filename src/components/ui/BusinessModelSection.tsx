@@ -17,10 +17,10 @@ export default function BusinessMModelSection() {
     <section className="bg-white py-14">
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-emerald-800">
+          <h2 className="text-2xl md:text-3xl font-bold text-[rgb(var(--color-primary))]">
             Phù Hợp Với Mô Hình Kinh Doanh
           </h2>
-          <div className="mx-auto mt-2 h-[2px] w-24 bg-emerald-800/40" />
+          <div className="mx-auto mt-2 h-[2px] w-24 bg-[rgb(var(--color-primary)/0.4)]" />
         </div>
 
         <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6">

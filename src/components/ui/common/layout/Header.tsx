@@ -16,7 +16,7 @@ const Header: React.FC<HeaderProps> = ({ className = "" }) => {
 
   return (
     <header
-      className={`sticky top-0 z-50 bg-emerald-800 border-b border-emerald-900/40 px-6 py-3 ${className}`}
+      className={`sticky top-0 z-50 bg-[rgb(var(--color-primary))] border-b border-[rgb(var(--color-primary)/0.4)] px-6 py-3 ${className}`}
     >
       <div className="flex items-center justify-between max-w-full mx-auto">
         {/* Logo */}
@@ -78,14 +78,14 @@ const Header: React.FC<HeaderProps> = ({ className = "" }) => {
           ) : (
             <div className="flex items-center space-x-3">
               <Link
-                href="#"
-                className="px-4 py-2 rounded-full bg-emerald-500 text-white text-sm font-medium hover:bg-emerald-600"
+                href={ROUTES.PAGES.PUBLIC.LOGIN}
+                className="px-4 py-2 rounded-full border border-whit text-sm font-medium hover:bg-[rgb(var(--color-accent-dark))]"
               >
                 Đăng nhập
               </Link>
               <Link
-                href="#"
-                className="px-4 py-2 rounded-full border border-white/70 text-white text-sm font-medium hover:bg-white/10"
+                href={ROUTES.PAGES.PUBLIC.REGISTER}
+                className="px-4 py-2 rounded-full border border-white text-white text-sm font-medium hover:bg-white/10"
               >
                 Đăng ký
               </Link>

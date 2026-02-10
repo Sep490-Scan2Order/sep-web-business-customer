@@ -11,10 +11,10 @@ export default function WorkingSection() {
     <section className="bg-white py-14">
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center">
-          <p className="text-emerald-700 text-sm md:text-base italic">
+          <p className="text-[rgb(var(--color-accent-dark))] text-sm md:text-base italic">
             Giải pháp tối ưu cho nhà hàng của bạn
           </p>
-          <h2 className="mt-2 text-2xl md:text-3xl font-bold text-emerald-800">
+          <h2 className="mt-2 text-2xl md:text-3xl font-bold text-[rgb(var(--color-primary))]">
             Scan to Order hoạt động như thế nào?
           </h2>
         </div>

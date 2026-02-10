@@ -29,11 +29,11 @@ export default function WhyChooseSection() {
     <section className="bg-white py-14">
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-emerald-800">
+          <h2 className="text-2xl md:text-3xl font-bold text-[rgb(var(--color-primary))]">
             Vì sao nhà hàng chuyển sang Scan to Order?
           </h2>
-          <div className="mx-auto mt-3 h-[2px] w-28 bg-emerald-800/40" />
-          <p className="mt-5 text-sm md:text-base text-emerald-800 font-semibold">
+          <div className="mx-auto mt-3 h-[2px] w-28 bg-[rgb(var(--color-primary)/0.4)]" />
+          <p className="mt-5 text-sm md:text-base text-[rgb(var(--color-primary))] font-semibold">
             Không chỉ tiện lợi cho khách hàng, Scan to Order còn giúp nhà hàng
             tối ưu chi phí và tăng hiệu quả vận hành.
           </p>
@@ -45,7 +45,7 @@ export default function WhyChooseSection() {
             return (
               <div
                 key={item.title}
-                className="rounded-2xl bg-emerald-50/70 border border-emerald-100 px-4 py-5 text-center shadow-sm"
+                className="rounded-2xl bg-[rgb(var(--color-accent-light))] border border-[rgb(var(--color-primary)/0.15)] px-4 py-5 text-center shadow-sm"
               >
                 <div className="mx-auto mb-3 h-10 w-10 rounded-full bg-white flex items-center justify-center text-gray-900">
                   <Icon className="h-5 w-5" />

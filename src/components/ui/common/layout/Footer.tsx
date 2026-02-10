@@ -58,25 +58,25 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
             <div className="space-y-2">
               <Link
                 href="#"
-                className="block text-sm text-gray-600 hover:text-emerald-700 transition-colors"
+                className="block text-sm text-gray-600 hover:text-[rgb(var(--color-accent-dark))] transition-colors"
               >
                 Về chúng tôi
               </Link>
               <Link
                 href="#"
-                className="block text-sm text-gray-600 hover:text-emerald-700 transition-colors"
+                className="block text-sm text-gray-600 hover:text-[rgb(var(--color-accent-dark))] transition-colors"
               >
                 Liên hệ chúng tôi
               </Link>
               <Link
                 href="#"
-                className="block text-sm text-gray-600 hover:text-emerald-700 transition-colors"
+                className="block text-sm text-gray-600 hover:text-[rgb(var(--color-accent-dark))] transition-colors"
               >
                 Hướng dẫn sử dụng
               </Link>
               <Link
                 href="#"
-                className="block text-sm text-gray-600 hover:text-emerald-700 transition-colors"
+                className="block text-sm text-gray-600 hover:text-[rgb(var(--color-accent-dark))] transition-colors"
               >
                 Chính sách dữ liệu
               </Link>
@@ -91,49 +91,49 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
             <div className="grid grid-cols-2 gap-y-2 gap-x-6">
               <Link
                 href="#"
-                className="text-sm text-gray-600 hover:text-emerald-700 transition-colors"
+                className="text-sm text-gray-600 hover:text-[rgb(var(--color-accent-dark))] transition-colors"
               >
                 Phú Quốc
               </Link>
               <Link
                 href="#"
-                className="text-sm text-gray-600 hover:text-emerald-700 transition-colors"
+                className="text-sm text-gray-600 hover:text-[rgb(var(--color-accent-dark))] transition-colors"
               >
                 Hội An
               </Link>
               <Link
                 href="#"
-                className="text-sm text-gray-600 hover:text-emerald-700 transition-colors"
+                className="text-sm text-gray-600 hover:text-[rgb(var(--color-accent-dark))] transition-colors"
               >
                 Phan Thiết
               </Link>
               <Link
                 href="#"
-                className="text-sm text-gray-600 hover:text-emerald-700 transition-colors"
+                className="text-sm text-gray-600 hover:text-[rgb(var(--color-accent-dark))] transition-colors"
               >
                 Hà Nội
               </Link>
               <Link
                 href="#"
-                className="text-sm text-gray-600 hover:text-emerald-700 transition-colors"
+                className="text-sm text-gray-600 hover:text-[rgb(var(--color-accent-dark))] transition-colors"
               >
                 Đà Lạt
               </Link>
               <Link
                 href="#"
-                className="text-sm text-gray-600 hover:text-emerald-700 transition-colors"
+                className="text-sm text-gray-600 hover:text-[rgb(var(--color-accent-dark))] transition-colors"
               >
                 Hồ Chí Minh
               </Link>
               <Link
                 href="#"
-                className="text-sm text-gray-600 hover:text-emerald-700 transition-colors"
+                className="text-sm text-gray-600 hover:text-[rgb(var(--color-accent-dark))] transition-colors"
               >
                 Nha Trang
               </Link>
               <Link
                 href="#"
-                className="text-sm text-gray-600 hover:text-emerald-700 transition-colors"
+                className="text-sm text-gray-600 hover:text-[rgb(var(--color-accent-dark))] transition-colors"
               >
                 Sa pa
               </Link>
@@ -153,12 +153,12 @@ const Footer: React.FC<FooterProps> = ({ className = "" }) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Nhập Email"
-                  className="w-full px-4 py-2.5 bg-emerald-100 border border-emerald-200 rounded-full text-sm placeholder-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-[rgb(var(--color-secondary))] border border-[rgb(var(--color-primary)/0.2)] rounded-full text-sm placeholder-[rgb(var(--color-accent-dark))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))] focus:border-transparent"
                   required
                 />
                 <button
                   type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-emerald-500 text-white p-2 rounded-full hover:bg-emerald-600 transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-[rgb(var(--color-accent))] text-white p-2 rounded-full hover:bg-[rgb(var(--color-accent-dark))] transition-colors"
                   aria-label="Gửi"
                 >
                   <Send className="h-4 w-4" />
