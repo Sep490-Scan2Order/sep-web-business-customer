@@ -36,7 +36,7 @@ const Header: React.FC<HeaderProps> = ({ className = "" }) => {
         {/* Navigation */}
         <nav className="hidden md:flex items-center space-x-12">
           <Link
-            href="#"
+            href={ROUTES.PAGES.PUBLIC.FEATURES}
             className="text-white/90 hover:text-white font-medium text-base"
           >
             Tính năng
@@ -54,7 +54,7 @@ const Header: React.FC<HeaderProps> = ({ className = "" }) => {
             Khách hàng
           </Link>
           <Link
-            href="#"
+            href={ROUTES.PAGES.PUBLIC.ABOUT_US}
             className="text-white/90 hover:text-white font-medium text-base"
           >
             Về chúng tôi

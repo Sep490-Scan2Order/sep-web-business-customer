@@ -6,7 +6,9 @@ export const ROUTES = {
     PUBLIC:{
       LOGIN: "/pages/public/login",
       REGISTER: "/pages/public/register",
-      PLAN:"/pages/public/plan",     
+      PLAN:"/pages/public/plan",
+      ABOUT_US: "/pages/public/about-us",
+      FEATURES: "/pages/public/features",     
     },
 
     PRIVATE:{
