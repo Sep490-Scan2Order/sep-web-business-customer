@@ -1,13 +1,60 @@
+"use client";
+
 import Link from "next/link";
-import { fetchPlansMock } from "@/src/Test/testData";
+import { API } from "@/src/constants/api";
 import { ROUTES } from "@/src/constants/routes";
+import apiClient from "@/src/services/apiClient";
+import { useEffect, useState } from "react";
+
+type PlanApiItem = {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  durationInDays: number;
+  isActive: boolean;
+  createdAt: string;
+  updateAt: string;
+  isDeleted: boolean;
+};
+
+type PlanApiResponse = {
+  isSuccess: boolean;
+  message: string;
+  data: PlanApiItem[];
+  errors: unknown;
+  timestamp: string;
+};
 
 const formatPrice = (value: number) =>
   new Intl.NumberFormat("vi-VN").format(value);
 
-export default async function PlanPage() {
-  const plans = await fetchPlansMock();
-  const activePlans = plans.filter((plan) => plan.Status === 1);
+export default function PlanPage() {
+  const [activePlans, setActivePlans] = useState<PlanApiItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await apiClient.get<PlanApiResponse>(API.PLAN.GETALL);
+        if (response.status === 200 && response.data.isSuccess) {
+          const filtered = response.data.data.filter(
+            (plan) => plan.isActive && !plan.isDeleted
+          );
+          setActivePlans(filtered);
+        } else {
+          setActivePlans([]);
+        }
+      } catch (error) {
+        console.error("Failed to load plans", error);
+        setActivePlans([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPlans();
+  }, []);
 
   return (
     <div>
@@ -77,60 +124,48 @@ export default async function PlanPage() {
           <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
             {activePlans.map((plan) => (
               <div
-                key={plan.PlanId}
-                className={`relative rounded-2xl border px-6 py-7 shadow-sm transition-transform hover:-translate-y-1 ${
-                  plan.IsPopular
-                    ? "border-[rgb(var(--color-accent))] bg-[rgb(var(--color-accent-light))] shadow-lg"
-                    : "border-[rgb(var(--color-primary)/0.15)] bg-white"
-                }`}
+                key={plan.id}
+                className="relative rounded-2xl border border-[rgb(var(--color-primary)/0.15)] bg-white px-6 py-7 shadow-sm transition-transform hover:-translate-y-1"
               >
-                {plan.IsPopular && (
-                  <span className="absolute -top-3 left-6 rounded-full bg-[rgb(var(--color-accent-dark))] px-3 py-1 text-xs font-semibold text-white">
-                    Phổ biến nhất
-                  </span>
-                )}
                 <div className="flex items-center justify-between">
                   <h3 className="text-xl font-bold text-[rgb(var(--color-primary))]">
-                    {plan.Name}
+                    {plan.name}
                   </h3>
                   <span className="rounded-full bg-[rgb(var(--color-accent-light))] px-3 py-1 text-xs font-semibold text-[rgb(var(--color-accent-dark))]">
-                    {plan.Tag}
+                    {Math.max(1, Math.ceil(plan.durationInDays / 30))} tháng
                   </span>
                 </div>
-                <p className="mt-2 text-sm text-gray-600">{plan.Description}</p>
+                <p className="mt-2 text-sm text-gray-600">{plan.description}</p>
 
                 <div className="mt-6 flex items-end gap-2">
                   <span className="text-3xl font-extrabold text-gray-900">
-                    {formatPrice(plan.Price)}đ
+                    {formatPrice(plan.price)}đ
                   </span>
                   <span className="text-sm text-gray-600">/tháng</span>
                 </div>
                 <p className="mt-2 text-xs text-[rgb(var(--color-accent-dark))]">
-                  Cam kết tối thiểu {plan.DurationMonths} tháng
+                  Cam kết tối thiểu {Math.max(1, Math.ceil(plan.durationInDays / 30))} tháng
                 </p>
-
-                <ul className="mt-5 space-y-2 text-sm text-gray-700">
-                  {plan.Features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2">
-                      <span className="mt-2 h-2 w-2 rounded-full bg-[rgb(var(--color-accent-dark))]" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
 
                 <Link
                   href={ROUTES.PAGES.PUBLIC.REGISTER}
-                  className={`mt-6 inline-flex w-full items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors ${
-                    plan.IsPopular
-                      ? "bg-[rgb(var(--color-accent-dark))] text-white hover:bg-[rgb(var(--color-primary))]"
-                      : "border border-[rgb(var(--color-accent-dark))] text-[rgb(var(--color-primary))] hover:bg-[rgb(var(--color-secondary)/0.6)]"
-                  }`}
+                  className="mt-6 inline-flex w-full items-center justify-center rounded-xl border border-[rgb(var(--color-accent-dark))] px-4 py-2.5 text-sm font-semibold text-[rgb(var(--color-primary))] transition-colors hover:bg-[rgb(var(--color-secondary)/0.6)]"
                 >
                   Bắt đầu ngay
                 </Link>
               </div>
             ))}
           </div>
+          {!isLoading && !activePlans.length && (
+            <div className="mt-8 text-center text-sm text-gray-600">
+              Hiện chưa có gói dịch vụ để hiển thị.
+            </div>
+          )}
+          {isLoading && (
+            <div className="mt-8 text-center text-sm text-gray-600">
+              Đang tải gói dịch vụ...
+            </div>
+          )}
         </div>
       </section>
 

@@ -13,3 +13,6 @@ export const THEME_COLORS = {
 	accentDark: ACCENT_DARK_COLOR,
 	accentLight: ACCENT_LIGHT_COLOR,
 } as const;
+
+
+export const TOKEN_STORAGE_KEY = "token";

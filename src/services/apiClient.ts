@@ -1,15 +1,25 @@
-import axios from 'axios';
+import axios from "axios";
+
+import { API } from "@/src/constants/api";
+import { TOKEN_STORAGE_KEY } from "@/src/constants/constant";
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://localhost:5001/api',
+  baseURL: API.BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
-// Thêm interceptor để đính kèm Token nếu cần
+const getAccessToken = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return localStorage.getItem(TOKEN_STORAGE_KEY);
+};
+
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
