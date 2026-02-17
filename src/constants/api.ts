@@ -4,4 +4,11 @@ export const API = {
     PLAN: {
         GETALL: "/plan",
     },
+    
+    OTP: {
+        SEND_REGISTER: "/Otp/send-register",
+    },
+    TENANT: {
+        REGISTER: "/Tenant/register",
+    }
 };
