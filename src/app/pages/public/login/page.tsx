@@ -148,9 +148,9 @@ export default function LoginPage() {
                         aria-label="Hiển thị mật khẩu"
                       >
                         {showPassword ? (
-                          <EyeOff className="h-5 w-5" />
-                        ) : (
                           <Eye className="h-5 w-5" />
+                        ) : (
+                          <EyeOff className="h-5 w-5" />
                         )}
                       </button>
                     </div>
@@ -193,7 +193,7 @@ export default function LoginPage() {
                       <div className="w-full border-t border-white/10"></div>
                     </div>
                     <div className="relative flex justify-center text-xs">
-                      <span className="bg-black/40 px-4 text-white/60 backdrop-blur-sm">
+                      <span className="px-4 text-white/60 ">
                         Hoặc tiếp tục với
                       </span>
                     </div>

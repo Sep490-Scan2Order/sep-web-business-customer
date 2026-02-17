@@ -339,9 +339,9 @@ export default function RegisterPage() {
                         aria-label="Hiển thị mật khẩu"
                       >
                         {showPassword ? (
-                          <EyeOff className="h-5 w-5" />
-                        ) : (
                           <Eye className="h-5 w-5" />
+                        ) : (
+                          <EyeOff className="h-5 w-5" />
                         )}
                       </button>
                     </div>
@@ -370,9 +370,9 @@ export default function RegisterPage() {
                         aria-label="Hiển thị mật khẩu xác nhận"
                       >
                         {showConfirmPassword ? (
-                          <EyeOff className="h-5 w-5" />
-                        ) : (
                           <Eye className="h-5 w-5" />
+                        ) : (
+                          <EyeOff className="h-5 w-5" />
                         )}
                       </button>
                     </div>
