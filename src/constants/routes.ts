@@ -12,13 +12,6 @@ export const ROUTES = {
     },
 
     PRIVATE:{
-      MY_TRIPS: "/pages/private/my-trips",
-      GROUP_TRIPS: "/pages/private/group-trips",
-      TRIP_PLANNER: "/pages/private/trip-planner",
-      ITINERARY_RESULT: "/pages/private/itinerary-result",
-      PROFILE_PAGE: "/pages/private/profile-page",
-      ITINERARY_DETAIL: "/pages/private/my-trips/itinerary-details",
-      ITINERARY_SHARE: "/pages/private/share-itinerary",
     },
 
   }
@@ -31,4 +24,14 @@ export const ADMIN_ROUTES = {
   LOCATION_MANAGE: "/admin/dashboard/destination-manage/location-manage",
   USER_MANAGE: "/admin/dashboard/user-manage",
   REPORT: "/admin/dashboard/report",
+};
+
+// Tenant routes
+export const TENANT_ROUTES = {
+  ROOT: "/tenant",
+  DASHBOARD: "/tenant/dashboard",
+  USERS: "/tenant/users",
+  RESTAURANT: "/tenant/restaurant",
+  MEALS: "/tenant/meals",
+  MENU_TEMPLATE: "/tenant/menu-template",
 };
