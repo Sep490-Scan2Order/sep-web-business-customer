@@ -9,7 +9,9 @@ import { toast } from "react-toastify";
 import bgImage from "@/src/images/homepage/unnamed.jpg";
 import logoDefault from "@/src/images/logo/logo_no_background.png";
 import { ROUTES } from "@/src/constants/routes";
-import { tenantService } from "@/src/services/tenantService";
+import { API } from "@/src/constants/api";
+import apiClient from "@/src/services/apiClient";
+import { ApiResponse, OtpResponse, RegisterTenantRequest, TenantDto } from "@/src/types/type";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -28,6 +30,21 @@ export default function RegisterPage() {
   });
   const [otpCode, setOtpCode] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+
+  const sendRegisterOtp = async (email: string): Promise<OtpResponse> => {
+    const response = await apiClient.post<OtpResponse>(
+      `${API.OTP.SEND_REGISTER}?email=${encodeURIComponent(email)}`
+    );
+    return response.data;
+  };
+
+  const register = async (data: RegisterTenantRequest): Promise<ApiResponse<TenantDto>> => {
+    const response = await apiClient.post<ApiResponse<TenantDto>>(
+      API.TENANT.REGISTER,
+      data
+    );
+    return response.data;
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -51,7 +68,7 @@ export default function RegisterPage() {
 
     try {
       setSendingOtp(true);
-      await tenantService.sendRegisterOtp(formData.email);
+      await sendRegisterOtp(formData.email);
       toast.success("Mã OTP đã được gửi đến email của bạn");
       setOtpSent(true);
     } catch (error) {
@@ -91,7 +108,7 @@ export default function RegisterPage() {
 
     try {
       setLoading(true);
-      const response = await tenantService.register({
+      const response = await register({
         name: formData.name,
         phone: formData.phone,
         taxNumber: formData.taxNumber,
