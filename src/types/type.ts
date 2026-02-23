@@ -3,7 +3,6 @@
 export interface RegisterTenantRequest {
   name: string;
   phone: string;
-  taxNumber: string;
   email: string;
   password: string;
   otpCode: string;
@@ -15,6 +14,11 @@ export interface TenantDto {
   phone: string;
   email: string;
   taxNumber?: string;
+}
+
+export interface TenantLoginRequest{
+  email: string;
+  password: string;
 }
 
 export interface ApiResponse<T> {

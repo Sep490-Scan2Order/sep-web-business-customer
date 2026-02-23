@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Eye, EyeOff, Building2, Mail, Phone, FileText, Lock, CheckCircle2, Send } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Building2, Mail, Phone, Lock, CheckCircle2, Send } from "lucide-react";
 import { toast } from "react-toastify";
 import bgImage from "@/src/images/homepage/unnamed.jpg";
 import logoDefault from "@/src/images/logo/logo_no_background.png";
@@ -23,7 +23,6 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
-    taxNumber: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -111,7 +110,6 @@ export default function RegisterPage() {
       const response = await register({
         name: formData.name,
         phone: formData.phone,
-        taxNumber: formData.taxNumber,
         email: formData.email,
         password: formData.password,
         otpCode: otpCode,
@@ -157,13 +155,6 @@ export default function RegisterPage() {
               </div>
             </Link>
 
-            <Link
-              href={ROUTES.HOME}
-              className="group flex h-11 w-11 items-center justify-center rounded-full border-2 border-white/20 text-white backdrop-blur-sm transition-all hover:border-white/40 hover:bg-white/10"
-              aria-label="Quay lại trang chủ"
-            >
-              <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-0.5" />
-            </Link>
           </div>
 
           {/* Main Content */}
@@ -236,101 +227,80 @@ export default function RegisterPage() {
                     />
                   </div>
 
-                  {/* Email & OTP */}
-                  <div className="group">
-                    <label className="mb-2 flex items-center gap-2 text-sm font-medium text-white/90">
-                      <Mail className="h-4 w-4 text-[rgb(var(--color-accent))]" />
-                      Email
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="email"
-                        name="email"
-                        required
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        placeholder="email@example.com"
-                        className="flex-1 rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/40 backdrop-blur-sm transition-all focus:border-[rgb(var(--color-accent))] focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))]/20"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleSendOtp}
-                        disabled={sendingOtp || !formData.email}
-                        className="group/btn relative flex items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-[rgb(var(--color-accent))] to-[rgb(var(--color-accent-dark))] px-5 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-[rgb(var(--color-accent))]/50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-lg whitespace-nowrap"
-                      >
-                        <Send className="h-4 w-4 transition-transform group-hover/btn:translate-x-0.5" />
-                        {sendingOtp ? "Đang gửi..." : otpSent ? "Gửi lại" : "Gửi OTP"}
-                        {otpSent && !sendingOtp && (
-                          <CheckCircle2 className="h-4 w-4 text-white" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Mã OTP */}
-                  <div className="group">
-                    <label className="mb-2 flex items-center gap-2 text-sm font-medium text-white/90">
-                      <Lock className="h-4 w-4 text-[rgb(var(--color-accent))]" />
-                      Mã OTP
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={otpCode}
-                      onChange={(e) => setOtpCode(e.target.value)}
-                      placeholder="Nhập mã 6 số"
-                      maxLength={6}
-                      disabled={!otpSent}
-                      className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/40 backdrop-blur-sm transition-all focus:border-[rgb(var(--color-accent))] focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))]/20 disabled:cursor-not-allowed disabled:opacity-50"
-                    />
-                    {!otpSent && (
-                      <p className="mt-1.5 flex items-center gap-1.5 text-xs text-white/50">
-                        <span className="inline-block h-1 w-1 rounded-full bg-white/50"></span>
-                        Nhập email và nhấn &quot;Gửi OTP&quot; để nhận mã
-                      </p>
-                    )}
-                    {otpSent && (
-                      <p className="mt-1.5 flex items-center gap-1.5 text-xs text-green-400">
-                        <CheckCircle2 className="h-3 w-3" />
-                        Mã OTP đã được gửi đến email của bạn
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Grid 2 columns cho Phone và Tax */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    {/* Số điện thoại */}
-                    <div className="group">
+                  {/* Email & OTP Row - 7:3 ratio */}
+                  <div className="grid grid-cols-10 gap-3">
+                    {/* Email - 7 columns */}
+                    <div className="col-span-7 group">
                       <label className="mb-2 flex items-center gap-2 text-sm font-medium text-white/90">
-                        <Phone className="h-4 w-4 text-[rgb(var(--color-accent))]" />
-                        Số điện thoại
+                        <Mail className="h-4 w-4 text-[rgb(var(--color-accent))]" />
+                        Email
                       </label>
-                      <input
-                        type="tel"
-                        name="phone"
-                        required
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        placeholder="0123456789"
-                        className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/40 backdrop-blur-sm transition-all focus:border-[rgb(var(--color-accent))] focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))]/20"
-                      />
+                      <div className="flex gap-2">
+                        <input
+                          type="email"
+                          name="email"
+                          required
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          placeholder="email@example.com"
+                          className="flex-1 rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/40 backdrop-blur-sm transition-all focus:border-[rgb(var(--color-accent))] focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))]/20"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleSendOtp}
+                          disabled={sendingOtp || !formData.email}
+                          className="group/btn relative flex items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-[rgb(var(--color-accent))] to-[rgb(var(--color-accent-dark))] px-5 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-[rgb(var(--color-accent))]/50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-lg whitespace-nowrap"
+                        >
+                          <Send className="h-4 w-4 transition-transform group-hover/btn:translate-x-0.5" />
+                          {sendingOtp ? "Đang gửi..." : otpSent ? "Gửi lại" : "Gửi OTP"}
+                          {otpSent && !sendingOtp && (
+                            <CheckCircle2 className="h-4 w-4 text-white" />
+                          )}
+                        </button>
+                      </div>
                     </div>
 
-                    {/* Mã số thuế */}
-                    <div className="group">
+                    {/* OTP - 3 columns */}
+                    <div className="col-span-3 group">
                       <label className="mb-2 flex items-center gap-2 text-sm font-medium text-white/90">
-                        <FileText className="h-4 w-4 text-[rgb(var(--color-accent))]" />
-                        Mã số thuế
+                        <Lock className="h-4 w-4 text-[rgb(var(--color-accent))]" />
+                        Mã OTP
                       </label>
                       <input
                         type="text"
-                        name="taxNumber"
-                        value={formData.taxNumber}
-                        onChange={handleInputChange}
-                        placeholder="0123456789"
-                        className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/40 backdrop-blur-sm transition-all focus:border-[rgb(var(--color-accent))] focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))]/20"
+                        required
+                        value={otpCode}
+                        onChange={(e) => setOtpCode(e.target.value)}
+                        placeholder="Nhập mã 6 số"
+                        maxLength={6}
+                        disabled={!otpSent}
+                        className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/40 backdrop-blur-sm transition-all focus:border-[rgb(var(--color-accent))] focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))]/20 disabled:cursor-not-allowed disabled:opacity-50"
                       />
+                      
+                      {otpSent && (
+                        <p className="mt-1.5 flex items-center gap-1.5 text-xs text-green-400">
+                          <CheckCircle2 className="h-3 w-3" />
+                          Nhận rồi
+                        </p>
+                      )}
                     </div>
+                  </div>
+
+                  {/* Số điện thoại */}
+                  <div className="group">
+                    <label className="mb-2 flex items-center gap-2 text-sm font-medium text-white/90">
+                      <Phone className="h-4 w-4 text-[rgb(var(--color-accent))]" />
+                      Số điện thoại
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      required
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      placeholder="0123456789"
+                      className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/40 backdrop-blur-sm transition-all focus:border-[rgb(var(--color-accent))] focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))]/20"
+                    />
                   </div>
 
                   {/* Mật khẩu */}

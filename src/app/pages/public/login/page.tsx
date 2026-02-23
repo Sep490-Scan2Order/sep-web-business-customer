@@ -3,14 +3,67 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Eye, EyeOff, Mail, Lock, CheckCircle2, ShieldCheck } from "lucide-react";
+import { toast } from "react-toastify";
 import bgImage from "@/src/images/homepage/unnamed.jpg";
 import logoDefault from "@/src/images/logo/logo_no_background.png";
-import { ROUTES } from "@/src/constants/routes";
+import { ROUTES, TENANT_ROUTES } from "@/src/constants/routes";
+import { API } from "@/src/constants/api";
+import apiClient from "@/src/services/apiClient";
+import { TOKEN_STORAGE_KEY } from "@/src/constants/constant";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.email || !formData.password) {
+      toast.error("Vui lòng điền đầy đủ thông tin");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await apiClient.post<any>(
+        API.TENANT.LOGIN,
+        {
+          email: formData.email,
+          password: formData.password,
+        }
+      );
+
+      if (response.data?.isSuccess) {
+        // Save token if provided
+        if (response.data?.data?.token) {
+          localStorage.setItem(TOKEN_STORAGE_KEY, response.data.data.token);
+        }
+        toast.success(response.data?.message || "Đăng nhập thành công");
+        router.push(TENANT_ROUTES.DASHBOARD);
+      } else {
+        toast.error(response.data?.message || "Đăng nhập thất bại");
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Đăng nhập thất bại");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="relative min-h-screen">
@@ -115,7 +168,7 @@ export default function LoginPage() {
                   </p>
                 </div>
 
-                <form className="mt-8 space-y-5">
+                <form className="mt-8 space-y-5" onSubmit={handleLogin}>
                   {/* Email/Username */}
                   <div className="group">
                     <label className="mb-2 flex items-center gap-2 text-sm font-medium text-white/90">
@@ -124,6 +177,9 @@ export default function LoginPage() {
                     </label>
                     <input
                       type="text"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
                       placeholder="email@example.com"
                       className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/40 backdrop-blur-sm transition-all focus:border-[rgb(var(--color-accent))] focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))]/20"
                     />
@@ -138,6 +194,9 @@ export default function LoginPage() {
                     <div className="relative">
                       <input
                         type={showPassword ? "text" : "password"}
+                        name="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
                         placeholder="Nhập mật khẩu của bạn"
                         className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 pr-12 text-sm text-white placeholder-white/40 backdrop-blur-sm transition-all focus:border-[rgb(var(--color-accent))] focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))]/20"
                       />
@@ -178,11 +237,24 @@ export default function LoginPage() {
                   {/* Submit button */}
                   <button
                     type="submit"
-                    className="group/submit relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-[rgb(var(--color-accent))] to-[rgb(var(--color-accent-dark))] py-3.5 text-sm font-bold text-white shadow-lg shadow-[rgb(var(--color-accent))]/30 transition-all hover:shadow-xl hover:shadow-[rgb(var(--color-accent))]/50"
+                    disabled={loading}
+                    className="group/submit relative w-full overflow-hidden rounded-lg bg-gradient-to-r from-[rgb(var(--color-accent))] to-[rgb(var(--color-accent-dark))] py-3.5 text-sm font-bold text-white shadow-lg shadow-[rgb(var(--color-accent))]/30 transition-all hover:shadow-xl hover:shadow-[rgb(var(--color-accent))]/50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-lg"
                   >
                     <span className="relative z-10 flex items-center justify-center gap-2">
-                      Đăng nhập
-                      <ArrowLeft className="h-4 w-4 rotate-180 transition-transform group-hover/submit:translate-x-1" />
+                      {loading ? (
+                        <>
+                          <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                          Đang xử lý...
+                        </>
+                      ) : (
+                        <>
+                          Đăng nhập
+                          <ArrowLeft className="h-4 w-4 rotate-180 transition-transform group-hover/submit:translate-x-1" />
+                        </>
+                      )}
                     </span>
                     <div className="absolute inset-0 -z-0 bg-gradient-to-r from-[rgb(var(--color-accent-dark))] to-[rgb(var(--color-accent))] opacity-0 transition-opacity group-hover/submit:opacity-100" />
                   </button>
