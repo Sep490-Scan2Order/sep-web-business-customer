@@ -19,11 +19,19 @@ export const ROUTES = {
 
 // Admin routes
 export const ADMIN_ROUTES = {
-  DASHBOARD: "/admin/dashboard",
-  DESTINATION_MANAGE: "/admin/dashboard/destination-manage",
-  LOCATION_MANAGE: "/admin/dashboard/destination-manage/location-manage",
-  USER_MANAGE: "/admin/dashboard/user-manage",
-  REPORT: "/admin/dashboard/report",
+  ROOT: "/admin",
+  // Dashboards
+  OVERVIEW: "/admin/overview",
+  BUSINESS_INSIGHT: "/admin/business-insight",
+  // Management
+  USER_MANAGEMENT: "/admin/user-management",
+  TENANT_MANAGEMENT: "/admin/tenant-management",
+  RESTAURANT_MANAGEMENT: "/admin/restaurant-management",
+  BILLING_SUBSCRIPTIONS: "/admin/billing-subscriptions",
+  TEMPLATE_MANAGEMENT: "/admin/template-management",
+  // Settings
+  AI_SETTINGS: "/admin/ai-settings",
+  GLOBAL_SETTINGS: "/admin/global-settings",
 };
 
 // Tenant routes

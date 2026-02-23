@@ -10,5 +10,7 @@ export const API = {
     },
     TENANT: {
         REGISTER: "/Tenant/register",
+        GET_ALL: "/Tenant/getAll",
+        BLOCK_TENANT: (id: string) => `/Tenant/${id}/block`,
     }
 };
