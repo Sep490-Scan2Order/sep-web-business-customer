@@ -12,8 +12,14 @@ import {
   Store,
   Users,
   UtensilsCrossed,
+  LogOut
 } from 'lucide-react'
-import { TENANT_ROUTES } from '@/src/constants/routes'
+import { ROUTES, TENANT_ROUTES } from '@/src/constants/routes'
+import { useAuth } from '@/src/hooks/useAuth'
+import apiClient from '@/src/services/apiClient'
+import { API } from '@/src/constants/api'
+import { toast } from 'react-toastify'
+import { useRouter } from 'next/navigation'
 
 type NavItem = {
   label: string
@@ -50,6 +56,17 @@ export default function TenantSidebar() {
   const pathname = usePathname() || ''
   const [collapsed, setCollapsed] = React.useState(false)
   const sidebarWidth = collapsed ? 'w-20' : 'w-72'
+  const {user , logout} = useAuth() 
+  const router = useRouter();
+
+  const handleLogOut = async () => {
+    const response = await apiClient.post(API.AUTH.LOGOUT);
+    if(response.data?.isSuccess) {
+      logout();
+      toast.success("Đăng xuất thành công");
+      router.push(ROUTES.HOME);
+    }
+  }
 
   return (
     <aside className={`flex h-screen ${sidebarWidth} shrink-0 flex-col border-r border-slate-200 bg-white px-4 py-5 transition-all`}>
@@ -122,7 +139,12 @@ export default function TenantSidebar() {
           </div>
         ))}
       </nav>
-
+      <div className={`mt-auto flex items-center gap-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 hover:bg-red-100 ${collapsed ? 'justify-center' : ''}`}>
+        <button onClick={handleLogOut} className="flex items-center gap-2">
+          <LogOut className="h-4 w-4" />
+          {!collapsed ? <span className="text-sm font-medium">Logout</span> : null}
+        </button>
+      </div>
     </aside>
   )
 }

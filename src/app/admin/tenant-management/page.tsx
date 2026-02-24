@@ -111,7 +111,7 @@ export default function TenantManagementPage() {
 
   // Filter tenants based on search
   const filteredTenants = tenants.filter(tenant => 
-    tenant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    tenant.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     tenant.accountId.toLowerCase().includes(searchQuery.toLowerCase()) ||
     tenant.phone.includes(searchQuery)
   );
@@ -262,7 +262,7 @@ export default function TenantManagementPage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-medium">
-                          {tenant.name.charAt(0).toUpperCase()}
+                          {tenant.name?.charAt(0).toUpperCase()}
                         </div>
                         <span className="text-sm font-medium text-gray-900">{tenant.name}</span>
                       </div>

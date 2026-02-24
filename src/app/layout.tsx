@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 import "./nprogress.css";
 import NavigationProgress from "@/src/components/NavigationProgress";
+import { AuthInitializer } from "@/src/components/AuthInitializer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,6 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.variable}>
+        <AuthInitializer />
         <Suspense fallback={null}>
           <NavigationProgress />
         </Suspense>

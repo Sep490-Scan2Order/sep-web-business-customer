@@ -11,10 +11,11 @@ import logoDefault from "@/src/images/logo/logo_no_background.png";
 import { ROUTES, TENANT_ROUTES } from "@/src/constants/routes";
 import { API } from "@/src/constants/api";
 import apiClient from "@/src/services/apiClient";
-import { TOKEN_STORAGE_KEY } from "@/src/constants/constant";
+import { useAuthStore, decodeToken } from "@/src/store/authStore";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { setAuth } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -41,7 +42,7 @@ export default function LoginPage() {
     try {
       setLoading(true);
       const response = await apiClient.post<any>(
-        API.TENANT.LOGIN,
+        API.AUTH.TENANT_LOGIN,
         {
           email: formData.email,
           password: formData.password,
@@ -49,14 +50,19 @@ export default function LoginPage() {
       );
 
       if (response.data?.isSuccess) {
-        // Save token if provided
-        if (response.data?.data?.token) {
-          localStorage.setItem(TOKEN_STORAGE_KEY, response.data.data.token);
+        // Save token and decode user info
+        if (response.data?.data?.accessToken) {
+          const token = response.data.data.accessToken;
+          const user = decodeToken(token);
+          
+          // Lưu auth vào store (sẽ tự động lưu token vào localStorage)
+          setAuth(user, token);
         }
-        toast.success(response.data?.message || "Đăng nhập thành công");
-        router.push(TENANT_ROUTES.DASHBOARD);
+        console.log("Login successful:", response.data.data);
+        toast.success( "Đăng nhập thành công");
+        router.push(ROUTES.HOME);
       } else {
-        toast.error(response.data?.message || "Đăng nhập thất bại");
+        toast.error("Đăng nhập thất bại");
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Đăng nhập thất bại");

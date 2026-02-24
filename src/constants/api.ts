@@ -10,8 +10,11 @@ export const API = {
     },
     TENANT: {
         REGISTER: "/Tenant/register",
-        LOGIN: "/Auth/tenant-login",
         GET_ALL: "/Tenant/getAll",
         BLOCK_TENANT: (id: string) => `/Tenant/${id}/block`,
+    },
+    AUTH: {
+        LOGOUT: "/Auth/logout",
+        TENANT_LOGIN: "/Auth/tenant-login",
     }
 };

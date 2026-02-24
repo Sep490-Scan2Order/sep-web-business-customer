@@ -31,3 +31,27 @@ export interface OtpResponse {
   isSuccess: boolean;
   message: string;
 }
+
+export interface User {
+  id: string;
+  email: string;
+  name?: string;
+  phone?: string;
+  role?: string;
+  [key: string]: any; // Để hỗ trợ các field khác từ token
+}
+
+export interface LoginResponse {
+  token: string;
+  user?: User;
+}
+
+export interface AuthState {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  setUser: (user: User | null) => void;
+  setToken: (token: string | null) => void;
+  setAuth: (user: User | null, token: string | null) => void;
+  logout: () => void;
+}
