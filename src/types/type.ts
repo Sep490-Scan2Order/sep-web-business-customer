@@ -55,3 +55,23 @@ export interface AuthState {
   setAuth: (user: User | null, token: string | null) => void;
   logout: () => void;
 }
+
+export interface SendForgotPasswordRequest {
+  email: string;
+}
+
+export interface VerifyForgotPasswordOtpRequest {
+  email: string;
+  otpCode: string;
+}
+
+export interface CompleteForgotPasswordRequest {
+  email: string;
+  newPassword: string;
+  resetToken: string;
+}
+
+export interface ResetPasswordResponse {
+  resetToken?: string;
+  [key: string]: any;
+}
