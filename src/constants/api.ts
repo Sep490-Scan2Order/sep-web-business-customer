@@ -12,6 +12,10 @@ export const API = {
         REGISTER: "/Tenant/register",
         GET_ALL: "/Tenant/getAll",
         BLOCK_TENANT: (id: string) => `/Tenant/${id}/block`,
+        TAX_VALIDATION: "/Tenant/tax-validation?taxCode=",
+    },
+    TENANT_WALLET: {
+        DEPOSIT_VERIFY_TAX: "/TenantWallet/deposit-verify-tax",
     },
     AUTH: {
         LOGOUT: "/Auth/logout",
