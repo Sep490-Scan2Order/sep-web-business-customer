@@ -12,6 +12,9 @@ export const API = {
         REGISTER: "/Tenant/register",
         GET_ALL: "/Tenant/getAll",
         BLOCK_TENANT: (id: string) => `/Tenant/${id}/block`,
+        SEND_EMAIL_FORGET_PASSWORD: (email: string) => `/Otp/send-forgot-password?email=${email}`,
+        VERIFY_OTP_FORGET_PASSWORD: "/Auth/Verify-forgot-password-otp",
+        COMPLETE_FORGET_PASSWORD: "/Auth/Complete-reset-password",
     },
     AUTH: {
         LOGOUT: "/Auth/logout",

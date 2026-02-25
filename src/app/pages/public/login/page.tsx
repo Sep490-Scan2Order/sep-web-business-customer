@@ -233,7 +233,7 @@ export default function LoginPage() {
                       <span className="text-xs text-white/70">Ghi nhớ đăng nhập</span>
                     </label>
                     <Link
-                      href="#"
+                      href={ROUTES.PAGES.PUBLIC.FORGOT_PASSWORD}
                       className="text-xs text-white/70 transition-colors hover:text-[rgb(var(--color-accent))] hover:underline"
                     >
                       Quên mật khẩu?
