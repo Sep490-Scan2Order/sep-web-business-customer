@@ -289,7 +289,8 @@ export default function TenantManagementPage() {
                     </td>
                     <td className="px-4 py-3">
                       {(() => {
-                        const isActive = tenant.status.toLowerCase() === 'true' || tenant.status.toLowerCase() === 'active';
+                        const status = tenant.status?.toLowerCase() || ''; 
+                        const isActive = status === 'true' || status === 'active';
                         return isActive ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-green-600 bg-green-50">
                             <span className="w-1.5 h-1.5 rounded-full bg-current"></span>

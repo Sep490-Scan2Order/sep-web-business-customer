@@ -40,6 +40,7 @@ export interface User {
   name?: string;
   phone?: string;
   role?: string;
+  avatar?: string;
   [key: string]: any; // Để hỗ trợ các field khác từ token
 }
 
@@ -117,4 +118,69 @@ export interface Restaurant {
   totalOrder: number;
   createdAt: string;
   distanceKm: number | null;
+}
+
+export interface AdministratorLoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface UserInfo {
+  id: string;
+  accountId: string;
+  name: string;
+  role: string;
+  avatar: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface AdministratorLoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  userInfo: UserInfo;
+}
+
+export interface SystemBlogDto {
+  id?: number;
+  systemBlogId?: number;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  totalViews: number;
+  blogType: string;
+  content?: string;
+  colorTitle?: string;
+  imageUrl?: string | string[];
+}
+
+// Blog Type Enum
+export enum BlogType {
+  Announcement = 1,
+  Promotion = 2,
+  Update = 3,
+  Event = 4,
+  Other = 5
+}
+
+// Add System Blog Request
+export interface AddSystemBlogDtoRequest {
+  content: string;
+  title: string;
+  colorTitle: string;
+  images?: File[];
+  blogType: BlogType;
+}
+
+// Add System Blog Response
+export interface AddSystemBlogDtoResponse {
+  systemBlogId: number;
+  content: string;
+  title: string;
+  colorTitle: string;
+  createdAt: string;
+  updatedAt: string;
+  totalViews: number;
+  imageUrl: string;
+  blogType: BlogType;
 }

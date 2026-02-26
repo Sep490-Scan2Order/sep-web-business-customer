@@ -5,6 +5,7 @@ export const ROUTES = {
 
     PUBLIC:{
       LOGIN: "/pages/public/login",
+      ADMIN_LOGIN: "/admin-login",
       REGISTER: "/pages/public/register",
       FORGOT_PASSWORD: "/pages/public/forgot-password",
       PLAN:"/pages/public/plan",

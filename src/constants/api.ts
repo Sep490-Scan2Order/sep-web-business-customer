@@ -23,6 +23,7 @@ export const API = {
     AUTH: {
         LOGOUT: "/Auth/logout",
         TENANT_LOGIN: "/Auth/tenant-login",
+        ADMINISTRATOR_LOGIN: "/Auth/administrator-login",
     },
     RESTAURANT: {
         CREATE: "/Restaurant",
@@ -31,5 +32,10 @@ export const API = {
         UPDATE: (id: string) => `/Restaurant/${id}`,
         DELETE: (id: string) => `/Restaurant/${id}`,
         GET_RESTAURANT_DETAIL_BY_SLUG: (slug: string) => `/Restaurant/${slug}`,
-    }
+    },
+    BLOG: {
+        CREATE: "/SystemBlog",
+        GET_ALL: "/SystemBlog",
+        GET_BY_ID: (id: number) => `/SystemBlog/${id}`,
+    },
 };

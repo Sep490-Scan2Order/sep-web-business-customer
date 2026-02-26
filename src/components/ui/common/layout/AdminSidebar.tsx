@@ -16,6 +16,7 @@ import {
   FileText,
   Bot,
   Settings,
+  Paperclip,
 } from 'lucide-react'
 
 type NavItem = {
@@ -42,6 +43,7 @@ const sections: { label: string; items: NavItem[] }[] = [
       { label: 'Restaurant Management', href: "/admin/restaurant-management", icon: UtensilsCrossed, hasChildren: true, match: 'prefix' },
       { label: 'Billing & Subscriptions', href: "/admin/billing-subscriptions", icon: CreditCard, hasChildren: true, match: 'prefix' },
       { label: 'Template Management', href: "/admin/template-management", icon: FileText, hasChildren: true, match: 'prefix' },
+      { label: 'Blog Management', href: "/admin/blog-management", icon: Paperclip, hasChildren: true, match: 'prefix' },
     ],
   },
   {
