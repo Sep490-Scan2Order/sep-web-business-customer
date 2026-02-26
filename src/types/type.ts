@@ -25,6 +25,8 @@ export interface ApiResponse<T> {
   isSuccess: boolean;
   message: string;
   data?: T;
+  errors?: any;
+  timestamp?: string;
 }
 
 export interface OtpResponse {
@@ -74,4 +76,45 @@ export interface CompleteForgotPasswordRequest {
 export interface ResetPasswordResponse {
   resetToken?: string;
   [key: string]: any;
+}
+
+export interface ProvinceSummary {
+  code: number;
+  name: string;
+  districts?: DistrictSummary[];
+}
+
+export interface DistrictSummary {
+  code: number;
+  name: string;
+}
+
+export interface CreateRestaurantRequest {
+  restaurantName: string;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  image?: File;
+  phone?: string;
+  description?: string;
+}
+
+export interface Restaurant {
+  id: number;
+  tenantId: string;
+  restaurantName: string;
+  address: string;
+  longitude: number;
+  latitude: number;
+  image: string;
+  phone: string;
+  description: string;
+  profileUrl: string;
+  qrMenu: string;
+  isActive: boolean;
+  isOpened: boolean;
+  isReceivingOrders: boolean;
+  totalOrder: number;
+  createdAt: string;
+  distanceKm: number | null;
 }

@@ -1,36 +1,73 @@
 'use client'
 
 import React from 'react'
+import { toast } from 'react-toastify'
 import TenantInfoRequirement from '@/src/components/ui/TenantInfoRequirement'
 import RestaurantEmptyState from '@/src/components/ui/RestaurantEmptyState'
 import RestaurantList from '@/src/components/ui/RestaurantList'
 import type { TenantInfo } from '@/src/components/ui/TenantInfoRequirement'
-import type { Restaurant } from '@/src/components/ui/RestaurantList'
+import type { Restaurant as RestaurantListItem } from '@/src/components/ui/RestaurantList'
+import { ApiResponse, CreateRestaurantRequest, Restaurant } from '@/src/types/type'
+import apiClient from '@/src/services/apiClient'
+import { API } from '@/src/constants/api'
+
+async function createRestaurant(
+  data: CreateRestaurantRequest
+): Promise<ApiResponse<Restaurant>> {
+  const formData = new FormData();
+  
+  // Lưu ý: Key phải khớp chính xác tuyệt đối với Property trong C# Request DTO
+  formData.append('RestaurantName', data.restaurantName);
+  if (data.address) formData.append('Address', data.address);
+  if (data.latitude !== undefined) formData.append('Latitude', data.latitude.toString());
+  if (data.longitude !== undefined) formData.append('Longitude', data.longitude.toString());
+  if (data.image) formData.append('Image', data.image); // File object từ input
+  if (data.phone) formData.append('Phone', data.phone);
+  if (data.description) formData.append('Description', data.description);
+
+  const response = await apiClient.post<ApiResponse<Restaurant>>(
+    API.RESTAURANT.CREATE,
+    formData,
+    {
+      headers: {
+        // Đảm bảo không bị ghi đè bởi application/json mặc định của apiClient
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  );
+
+  return response.data;
+}
+
+async function getAllRestaurants(): Promise<ApiResponse<Restaurant[]>> {
+  const response = await apiClient.get<ApiResponse<Restaurant[]>>(
+    API.RESTAURANT.GET_ALL
+  )
+  return response.data
+}
 
 export default function RestaurantPage() {
   const [showInfoModal, setShowInfoModal] = React.useState(false)
   const [isLoading, setIsLoading] = React.useState(false)
-  const [restaurants, setRestaurants] = React.useState<Restaurant[]>([])
+  const [restaurants, setRestaurants] = React.useState<RestaurantListItem[]>([])
 
-  // TODO: Replace with actual API call to fetch restaurants
+  // Fetch restaurants on component mount
   React.useEffect(() => {
     const fetchRestaurants = async () => {
       try {
-        // Mock data - replace with API call
-        // const response = await fetch('/api/tenant/restaurants')
-        // const data = await response.json()
-        // setRestaurants(data)
-
-        // Uncomment this to test with mock data
-        // setRestaurants([
-        //   { id: '1', name: 'Nhà hàng tính thương' },
-        //   { id: '2', name: 'Nhà hàng tính thương 2' },
-        //   { id: '3', name: 'Nhà hàng tính thương 3' },
-        //   { id: '4', name: 'Nhà hàng tính thương 4' },
-        //   { id: '5', name: 'Nhà hàng tính thương 5' },
-        // ])
+        const response = await getAllRestaurants()
+        if (response.isSuccess && response.data) {
+          // Map the API response to the Restaurant type expected by RestaurantList
+          const mappedRestaurants: RestaurantListItem[] = response.data.map((r) => ({
+            id: r.id.toString(),
+            name: r.restaurantName,
+            status: r.isActive ? 'active' : 'inactive',
+          }))
+          setRestaurants(mappedRestaurants)
+        }
       } catch (error) {
         console.error('Error fetching restaurants:', error)
+        toast.error('Không thể tải danh sách nhà hàng')
       }
     }
 
@@ -44,29 +81,33 @@ export default function RestaurantPage() {
   const handleSubmit = async (info: TenantInfo) => {
     setIsLoading(true)
     try {
-      // TODO: Replace with actual API call to create restaurant
-      // const response = await fetch('/api/tenant/restaurants', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(info),
-      // })
-      // if (response.ok) {
-      //   const newRestaurant = await response.json()
-      //   setRestaurants((prev) => [...prev, newRestaurant])
-      //   setShowInfoModal(false)
-      // }
+      const response = await createRestaurant({
+        restaurantName: info.restaurantName,
+        phone: info.phone,
+        address: info.address,
+        description: info.description,
+        latitude: info.latitude,
+        longitude: info.longitude,
+        image: info.image,
+      })
 
-      // Mock success - add to restaurants list
-      console.log('Restaurant info submitted:', info)
-      const newRestaurant: Restaurant = {
-        id: Date.now().toString(),
-        name: info.tenantName,
-        status: 'active',
+      if (response.isSuccess && response.data) {
+        toast.success(response.message || 'Tạo nhà hàng thành công!')
+        
+        // Add new restaurant to list
+        const newRestaurant: RestaurantListItem = {
+          id: response.data.id.toString(),
+          name: response.data.restaurantName,
+          status: response.data.isActive ? 'active' : 'inactive',
+        }
+        setRestaurants((prev) => [...prev, newRestaurant])
+        setShowInfoModal(false)
+      } else {
+        toast.error(response.message || 'Tạo nhà hàng thất bại')
       }
-      setRestaurants((prev) => [...prev, newRestaurant])
-      setShowInfoModal(false)
     } catch (error) {
       console.error('Error creating restaurant:', error)
+      toast.error(error instanceof Error ? error.message : 'Có lỗi xảy ra khi tạo nhà hàng')
     } finally {
       setIsLoading(false)
     }

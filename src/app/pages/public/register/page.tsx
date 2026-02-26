@@ -11,11 +11,13 @@ import logoDefault from "@/src/images/logo/logo_no_background.png";
 import { ROUTES } from "@/src/constants/routes";
 import { API } from "@/src/constants/api";
 import apiClient from "@/src/services/apiClient";
-import { ApiResponse, OtpResponse, RegisterTenantRequest, TenantDto } from "@/src/types/type";
+import { ApiResponse, DistrictSummary, OtpResponse, ProvinceSummary, RegisterTenantRequest, TenantDto } from "@/src/types/type";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [provinces, setProvinces] = useState<ProvinceSummary[]>([]);
+  const [districts, setDistricts] = useState<DistrictSummary[]>([]);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);

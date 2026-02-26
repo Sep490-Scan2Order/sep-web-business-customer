@@ -19,5 +19,12 @@ export const API = {
     AUTH: {
         LOGOUT: "/Auth/logout",
         TENANT_LOGIN: "/Auth/tenant-login",
+    },
+    RESTAURANT: {
+        CREATE: "/Restaurant",
+        GET_ALL: "/Restaurant/getAll",
+        GET_BY_ID: (id: string) => `/Restaurant/${id}`,
+        UPDATE: (id: string) => `/Restaurant/${id}`,
+        DELETE: (id: string) => `/Restaurant/${id}`,
     }
 };
