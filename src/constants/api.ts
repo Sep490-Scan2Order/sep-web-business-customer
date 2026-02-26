@@ -26,9 +26,10 @@ export const API = {
     },
     RESTAURANT: {
         CREATE: "/Restaurant",
-        GET_ALL: "/Restaurant/getAll",
+        GET_ALL_RESTAURANT_BY_TENANT_ID: "/Restaurant/get-all-restaurant-by-tenant",
         GET_BY_ID: (id: string) => `/Restaurant/${id}`,
         UPDATE: (id: string) => `/Restaurant/${id}`,
         DELETE: (id: string) => `/Restaurant/${id}`,
+        GET_RESTAURANT_DETAIL_BY_SLUG: (slug: string) => `/Restaurant/${slug}`,
     }
 };

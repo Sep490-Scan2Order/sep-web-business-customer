@@ -1,11 +1,14 @@
 'use client'
 
 import React from 'react'
+import { useRouter } from 'next/navigation'
 
 export interface Restaurant {
   id: string
   name: string
   status?: 'active' | 'inactive'
+  image?: string
+  slug?: string
 }
 
 interface RestaurantListProps {
@@ -14,6 +17,7 @@ interface RestaurantListProps {
 }
 
 export default function RestaurantList({ restaurants, onCreateClick }: RestaurantListProps) {
+  const router = useRouter()
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
@@ -30,9 +34,22 @@ export default function RestaurantList({ restaurants, onCreateClick }: Restauran
         {restaurants.map((restaurant) => (
           <div
             key={restaurant.id}
-            className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow"
+            onClick={() => {
+              if (restaurant.slug) {
+                const encodedSlug = encodeURIComponent(restaurant.slug)
+                router.push(`/tenant/restaurant/${encodedSlug}`)
+              }
+            }}
+            className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer"
           >
-            <div className="aspect-video bg-emerald-600" />
+            <div 
+              className="aspect-video bg-emerald-600 bg-cover bg-center"
+              style={{
+                backgroundImage: restaurant.image 
+                  ? `url(${restaurant.image})` 
+                  : undefined
+              }}
+            />
             <div className="p-4">
               <p className="text-sm font-medium text-slate-700 truncate">
                 {restaurant.name}

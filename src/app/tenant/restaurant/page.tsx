@@ -41,7 +41,7 @@ async function createRestaurant(
 
 async function getAllRestaurants(): Promise<ApiResponse<Restaurant[]>> {
   const response = await apiClient.get<ApiResponse<Restaurant[]>>(
-    API.RESTAURANT.GET_ALL
+    API.RESTAURANT.GET_ALL_RESTAURANT_BY_TENANT_ID
   )
   return response.data
 }
@@ -62,6 +62,8 @@ export default function RestaurantPage() {
             id: r.id.toString(),
             name: r.restaurantName,
             status: r.isActive ? 'active' : 'inactive',
+            image: r.image,
+            slug: r.slug,
           }))
           setRestaurants(mappedRestaurants)
         }
@@ -99,6 +101,8 @@ export default function RestaurantPage() {
           id: response.data.id.toString(),
           name: response.data.restaurantName,
           status: response.data.isActive ? 'active' : 'inactive',
+          image: response.data.image,
+          slug: response.data.slug,
         }
         setRestaurants((prev) => [...prev, newRestaurant])
         setShowInfoModal(false)
