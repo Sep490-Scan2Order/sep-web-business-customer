@@ -49,6 +49,12 @@ export interface LoginResponse {
   user?: User;
 }
 
+export interface TenantLoginResponse {
+  accessToken: string;
+  refreshToken: string;
+  userInfo: UserInfo;
+}
+
 export interface AuthState {
   user: User | null;
   token: string | null;
@@ -128,11 +134,29 @@ export interface AdministratorLoginRequest {
 export interface UserInfo {
   id: string;
   accountId: string;
-  name: string;
+  name: string | null;
+  email: string;
+  phone: string;
   role: string;
-  avatar: string;
+  avatar: string | null;
   isActive: boolean;
-  createdAt: string;
+  verified: boolean;
+  taxNumber: string | null;
+  bankId: string;
+  cardNumber: string;
+  bankName: string;
+  bankLogo: string;
+  isVerifyBank: boolean;
+  isVerifyTax: boolean;
+  debtStartedAt: string | null;
+  subscriptionExpiryDate: string | null;
+  lastWarningSentAt: string | null;
+  totalDebtAmount: number;
+  planName: string;
+  totalRestaurants: number;
+  totalDishes: number;
+  totalCategories: number;
+  createdAt?: string;
 }
 
 export interface AdministratorLoginResponse {
@@ -183,4 +207,17 @@ export interface AddSystemBlogDtoResponse {
   totalViews: number;
   imageUrl: string;
   blogType: BlogType;
+}
+
+
+export interface BankInfo{
+   id: string;
+   name: string;
+   code: string;
+   bin: number;
+   short_name: string;
+   logo_url: string;
+   icon_url: string;
+   swift_code: string;
+   lookup_supported: number;
 }

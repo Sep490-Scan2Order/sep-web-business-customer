@@ -50,16 +50,11 @@ export default function AdminLoginPage() {
       if (response.data?.isSuccess && response.data.data) {
         const { accessToken, refreshToken, userInfo } = response.data.data;
         
-        // Tạo user object từ userInfo trong response
+        // Luu full userInfo de dong bo voi store
         const user = {
-          id: userInfo.id,
-          email: formData.email,
-          name: userInfo.name,
-          role: userInfo.role,
-          avatar: userInfo.avatar,
-          isActive: userInfo.isActive,
-          accountId: userInfo.accountId,
-          createdAt: userInfo.createdAt,
+          ...userInfo,
+          email: userInfo.email || formData.email,
+          avatar: userInfo.avatar || undefined,
         };
         
         // Lưu token và user vào store (sẽ tự động lưu accessToken vào localStorage)

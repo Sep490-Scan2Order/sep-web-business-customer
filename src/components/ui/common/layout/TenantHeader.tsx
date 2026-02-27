@@ -1,3 +1,6 @@
+'use client';
+import { useAuth } from '@/src/hooks/useAuth';
+import { UserInfo } from '@/src/types/type';
 import React from 'react'
 
 const IconBell = () => (
@@ -16,12 +19,15 @@ const IconSearch = () => (
 )
 
 export default function TenantHeader() {
+   const { user } = useAuth();
+   const tenantInfo = (user ?? null) as UserInfo | null
+
   return (
     <header className="border-b border-slate-200 bg-white px-6 py-4">
       <div className="flex flex-wrap items-center gap-4">
         <div className="min-w-[200px]">
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Dashboards</div>
-          <div className="text-lg font-semibold text-slate-900">Overview</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Scan to Order</div>
+          <div className="text-lg font-semibold text-slate-900">Management</div>
         </div>
 
         <div className="flex flex-1 items-center gap-3">
@@ -40,8 +46,8 @@ export default function TenantHeader() {
             type="button"
             className="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
           >
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            <span>Active</span>
+            <span className={`h-2 w-2 rounded-full ${tenantInfo?.isActive ? "bg-emerald-500" : "bg-red-500"}`} />
+            <span>{tenantInfo?.isActive ? "Active" : "Inactive"}</span>
           </button>
 
           <button
@@ -55,9 +61,22 @@ export default function TenantHeader() {
           <button
             type="button"
             className="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
-          >
-            <span className="h-7 w-7 rounded-full bg-slate-200" />
-            <span className="font-medium">Business Customer</span>
+          >         
+            <span className="h-7 w-7 rounded-full bg-slate-200">
+                {tenantInfo?.avatar ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={tenantInfo.avatar}
+                alt="Tenant avatar"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-lg font-semibold">
+                {tenantInfo?.name}
+              </div>
+            )}
+            </span>
+            <span className="font-medium">{tenantInfo?.name}</span>
           </button>
         </div>
       </div>

@@ -14,7 +14,7 @@ function TenantLayoutContent({children}: {children: React.ReactNode}) {
     {/*Content*/}
     <div className="flex-1 flex flex-col">
         <TenantHeader/>
-        <main className="flex-1 p-8 overflow-y-auto">
+        <main className="flex-1 p-8">
           <div className="max-w-7xl mx-auto">{children}</div>
         </main>
     </div>

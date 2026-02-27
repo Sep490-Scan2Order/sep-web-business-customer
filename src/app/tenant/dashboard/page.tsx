@@ -1,19 +1,22 @@
 "use client";
-import DepositVerifyTaxModelPopUp from "@/src/components/ui/DepositVerifyTaxModelPopUp";
+import DepositVerifyTaxModelPopUp from "@/src/components/ui/tenant/DepositVerifyTaxModelPopUp";
 import VerifyTaxModelPopUp, {
   TenantTaxInfo,
-} from "@/src/components/ui/VerifyTaxModelPopUp";
+} from "@/src/components/ui/tenant/VerifyTaxModelPopUp";
 import { API } from "@/src/constants/api";
 import apiClient from "@/src/services/apiClient";
-import React from "react";
+import React, { useEffect } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { set } from "nprogress";
+import {useAuth} from "@/src/hooks/useAuth";
+import {UserInfo} from "@/src/types/type";
 
 export default function DashboardPage() {
-  const [showInfoModal, setShowInfoModal] = React.useState(true);
+  const [showInfoModal, setShowInfoModal] = React.useState(false);
   const [showDepositModal, setShowDepositModal] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const { user } = useAuth();
+   const tenantInfo = (user ?? null) as UserInfo | null
   const router = useRouter();
 
   const handleSubmit = async (info: TenantTaxInfo) => {
@@ -22,7 +25,6 @@ export default function DashboardPage() {
       const response = await apiClient.put(
         `${API.TENANT.TAX_VALIDATION}${encodeURIComponent(info.taxCode)}`,
       );
-      console.log("Tax validation response:", response.data);
       if (response.data.isSuccess === true) {
         toast.success("Thông tin mã số thuế đã được xác nhận thành công!");
         setShowInfoModal(false);
@@ -32,7 +34,10 @@ export default function DashboardPage() {
       }
     } catch (error) {
       console.error("Error validating tax:", error);
-      toast.error("Có lỗi xảy ra!");
+      const backendMessage = (error as any).response?.data?.message;
+      toast.error(
+        backendMessage || (error as any).message || "Có lỗi xảy ra trong quá trình xác nhận mã số thuế!"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -56,6 +61,14 @@ export default function DashboardPage() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/tenant/login");
+    } else if (tenantInfo && !tenantInfo.isVerifyTax) {
+      setShowInfoModal(true);
+    }
+  }, [user, tenantInfo, router]);
   return (
     <div>
       <VerifyTaxModelPopUp

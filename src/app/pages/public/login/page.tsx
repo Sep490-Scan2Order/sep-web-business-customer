@@ -8,10 +8,11 @@ import { ArrowLeft, Eye, EyeOff, Mail, Lock, CheckCircle2, ShieldCheck } from "l
 import { toast } from "react-toastify";
 import bgImage from "@/src/images/homepage/unnamed.jpg";
 import logoDefault from "@/src/images/logo/logo_no_background.png";
-import { ROUTES, TENANT_ROUTES } from "@/src/constants/routes";
+import { ROUTES } from "@/src/constants/routes";
 import { API } from "@/src/constants/api";
 import apiClient from "@/src/services/apiClient";
-import { useAuthStore, decodeToken } from "@/src/store/authStore";
+import { useAuthStore } from "@/src/store/authStore";
+import { TenantLoginResponse, ApiResponse } from "@/src/types/type";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -41,7 +42,7 @@ export default function LoginPage() {
 
     try {
       setLoading(true);
-      const response = await apiClient.post<any>(
+      const response = await apiClient.post<ApiResponse<TenantLoginResponse>>(
         API.AUTH.TENANT_LOGIN,
         {
           email: formData.email,
@@ -49,20 +50,29 @@ export default function LoginPage() {
         }
       );
 
-      if (response.data?.isSuccess) {
-        // Save token and decode user info
-        if (response.data?.data?.accessToken) {
-          const token = response.data.data.accessToken;
-          const user = decodeToken(token);
-          
-          // Lưu auth vào store (sẽ tự động lưu token vào localStorage)
-          setAuth(user, token);
+      if (response.data?.isSuccess && response.data.data) {
+        const { accessToken, refreshToken, userInfo } = response.data.data;
+        
+        // Luu full userInfo de dung cho cac trang can du lieu tenant
+        const user = {
+          ...userInfo,
+          email: userInfo.email || formData.email,
+          avatar: userInfo.avatar || undefined,
+        };
+        
+        // Lưu token và user vào store (sẽ tự động lưu accessToken vào localStorage)
+        setAuth(user, accessToken);
+        
+        // Lưu refreshToken riêng vào localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('refreshToken', refreshToken);
         }
-        console.log("Login successful:", response.data.data);
-        toast.success( "Đăng nhập thành công");
+        
+        console.log("Login successful:", user);
+        toast.success("Đăng nhập thành công");
         router.push(ROUTES.HOME);
       } else {
-        toast.error("Đăng nhập thất bại");
+        toast.error(response.data?.message || "Đăng nhập thất bại");
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Đăng nhập thất bại");

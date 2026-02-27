@@ -5,7 +5,7 @@ import { X } from 'lucide-react'
 interface TenantTaxInfoRequirementProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (formData: any) => void
+  onSubmit: (formData: unknown) => void
   isLoading?: boolean
 }
 export default function DepositVerifyTaxModelPopUp({ isOpen, onClose, onSubmit, isLoading }: TenantTaxInfoRequirementProps) {

@@ -16,6 +16,8 @@ export const API = {
         VERIFY_OTP_FORGET_PASSWORD: "/Auth/Verify-forgot-password-otp",
         COMPLETE_FORGET_PASSWORD: "/Auth/Complete-reset-password",
         SEND_EMAIL_FORGET_PASSWORD: (email: string) => `/Otp/send-forgot-password?email=${email}`,
+        SEARCH_BANK_NAME_BY_CARD_NUMBER: "/Tenant/bank-lookup",
+        UPDATE_BANK_INFO: "/Tenant/update-bank-info?bankId=",
     },
     TENANT_WALLET: {
         DEPOSIT_VERIFY_TAX: "/TenantWallet/deposit-verify-tax",
@@ -37,5 +39,9 @@ export const API = {
         CREATE: "/SystemBlog",
         GET_ALL: "/SystemBlog",
         GET_BY_ID: (id: number) => `/SystemBlog/${id}`,
-    },
+    }
+};
+
+export const BANK_API = {
+    GET_ALL: "https://api.banklookup.net/bank/list"
 };
