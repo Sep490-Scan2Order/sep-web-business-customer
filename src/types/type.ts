@@ -106,6 +106,16 @@ export interface CreateRestaurantRequest {
   description?: string;
 }
 
+export interface UpdateRestaurantLocationRequest {
+  id: number;
+  restaurantName: string;
+  address?: string;
+  phone?: string;
+  description?: string;
+  latitude: number;
+  longitude: number;
+}
+
 export interface Restaurant {
   id: number;
   tenantId: string;
