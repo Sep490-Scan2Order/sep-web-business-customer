@@ -2,7 +2,11 @@ import axios from "axios";
 
 import { API } from "@/src/constants/api";
 import { TOKEN_STORAGE_KEY } from "@/src/constants/constant";
-import { ApiResponse, Restaurant, UpdateRestaurantLocationRequest } from "@/src/types/type";
+import {
+  ApiResponse,
+  Restaurant,
+  UpdateRestaurantLocationRequest,
+} from "@/src/types/type";
 
 const apiClient = axios.create({
   baseURL: API.BASE_URL,

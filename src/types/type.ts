@@ -231,3 +231,37 @@ export interface BankInfo{
    swift_code: string;
    lookup_supported: number;
 }
+
+export interface DishesDto{
+  id: number;
+  categoryId?: number;
+  categoryName: string;
+  dishName: string;
+  price: number;
+  description: string;
+  imageUrl?: string;
+  image?: string;
+  dishAvailability: number;
+  isAvailable: boolean;
+  createdAt?: string;
+}
+
+export interface CreateDishRequest{
+  dishName: string;
+  price: number;
+  description: string;
+  image?: File;
+  dishAvailability: number;
+}
+
+export interface CreateCategoryRequest{
+  categoryName: string;
+}
+
+export interface CategoryDto{
+  id: number;
+  tenantId: string;
+  categoryName: string;
+  isActive: boolean;
+  createdAt: string;
+}

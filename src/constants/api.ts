@@ -39,6 +39,14 @@ export const API = {
         CREATE: "/SystemBlog",
         GET_ALL: "/SystemBlog",
         GET_BY_ID: (id: number) => `/SystemBlog/${id}`,
+    },
+    CATEGORY:{
+        CREATE: "/Category/create-category",
+        GET_ALL: "/Category/get-category-by-tenant"
+    },
+    DISHES:{
+        CREATE: (categoryId: number) => `/Dish/create-dish/${categoryId}`,
+        GET_ALL: "/Dish/get-dishes-by-tenant"
     }
 };
 
