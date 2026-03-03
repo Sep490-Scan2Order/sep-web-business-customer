@@ -47,6 +47,15 @@ export const API = {
     DISHES:{
         CREATE: (categoryId: number) => `/Dish/create-dish/${categoryId}`,
         GET_ALL: "/Dish/get-dishes-by-tenant"
+    },
+    MENU_TEMPLATE: {
+        CREATE: "/MenuTemplate",
+        GET_ALL: "/MenuTemplate",
+        GET_BY_ID: (id: number) => `/MenuTemplate/${id}`,
+    },
+    MENU_RESTAURANT: {
+        APPLY_TEMPLATE: `/MenuRestaurant`,
+        GET_MENU_BY_RESTAURANT_ID: (restaurantId: number) => `/MenuRestaurant/${restaurantId}`,
     }
 };
 

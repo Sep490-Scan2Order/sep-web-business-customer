@@ -265,3 +265,15 @@ export interface CategoryDto{
   isActive: boolean;
   createdAt: string;
 }
+
+export interface CreateMenuTemplateRequest{
+  templateName: string;
+  layoutConfigJson: string;
+  themeColor: string;
+  fontFamily: string;
+}
+
+export interface ApplyMenuTemplateRequest{
+  restaurantId: number;
+  templateId: number;
+}
