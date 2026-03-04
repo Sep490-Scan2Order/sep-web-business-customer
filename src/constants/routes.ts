@@ -48,4 +48,5 @@ export const TENANT_ROUTES = {
   SETTINGS: "/tenant/tenant-setting",
   CATEGORY: "/tenant/meals/category",
   DISH: "/tenant/meals/dish",
+  PLAN: "/tenant/plan",
 };

@@ -1,5 +1,6 @@
 import React from 'react'
 import TenantLayout from '@/src/components/ui/common/layout/TenantLayoutClientProps'
+import { TenantAuthProvider } from '@/src/components/providers/TenantAuthProvider'
 
 export const metadata = {
   title: 'Scan To Order - Tenant',
@@ -8,6 +9,8 @@ export const metadata = {
 
 export default function TenantPageLayout({children}: {children: React.ReactNode}) {
   return (
-    <TenantLayout>{children}</TenantLayout>
+    <TenantAuthProvider>
+      <TenantLayout>{children}</TenantLayout>
+    </TenantAuthProvider>
   )
 }

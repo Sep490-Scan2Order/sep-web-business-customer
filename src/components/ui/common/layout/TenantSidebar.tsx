@@ -18,8 +18,6 @@ import {
 } from "lucide-react";
 import { ROUTES, TENANT_ROUTES } from "@/src/constants/routes";
 import { useAuth } from "@/src/hooks/useAuth";
-import apiClient from "@/src/services/apiClient";
-import { API } from "@/src/constants/api";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { UserInfo } from '@/src/types/type'
@@ -97,6 +95,17 @@ const sections: { label: string; items: NavItem[] }[] = [
       },
     ],
   },
+  {
+    label: "Subscription",
+    items: [
+      {
+        label: "Plans",
+        href: TENANT_ROUTES.PLAN,
+        icon: Settings,
+        match: "prefix",
+      },
+    ],
+  },
 ];
 
 
@@ -111,12 +120,9 @@ export default function TenantSidebar() {
   const tenantInfo = (user ?? null) as UserInfo | null
 
   const handleLogOut = async () => {
-    const response = await apiClient.post(API.AUTH.LOGOUT);
-    if (response.data?.isSuccess) {
       logout();
       toast.success("Đăng xuất thành công");
       router.push(ROUTES.HOME);
-    }
   };
 
   const toggleDropdown = (label: string) => {

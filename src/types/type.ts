@@ -34,14 +34,52 @@ export interface OtpResponse {
   message: string;
 }
 
+/**
+ * User interface - Đại diện cho thông tin user trong auth state
+ * Bao gồm tất cả fields từ UserInfo để hỗ trợ tenant data
+ */
 export interface User {
+  // Basic info
   id: string;
+  accountId?: string;
   email: string;
-  name?: string;
+  name?: string | null;
   phone?: string;
   role?: string;
-  avatar?: string;
-  [key: string]: any; // Để hỗ trợ các field khác từ token
+  avatar?: string | null;
+  
+  // Status
+  isActive?: boolean;
+  verified?: boolean;
+  
+  // Bank info
+  bankId?: string;
+  cardNumber?: string;
+  bankName?: string;
+  bankLogo?: string;
+  isVerifyBank?: boolean;
+  
+  // Tax info
+  taxNumber?: string | null;
+  isVerifyTax?: boolean;
+  
+  // Subscription info
+  debtStartedAt?: string | null;
+  subscriptionExpiryDate?: string | null;
+  lastWarningSentAt?: string | null;
+  totalDebtAmount?: number;
+  planName?: string;
+  
+  // Stats
+  totalRestaurants?: number;
+  totalDishes?: number;
+  totalCategories?: number;
+  
+  // Timestamps
+  createdAt?: string;
+  
+  // Fallback cho các field khác từ token
+  [key: string]: any;
 }
 
 export interface LoginResponse {
