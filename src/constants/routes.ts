@@ -46,4 +46,6 @@ export const TENANT_ROUTES = {
   MEALS: "/tenant/meals",
   MENU_TEMPLATE: "/tenant/menu-template",
   SETTINGS: "/tenant/tenant-setting",
+  CATEGORY: "/tenant/meals/category",
+  DISH: "/tenant/meals/dish",
 };

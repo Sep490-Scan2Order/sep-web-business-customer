@@ -42,11 +42,14 @@ export const API = {
     },
     CATEGORY:{
         CREATE: "/Category/create-category",
-        GET_ALL: "/Category/get-category-by-tenant"
+        GET_ALL: "/Category/get-category-by-tenant",
+        UPDATE_CATEGORY: (id: number) => `/Category/update-category/${id}`,
     },
     DISHES:{
         CREATE: (categoryId: number) => `/Dish/create-dish/${categoryId}`,
-        GET_ALL: "/Dish/get-dishes-by-tenant"
+        GET_ALL: "/Dish/get-dishes-by-tenant",
+        UPDATE_DISH: (categoryId: number, dishId: number) => `/Dish/update-dish/${categoryId}/${dishId}`,
+        UPDATE_DISH_AVALABILITY: (dishId: number) => `/Dish/update-dish-availability/${dishId}`,
     },
     MENU_TEMPLATE: {
         CREATE: "/MenuTemplate",

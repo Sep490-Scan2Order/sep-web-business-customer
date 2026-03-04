@@ -74,8 +74,11 @@ export default function LoginPage() {
       } else {
         toast.error(response.data?.message || "Đăng nhập thất bại");
       }
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Đăng nhập thất bại");
+    } catch (error: unknown) {
+      const backendMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message;
+      toast.error(
+        backendMessage || (error as { message?: string }).message || "Có lỗi xảy ra khi đăng nhập"
+      );
     } finally {
       setLoading(false);
     }
