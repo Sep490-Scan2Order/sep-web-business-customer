@@ -3,14 +3,15 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/src/hooks/useAuth';
+import { useHasHydrated } from '@/src/store/authStore';
 import { toast } from 'react-toastify';
 
 interface AuthProviderProps {
   children: React.ReactNode;
-  requiredRole?: string | string[]; // Role yêu cầu (tenant, admin, etc.)
-  redirectTo?: string; // Trang redirect khi không đủ quyền
-  loginMessage?: string; // Thông báo khi chưa đăng nhập
-  accessDeniedMessage?: string; // Thông báo khi không đủ quyền
+  requiredRole?: string | string[]; 
+  redirectTo?: string; 
+  loginMessage?: string; 
+  accessDeniedMessage?: string; 
 }
 
 /**
@@ -41,11 +42,17 @@ export function AuthProvider({
   accessDeniedMessage = 'Bạn không có quyền truy cập trang này',
 }: AuthProviderProps) {
   const { user, isAuthenticated } = useAuth();
+  const hasHydrated = useHasHydrated();
   const router = useRouter();
   const pathname = usePathname();
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
+    // Đợi zustand persist rehydrate xong trước khi check auth
+    if (!hasHydrated) {
+      return;
+    }
+
     const checkAuth = () => {
       // Kiểm tra authentication
       if (!isAuthenticated || !user) {
@@ -79,7 +86,7 @@ export function AuthProvider({
     };
 
     checkAuth();
-  }, [isAuthenticated, user, router, pathname, requiredRole, redirectTo, loginMessage, accessDeniedMessage]);
+  }, [hasHydrated, isAuthenticated, user, router, pathname, requiredRole, redirectTo, loginMessage, accessDeniedMessage]);
 
   // Hiển thị loading trong khi check auth
   if (isChecking) {

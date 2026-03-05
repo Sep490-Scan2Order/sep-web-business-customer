@@ -1,7 +1,7 @@
 import axios from "axios";
 
 import { API } from "@/src/constants/api";
-import { TOKEN_STORAGE_KEY } from "@/src/constants/constant";
+import { useAuthStore } from "@/src/store/authStore";
 import {
   ApiResponse,
   Restaurant,
@@ -16,11 +16,8 @@ const apiClient = axios.create({
 });
 
 const getAccessToken = () => {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  return localStorage.getItem(TOKEN_STORAGE_KEY);
+  // Lấy token từ zustand store thay vì localStorage
+  return useAuthStore.getState().token;
 };
 
 apiClient.interceptors.request.use((config) => {
