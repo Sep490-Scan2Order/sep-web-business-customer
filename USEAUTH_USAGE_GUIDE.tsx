@@ -213,7 +213,7 @@ export function SafeAccessExample() {
 // EXAMPLE 6: Format và display helpers
 // =====================================================
 
-export const formatUserData = (user: typeof useAuth extends () => infer R ? R['user'] : never) => {
+export const formatUserData = (user: Awaited<ReturnType<typeof useAuth>>['user'] | null) => {
   if (!user) return null;
 
   return {

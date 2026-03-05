@@ -166,6 +166,7 @@ export interface Restaurant {
   phone: string;
   description: string;
   profileUrl: string;
+  slug: string;
   qrMenu: string;
   isActive: boolean;
   isOpened: boolean;
