@@ -18,6 +18,7 @@ export const API = {
         SEND_EMAIL_FORGET_PASSWORD: (email: string) => `/Otp/send-forgot-password?email=${email}`,
         SEARCH_BANK_NAME_BY_CARD_NUMBER: "/Tenant/bank-lookup",
         UPDATE_BANK_INFO: "/Tenant/update-bank-info?bankId=",
+        GET_TENANT_BY_ID: (id: string) => `/Tenant/${id}`,
     },
     TENANT_WALLET: {
         DEPOSIT_VERIFY_TAX: "/TenantWallet/deposit-verify-tax",

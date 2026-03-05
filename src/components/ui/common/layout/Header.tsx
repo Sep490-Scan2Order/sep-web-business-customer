@@ -26,12 +26,9 @@ const Header: React.FC<HeaderProps> = ({ className = "" }) => {
   };
 
   const handleLogOut = async () => {
-    const response = await apiClient.post(API.AUTH.LOGOUT);
-    if (response.data?.isSuccess) {
       logout();
       toast.success("Đăng xuất thành công");
       router.push(ROUTES.HOME);
-    }
   };
   return (
     <header

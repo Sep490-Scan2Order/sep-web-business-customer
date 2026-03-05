@@ -8,15 +8,15 @@ import apiClient from "@/src/services/apiClient";
 import React, { useEffect } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import {useAuth} from "@/src/hooks/useAuth";
-import {UserInfo} from "@/src/types/type";
+import { useAuth } from "@/src/hooks/useAuth";
+import { UserInfo } from "@/src/types/type";
 
 export default function DashboardPage() {
   const [showInfoModal, setShowInfoModal] = React.useState(false);
   const [showDepositModal, setShowDepositModal] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
-  const { user } = useAuth();
-   const tenantInfo = (user ?? null) as UserInfo | null
+  const { user, refreshUserInfo } = useAuth();
+  const tenantInfo = (user ?? null) as UserInfo | null;
   const router = useRouter();
 
   const handleSubmit = async (info: TenantTaxInfo) => {
@@ -26,6 +26,7 @@ export default function DashboardPage() {
         `${API.TENANT.TAX_VALIDATION}${encodeURIComponent(info.taxCode)}`,
       );
       if (response.data.isSuccess === true) {
+        await refreshUserInfo();
         toast.success("Thông tin mã số thuế đã được xác nhận thành công!");
         setShowInfoModal(false);
         setShowDepositModal(true);

@@ -1,6 +1,7 @@
 "use client"
 import { API, BANK_API } from '@/src/constants/api';
 import apiClient from '@/src/services/apiClient';
+import { useAuth } from '@/src/hooks/useAuth';
 import { BankInfo } from '@/src/types/type';
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
@@ -26,6 +27,7 @@ export default function TenantVerifyBankModelPopup({
   onSubmit,
   isLoading = false,
 }: TenantVerifyBankModelPopupProps) {
+  const { refreshUserInfo } = useAuth();
   const [banks, setBanks] = useState<BankInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -141,6 +143,7 @@ export default function TenantVerifyBankModelPopup({
       if (updateResponse.data?.isSuccess) {
         setQrUrl(updateResponse.data?.data || null);
         setQrMessage(updateResponse.data?.message || null);
+        await refreshUserInfo();
         onSubmit({ ...formData, bank: selectedBank });
       } else {
         toast.error(updateResponse.data?.message || 'Cập nhật thông tin ngân hàng thất bại');
@@ -187,7 +190,7 @@ export default function TenantVerifyBankModelPopup({
                 </div>
               ) : null}
               <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-                Sau khi chuyển khoản thành công, vui lòng đăng xuất và đăng nhập lại để cập nhật trạng thái.
+                Sau khi giao dịch được xác nhận, trạng thái sẽ được đồng bộ tự động.
               </div>
               <div className="flex gap-3">
                 <button

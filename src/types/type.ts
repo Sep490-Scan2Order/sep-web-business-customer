@@ -100,6 +100,7 @@ export interface AuthState {
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
   setAuth: (user: User | null, token: string | null) => void;
+  refreshUserInfo: () => Promise<User | null>;
   logout: () => void;
 }
 

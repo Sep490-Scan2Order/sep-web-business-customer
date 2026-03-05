@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { jwtDecode } from 'jwt-decode';
 import { User, AuthState } from '@/src/types/type';
+import { getTenantById } from '@/src/services/tenantService';
 
 interface AuthStateWithHydration extends AuthState {
   _hasHydrated: boolean;
@@ -33,6 +34,26 @@ export const useAuthStore = create<AuthStateWithHydration>()(
           token,
           isAuthenticated: !!user && !!token,
         });
+      },
+
+      refreshUserInfo: async () => {
+        const { user } = useAuthStore.getState();
+
+        if (!user?.id) {
+          return null;
+        }
+
+        try {
+          const latestUser = await getTenantById(user.id);
+          set((state) => ({
+            user: latestUser,
+            isAuthenticated: !!latestUser && !!state.token,
+          }));
+          return latestUser;
+        } catch (error) {
+          console.error('Failed to refresh user info:', error);
+          return null;
+        }
       },
 
       logout: () => {

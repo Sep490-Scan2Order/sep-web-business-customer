@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { API } from "@/src/constants/api";
 import apiClient from "@/src/services/apiClient";
 import { toast } from "react-toastify";
-import {useAuth} from "@/src/hooks/useAuth";
+import { useAuth } from "@/src/hooks/useAuth";
+import PlanPopUpConfirm from "@/src/components/ui/tenant/PlanPopUpConfirm";
 
 type PlanApiItem = {
   id: number;
@@ -30,19 +31,23 @@ const formatPrice = (value: number) =>
 
 export default function PlanPage() {
   const [activePlans, setActivePlans] = useState<PlanApiItem[]>([]);
+  const [selectedPlan, setSelectedPlan] = useState<PlanApiItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, refreshUserInfo } = useAuth();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
   const isFirstTimeBuyer = !user?.subscriptionExpiryDate;
 
 
   const handleBuySubscription = async (planId: number) => {
-   
+    setLoading(true);
     if (isFirstTimeBuyer) {
         try{
+            console.log("Buying first subscription with planId:", planId);
             const response = await apiClient.post(API.SUBSCRIPTION.BUY_FIRST_SUBSCRIPTION(planId));
             if (response.data.isSuccess) {
                 toast.success("Mua gói dịch vụ thành công!");
-                // Optionally, refresh user data or redirect to another page
+              await refreshUserInfo();
             } else {
                 toast.error(response.data.message || "Mua gói dịch vụ thất bại");
             }
@@ -58,9 +63,11 @@ export default function PlanPage() {
         }
     } else {
       try{
+         console.log("Buying upgrade subscription with planId:", planId);
         const response = await apiClient.post(API.SUBSCRIPTION.BUY_UPGRADE_SUBSCRIPTION(planId));
         if (response.data.isSuccess) {
           toast.success("Nâng cấp gói dịch vụ thành công!");
+          await refreshUserInfo();
         } else {
           toast.error(response.data.message || "Nâng cấp gói dịch vụ thất bại");
         }
@@ -75,7 +82,13 @@ export default function PlanPage() {
         );
       }
     }
-    // Implementation for buying subscription
+    setLoading(false);
+  }
+
+  const handleClickPlan = (planId: number) => {
+    const selected = activePlans.find((plan) => plan.id === planId) || null;
+    setSelectedPlan(selected);
+    setShowInfoModal(true);
   }
 
   useEffect(() => {
@@ -210,7 +223,7 @@ export default function PlanPage() {
                   </p>
 
                   <button
-                    onClick={() => !isCurrentPlan && handleBuySubscription(plan.id)}
+                    onClick={() => !isCurrentPlan && handleClickPlan(plan.id)}
                     disabled={isCurrentPlan}
                     className={`mt-6 inline-flex w-full items-center justify-center rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors ${
                       isCurrentPlan
@@ -236,6 +249,16 @@ export default function PlanPage() {
           )}
         </div>
       </section>
+
+       {showInfoModal && (
+        <PlanPopUpConfirm
+          onClose={() => setShowInfoModal(false)}
+          onSubmit={handleBuySubscription}
+          isLoading={loading}
+          planData={selectedPlan}
+          isFirstPlan={isFirstTimeBuyer}
+        />
+      )}
     </div>
   );
 }
