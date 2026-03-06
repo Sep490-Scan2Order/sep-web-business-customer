@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import apiClient from "@/src/services/apiClient";
 import { API } from "@/src/constants/api";
 import { ApiResponse, CategoryDto, DishesDto, Restaurant, ApplyMenuTemplateRequest } from "@/src/types/type";
+import { useAuth } from "@/src/hooks/useAuth";
 import { toast } from "sonner";
 
 interface MenuTemplate {
@@ -43,21 +44,22 @@ const getAllMenuTemplates = async (): Promise<ApiResponse<MenuTemplate[]>> => {
   return response.data;
 };
 
-const getCategoriesByTenant = async (): Promise<ApiResponse<CategoryDto[]>> => {
+const getCategoriesByTenant = async (tenantId: string): Promise<ApiResponse<CategoryDto[]>> => {
   const response = await apiClient.get<ApiResponse<CategoryDto[]>>(
-    API.CATEGORY.GET_ALL
+    API.CATEGORY.GET_ALL_BY_TENANT_ID(tenantId)
   );
   return response.data;
 };
 
-const getDishesByTenant = async (): Promise<ApiResponse<DishesDto[]>> => {
+const getDishesByTenant = async (tenantId: string): Promise<ApiResponse<DishesDto[]>> => {
   const response = await apiClient.get<ApiResponse<DishesDto[]>>(
-    API.DISHES.GET_ALL
+    API.DISHES.GET_ALL_BY_TENANT_ID(tenantId)
   );
   return response.data;
 };
 
 const getRestaurantsByTenant = async (): Promise<ApiResponse<Restaurant[]>> => {
+  // API này lấy tất cả restaurants của tenant hiện tại từ JWT token
   const response = await apiClient.get<ApiResponse<Restaurant[]>>(
     API.RESTAURANT.GET_ALL_RESTAURANT_BY_TENANT_ID
   );
@@ -73,6 +75,7 @@ const applyTemplateToRestaurant = async (request: ApplyMenuTemplateRequest): Pro
 };
 
 export default function MenuTemplatePage() {
+  const { user } = useAuth();
   const [templates, setTemplates] = useState<MenuTemplate[]>([]);
   const [categories, setCategories] = useState<CategoryDto[]>([]);
   const [dishes, setDishes] = useState<DishesDto[]>([]);
@@ -84,18 +87,29 @@ export default function MenuTemplatePage() {
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
 
   useEffect(() => {
+    if (!user?.id) {
+      return;
+    }
     loadAllData();
-  }, []);
+  }, [user?.id]);
 
   const loadAllData = async () => {
     try {
       setLoading(true);
       
-      const [templatesRes, categoriesRes, dishesRes, restaurantsRes] = await Promise.all([
+      // Đảm bảo có tenantId trước khi load data
+      if (!user?.id) {
+        toast.error("Không tìm thấy thông tin tenant");
+        return;
+      }
+
+      // Load tất cả data song song với tenantId từ user hiện tại
+      // (tất cả restaurants của tenant đều có cùng tenantId)
+      const [templatesRes, restaurantsRes, categoriesRes, dishesRes] = await Promise.all([
         getAllMenuTemplates(),
-        getCategoriesByTenant(),
-        getDishesByTenant(),
         getRestaurantsByTenant(),
+        getCategoriesByTenant(user.id),
+        getDishesByTenant(user.id),
       ]);
 
       if (templatesRes.isSuccess && templatesRes.data) {

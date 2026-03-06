@@ -44,12 +44,14 @@ export const API = {
         CREATE: "/Category/create-category",
         GET_ALL: "/Category/get-category-by-tenant",
         UPDATE_CATEGORY: (id: number) => `/Category/update-category/${id}`,
+        GET_ALL_BY_TENANT_ID: (tenantId: string) => `/Category/get-category-by-tenantId/${tenantId}`,
     },
     DISHES:{
         CREATE: (categoryId: number) => `/Dish/create-dish/${categoryId}`,
         GET_ALL: "/Dish/get-dishes-by-tenant",
         UPDATE_DISH: (categoryId: number, dishId: number) => `/Dish/update-dish/${categoryId}/${dishId}`,
         UPDATE_DISH_AVALABILITY: (dishId: number) => `/Dish/update-dish-availability/${dishId}`,
+        GET_ALL_BY_TENANT_ID: (tenantId: string) => `/Dish/get-dish-by-tenantId/${tenantId}`,
     },
     MENU_TEMPLATE: {
         CREATE: "/MenuTemplate",

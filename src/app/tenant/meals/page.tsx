@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import apiClient from "@/src/services/apiClient";
 import { API } from "@/src/constants/api";
+import { useAuth } from "@/src/hooks/useAuth";
 import {
   ApiResponse,
   CategoryDto,
@@ -12,6 +13,7 @@ import {
 } from "@/src/types/type";
 
 export default function MealsPage() {
+  const { user } = useAuth();
   const [categories, setCategories] = useState<CategoryDto[]>([]);
   const [meals, setMeals] = useState<DishesDto[]>([]);
   const [loading, setLoading] = useState(false);
@@ -33,8 +35,10 @@ export default function MealsPage() {
   const [mealImage, setMealImage] = useState<File | null>(null);
   const [mealImagePreview, setMealImagePreview] = useState<string | null>(null);
 
-  const getCategoriesApi = async (): Promise<ApiResponse<CategoryDto[]>> => {
-    const response = await apiClient.get<ApiResponse<CategoryDto[]>>(API.CATEGORY.GET_ALL);
+  const getCategoriesApi = async (tenantId: string): Promise<ApiResponse<CategoryDto[]>> => {
+    const response = await apiClient.get<ApiResponse<CategoryDto[]>>(
+      API.CATEGORY.GET_ALL_BY_TENANT_ID(tenantId)
+    );
     return response.data;
   };
 
@@ -45,8 +49,10 @@ export default function MealsPage() {
     return response.data;
   };
 
-  const getDishesApi = async (): Promise<ApiResponse<DishesDto[]>> => {
-    const response = await apiClient.get<ApiResponse<DishesDto[]>>(API.DISHES.GET_ALL);
+  const getDishesApi = async (tenantId: string): Promise<ApiResponse<DishesDto[]>> => {
+    const response = await apiClient.get<ApiResponse<DishesDto[]>>(
+      API.DISHES.GET_ALL_BY_TENANT_ID(tenantId)
+    );
     return response.data;
   };
 
@@ -74,13 +80,18 @@ export default function MealsPage() {
   };
 
   const fetchInitialData = async () => {
+    if (!user?.id) {
+      setError("Không tìm thấy tenantId để tải danh mục");
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
 
       const [categoriesResponse, mealsResponse] = await Promise.all([
-        getCategoriesApi(),
-        getDishesApi(),
+        getCategoriesApi(user.id),
+        getDishesApi(user.id),
       ]);
 
       if (categoriesResponse.isSuccess && categoriesResponse.data) {
@@ -105,8 +116,13 @@ export default function MealsPage() {
   };
 
   const fetchCategories = async () => {
+    if (!user?.id) {
+      setError("Không tìm thấy tenantId để tải danh mục");
+      return;
+    }
+
     try {
-      const response = await getCategoriesApi();
+      const response = await getCategoriesApi(user.id);
       if (response.isSuccess && response.data) {
         setCategories(response.data);
       } else {
@@ -119,8 +135,13 @@ export default function MealsPage() {
   };
 
   const fetchMeals = async () => {
+    if (!user?.id) {
+      setError("Không tìm thấy tenantId để tải món ăn");
+      return;
+    }
+
     try {
-      const response = await getDishesApi();
+      const response = await getDishesApi(user.id);
       if (response.isSuccess && response.data) {
         setMeals(response.data);
       } else {
@@ -224,7 +245,7 @@ export default function MealsPage() {
 
   useEffect(() => {
     fetchInitialData();
-  }, []);
+  }, [user?.id]);
 
   return (
     <div className="p-6">

@@ -2,6 +2,7 @@
 import CategoryList from "@/src/components/ui/tenant/CategoryList";
 import CategoryPopUp from "@/src/components/ui/tenant/CategoryPopUp";
 import { API } from "@/src/constants/api";
+import { useAuth } from "@/src/hooks/useAuth";
 import apiClient from "@/src/services/apiClient";
 import { CategoryDto } from "@/src/types/type";
 import { Plus } from "lucide-react";
@@ -9,6 +10,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 export default function CategoryPage() {
+  const { user } = useAuth();
   const [categories, setCategories] = useState<CategoryDto[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -16,8 +18,13 @@ export default function CategoryPage() {
 
   useEffect(() => {
     const fetchCategories = async () => {
+      if (!user?.id) {
+        toast.error("Không tìm thấy tenantId để tải danh mục");
+        return;
+      }
+
       try {
-        const response = await apiClient.get(API.CATEGORY.GET_ALL);
+        const response = await apiClient.get(API.CATEGORY.GET_ALL_BY_TENANT_ID(user.id));
         if (response.data.isSuccess && response.data.data) {
           setCategories(response.data.data);
         } else {
@@ -37,7 +44,7 @@ export default function CategoryPage() {
       }
     };
     fetchCategories();
-  }, []);
+  }, [user?.id]);
 
    const handleCreateClick = () => {
     setShowInfoModal(true)

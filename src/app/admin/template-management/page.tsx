@@ -314,11 +314,11 @@ export default function TemplateManagementPage() {
         // Lưu dataMapping thay vì menuStructure
         dataMapping: {
           categories: {
-            source: "API.CATEGORY.GET_ALL",
+            source: "API.CATEGORY.GET_ALL_BY_TENANT_ID(tenantId)",
             displayField: "categoryName",
           },
           dishes: {
-            source: "API.DISHES.GET_ALL",
+            source: "API.DISHES.GET_ALL_BY_TENANT_ID(tenantId)",
             groupBy: "categoryId",
             displayFields: ["dishName", "price", "description"],
           },
@@ -745,8 +745,8 @@ export default function TemplateManagementPage() {
             <p className="font-semibold">ℹ️ Lưu ý: Phần này CHỈ dùng để preview UI</p>
             <p className="mt-1 text-xs text-blue-700">
               Category/Dish mà bạn nhập ở đây <strong>KHÔNG</strong> được lưu vào database. 
-              Khi tenant sử dụng template, họ sẽ đổ data thật từ API <code className="rounded bg-blue-100 px-1">API.CATEGORY.GET_ALL</code> 
-              và <code className="rounded bg-blue-100 px-1">API.DISHES.GET_ALL</code> vào layout này.
+              Khi tenant sử dụng template, họ sẽ đổ data thật từ API <code className="rounded bg-blue-100 px-1">API.CATEGORY.GET_ALL_BY_TENANT_ID(tenantId)</code> 
+              và <code className="rounded bg-blue-100 px-1">API.DISHES.GET_ALL_BY_TENANT_ID(tenantId)</code> vào layout này.
             </p>
           </div>
           

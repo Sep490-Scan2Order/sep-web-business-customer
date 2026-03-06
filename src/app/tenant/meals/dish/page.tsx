@@ -2,6 +2,7 @@
 import DishList from "@/src/components/ui/tenant/DishList";
 import DishPopUp from "@/src/components/ui/tenant/DishPopUp";
 import { API } from "@/src/constants/api";
+import { useAuth } from "@/src/hooks/useAuth";
 import apiClient from "@/src/services/apiClient";
 import { DishesDto, CategoryDto } from "@/src/types/type";
 import { Plus } from "lucide-react";
@@ -9,6 +10,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 export default function DishPage() {
+  const { user } = useAuth();
   const [dishes, setDishes] = useState<DishesDto[]>([]);
   const [categories, setCategories] = useState<CategoryDto[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -17,11 +19,16 @@ export default function DishPage() {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!user?.id) {
+        toast.error("Không tìm thấy tenantId để tải danh mục");
+        return;
+      }
+
       try {
         // Fetch categories and dishes in parallel
         const [categoriesResponse, dishesResponse] = await Promise.all([
-          apiClient.get(API.CATEGORY.GET_ALL),
-          apiClient.get(API.DISHES.GET_ALL)
+          apiClient.get(API.CATEGORY.GET_ALL_BY_TENANT_ID(user.id)),
+          apiClient.get(API.DISHES.GET_ALL_BY_TENANT_ID(user.id))
         ]);
 
         if (categoriesResponse.data.isSuccess && categoriesResponse.data.data) {
@@ -45,7 +52,7 @@ export default function DishPage() {
       }
     };
     fetchData();
-  }, []);
+  }, [user?.id]);
 
   const handleCreateClick = () => {
     if (categories.length === 0) {
