@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import apiClient from "@/src/services/apiClient";
 import { API } from "@/src/constants/api";
-import { CreateMenuTemplateRequest, ApiResponse } from "@/src/types/type";
+import { ApiResponse } from "@/src/types/type";
 import { toast } from "sonner";
 
 interface MenuTemplate {
@@ -16,6 +16,7 @@ interface MenuTemplate {
   isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  backgroundImageUrl?: string;
 }
 
 interface FixedLayoutSlot {
@@ -69,11 +70,16 @@ const getAllMenuTemplates = async (): Promise<ApiResponse<MenuTemplate[]>> => {
 };
 
 const createMenuTemplate = async (
-  payload: CreateMenuTemplateRequest
+  payload: FormData
 ): Promise<ApiResponse<MenuTemplate>> => {
   const response = await apiClient.post<ApiResponse<MenuTemplate>>(
     API.MENU_TEMPLATE.CREATE,
-    payload
+    payload,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
   );
   return response.data;
 };
@@ -144,11 +150,27 @@ export default function TemplateManagementPage() {
   );
   const [backgroundColor, setBackgroundColor] = useState("#FFFFFF");
   const [backgroundImageUrl, setBackgroundImageUrl] = useState("");
+  const [backgroundImageFile, setBackgroundImageFile] = useState<File | null>(null);
+  const [backgroundImagePreviewUrl, setBackgroundImagePreviewUrl] = useState("");
   const [sections, setSections] = useState<MenuSection[]>(initialSections);
 
   useEffect(() => {
     loadTemplates();
   }, []);
+
+  useEffect(() => {
+    if (!backgroundImageFile) {
+      setBackgroundImagePreviewUrl("");
+      return;
+    }
+
+    const localPreviewUrl = URL.createObjectURL(backgroundImageFile);
+    setBackgroundImagePreviewUrl(localPreviewUrl);
+
+    return () => {
+      URL.revokeObjectURL(localPreviewUrl);
+    };
+  }, [backgroundImageFile]);
 
   const loadTemplates = async () => {
     try {
@@ -174,6 +196,7 @@ export default function TemplateManagementPage() {
     setBackgroundMode("color");
     setBackgroundColor("#FFFFFF");
     setBackgroundImageUrl("");
+    setBackgroundImageFile(null);
     setSections(initialSections);
   };
 
@@ -185,13 +208,40 @@ export default function TemplateManagementPage() {
     }
   };
 
+  const mapLayoutWithApiBackground = (
+    layout: TemplateLayoutConfig | null,
+    backgroundImageUrl?: string
+  ): TemplateLayoutConfig | null => {
+    if (!layout) {
+      return null;
+    }
+
+    if (!backgroundImageUrl?.trim()) {
+      return layout;
+    }
+
+    return {
+      ...layout,
+      canvas: {
+        width: layout.canvas?.width ?? 1000,
+        height: layout.canvas?.height ?? 800,
+        backgroundMode: layout.canvas?.backgroundMode,
+        backgroundColor: layout.canvas?.backgroundColor,
+        backgroundImageUrl: backgroundImageUrl.trim(),
+      },
+    };
+  };
+
   const handleViewTemplateDetail = async (id: number) => {
     try {
       setLoadingDetailId(id);
       const response = await getMenuTemplateById(id);
       if (response.isSuccess && response.data) {
         setSelectedTemplateDetail(response.data);
-        setSelectedTemplateLayout(parseLayoutConfig(response.data.layoutConfigJson));
+        const parsedLayout = parseLayoutConfig(response.data.layoutConfigJson);
+        setSelectedTemplateLayout(
+          mapLayoutWithApiBackground(parsedLayout, response.data.backgroundImageUrl)
+        );
       } else {
         toast.error(response.message || "Failed to load template detail");
       }
@@ -308,7 +358,10 @@ export default function TemplateManagementPage() {
           height: 800,
           backgroundMode,
           backgroundColor,
-          backgroundImageUrl: backgroundMode === "image" ? backgroundImageUrl : "",
+          backgroundImageUrl:
+            backgroundMode === "image"
+              ? (backgroundImageUrl.trim() || undefined)
+              : undefined,
         },
         slots: FIXED_SLOTS,
         // Lưu dataMapping thay vì menuStructure
@@ -325,12 +378,14 @@ export default function TemplateManagementPage() {
         },
       });
 
-      const payload: CreateMenuTemplateRequest = {
-        templateName,
-        themeColor,
-        fontFamily,
-        layoutConfigJson,
-      };
+      const payload = new FormData();
+      payload.append("TemplateName", templateName);
+      payload.append("ThemeColor", themeColor);
+      payload.append("FontFamily", fontFamily);
+      payload.append("LayoutConfigJson", layoutConfigJson);
+      if (backgroundMode === "image" && backgroundImageFile) {
+        payload.append("BackgroundImageUrl", backgroundImageFile);
+      }
 
       const response = await createMenuTemplate(payload);
       if (response.isSuccess) {
@@ -453,6 +508,12 @@ export default function TemplateManagementPage() {
                       {selectedTemplateDetail.fontFamily}
                     </p>
                   </div>
+                  <div className="rounded-lg border border-slate-200 p-3 text-sm md:col-span-3">
+                    <p className="text-slate-500">Background Image URL</p>
+                    <p className="break-all font-medium text-slate-900">
+                      {selectedTemplateDetail.backgroundImageUrl || "(Không có)"}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Data Mapping Rules Section */}
@@ -507,8 +568,9 @@ export default function TemplateManagementPage() {
                             selectedTemplateLayout.canvas?.backgroundColor ?? "#FFFFFF",
                           backgroundImage:
                             selectedTemplateLayout.canvas?.backgroundMode === "image" &&
-                            selectedTemplateLayout.canvas?.backgroundImageUrl
-                              ? `url(${selectedTemplateLayout.canvas.backgroundImageUrl})`
+                            (selectedTemplateLayout.canvas?.backgroundImageUrl ||
+                              selectedTemplateDetail.backgroundImageUrl)
+                              ? `url(${selectedTemplateLayout.canvas?.backgroundImageUrl || selectedTemplateDetail.backgroundImageUrl})`
                               : undefined,
                           backgroundSize: "cover",
                           backgroundPosition: "center",
@@ -622,8 +684,8 @@ export default function TemplateManagementPage() {
     fontFamily,
     backgroundColor,
     backgroundImage:
-      backgroundMode === "image" && backgroundImageUrl.trim()
-        ? `url(${backgroundImageUrl.trim()})`
+      backgroundMode === "image" && (backgroundImagePreviewUrl || backgroundImageUrl.trim())
+        ? `url(${backgroundImagePreviewUrl || backgroundImageUrl.trim()})`
         : undefined,
     backgroundSize: "cover",
     backgroundPosition: "center",
@@ -727,7 +789,18 @@ export default function TemplateManagementPage() {
               </div>
             ) : (
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-slate-700">Background Image URL</label>
+                <label className="block text-sm font-medium text-slate-700">Background Image Upload</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setBackgroundImageFile(e.target.files?.[0] ?? null)}
+                  className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                />
+                <p className="mt-1 text-xs text-slate-500">
+                  Ảnh sẽ được upload lên server qua field <code className="rounded bg-slate-100 px-1">BackgroundImageUrl</code>.
+                </p>
+
+                <label className="mt-3 block text-sm font-medium text-slate-700">Hoặc nhập URL ảnh (preview local)</label>
                 <input
                   type="url"
                   value={backgroundImageUrl}

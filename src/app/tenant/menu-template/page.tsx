@@ -13,6 +13,7 @@ interface MenuTemplate {
   layoutConfigJson: string;
   themeColor: string;
   fontFamily: string;
+  backgroundImageUrl?: string;
 }
 
 interface TemplateLayoutConfig {
@@ -40,6 +41,15 @@ interface TemplateLayoutConfig {
 const getAllMenuTemplates = async (): Promise<ApiResponse<MenuTemplate[]>> => {
   const response = await apiClient.get<ApiResponse<MenuTemplate[]>>(
     API.MENU_TEMPLATE.GET_ALL
+  );
+  return response.data;
+};
+
+const getMenuTemplateById = async (
+  id: number
+): Promise<ApiResponse<MenuTemplate>> => {
+  const response = await apiClient.get<ApiResponse<MenuTemplate>>(
+    API.MENU_TEMPLATE.GET_BY_ID(id)
   );
   return response.data;
 };
@@ -155,9 +165,53 @@ export default function MenuTemplatePage() {
     }
   };
 
-  const handleSelectTemplate = (template: MenuTemplate) => {
-    setSelectedTemplate(template);
-    setSelectedLayout(parseLayoutConfig(template.layoutConfigJson));
+  const mapLayoutWithApiBackground = (
+    layout: TemplateLayoutConfig | null,
+    backgroundImageUrl?: string
+  ): TemplateLayoutConfig | null => {
+    if (!layout) {
+      return null;
+    }
+
+    if (!backgroundImageUrl?.trim()) {
+      return layout;
+    }
+
+    return {
+      ...layout,
+      canvas: {
+        width: layout.canvas?.width ?? 1000,
+        height: layout.canvas?.height ?? 800,
+        backgroundMode: layout.canvas?.backgroundMode,
+        backgroundColor: layout.canvas?.backgroundColor,
+        backgroundImageUrl: backgroundImageUrl.trim(),
+      },
+    };
+  };
+
+  const handleSelectTemplate = async (template: MenuTemplate) => {
+    try {
+      const detailRes = await getMenuTemplateById(template.id);
+
+      if (detailRes.isSuccess && detailRes.data) {
+        setSelectedTemplate(detailRes.data);
+        const parsedLayout = parseLayoutConfig(detailRes.data.layoutConfigJson);
+        setSelectedLayout(
+          mapLayoutWithApiBackground(parsedLayout, detailRes.data.backgroundImageUrl)
+        );
+        return;
+      }
+
+      // Fallback khi không lấy được detail: vẫn cho xem preview từ dữ liệu list
+      setSelectedTemplate(template);
+      setSelectedLayout(parseLayoutConfig(template.layoutConfigJson));
+      toast.error(detailRes.message || "Không tải được chi tiết template");
+    } catch (error) {
+      console.error("Error loading template detail:", error);
+      setSelectedTemplate(template);
+      setSelectedLayout(parseLayoutConfig(template.layoutConfigJson));
+      toast.error("Không tải được chi tiết template");
+    }
   };
 
   const groupDishesByCategory = () => {

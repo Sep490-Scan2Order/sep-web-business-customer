@@ -311,6 +311,7 @@ export interface CreateMenuTemplateRequest{
   layoutConfigJson: string;
   themeColor: string;
   fontFamily: string;
+  backgroundImageUrl?: File;
 }
 
 export interface ApplyMenuTemplateRequest{
