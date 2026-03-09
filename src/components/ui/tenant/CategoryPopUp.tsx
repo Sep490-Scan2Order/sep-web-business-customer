@@ -37,54 +37,38 @@ export default function CategoryPopUp({ onClose, onSubmit, onUpdate, isLoading, 
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
       onClick={onClose}
     >
       <div 
-        className="relative w-full max-w-lg rounded-2xl bg-white shadow-2xl animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-md rounded-xl border border-slate-200 bg-white shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header with Gradient */}
-        <div className="relative overflow-hidden rounded-t-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 px-8 py-6">
-          <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10" />
-          <div className="absolute -right-4 -bottom-4 h-24 w-24 rounded-full bg-white/10" />
-          
-          <div className="relative flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="rounded-xl bg-white/20 p-2.5 backdrop-blur-sm">
-                {categoryData ? (
-                  <Edit2 className="h-6 w-6 text-white" />
-                ) : (
-                  <Plus className="h-6 w-6 text-white" />
-                )}
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-white">
-                  {categoryData ? "Cập nhật danh mục" : "Tạo danh mục mới"}
-                </h2>
-                <p className="text-sm text-emerald-50">
-                  {categoryData ? "Chỉnh sửa thông tin danh mục" : "Thêm danh mục mới vào hệ thống"}
-                </p>
-              </div>
-            </div>
-            
-            <button
-              onClick={onClose}
-              className="rounded-lg bg-white/20 p-2 text-white backdrop-blur-sm transition-all hover:bg-white/30 hover:rotate-90"
-              disabled={isLoading}
-            >
-              <X className="h-5 w-5" />
-            </button>
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900">
+              {categoryData ? "Cập nhật danh mục" : "Tạo danh mục mới"}
+            </h2>
+            <p className="text-sm text-slate-500">
+              {categoryData ? "Chỉnh sửa thông tin danh mục" : "Thêm danh mục mới vào menu"}
+            </p>
           </div>
+          
+          <button
+            onClick={onClose}
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            disabled={isLoading}
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
         {/* Content */}
-        <div className="p-8">
+        <div className="p-6">
           <div className="space-y-2">
-            <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-              <Layers className="h-4 w-4 text-emerald-600" />
-              Tên danh mục
-              <span className="text-red-500">*</span>
+            <label className="text-sm font-medium text-slate-700">
+              Tên danh mục <span className="text-red-500">*</span>
             </label>
             <input
               ref={inputRef}
@@ -94,7 +78,7 @@ export default function CategoryPopUp({ onClose, onSubmit, onUpdate, isLoading, 
               onChange={(e) => setCategoryName(e.target.value)}
               onKeyDown={handleKeyDown}
               disabled={isLoading}
-              className="w-full rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-slate-300 focus:bg-white disabled:cursor-not-allowed disabled:opacity-50"
             />
             <p className="text-xs text-slate-500">
               Tên danh mục sẽ được hiển thị trong menu của bạn
@@ -103,18 +87,18 @@ export default function CategoryPopUp({ onClose, onSubmit, onUpdate, isLoading, 
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 rounded-b-2xl bg-slate-50 px-8 py-5">
+        <div className="flex items-center justify-end gap-2 border-t border-slate-200 px-6 py-4">
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="rounded-xl border-2 border-slate-200 bg-white px-6 py-2.5 text-sm font-semibold text-slate-700 transition-all hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Hủy bỏ
           </button>
           <button
             onClick={handleSubmit}
             disabled={isLoading || !categoryName.trim()}
-            className="group relative flex items-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/30 transition-all hover:scale-105 hover:shadow-xl hover:shadow-emerald-500/40 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isLoading ? (
               <>

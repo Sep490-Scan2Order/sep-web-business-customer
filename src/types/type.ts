@@ -281,7 +281,6 @@ export interface DishesDto{
   description: string;
   imageUrl?: string;
   image?: string;
-  dishAvailability: number;
   isAvailable: boolean;
   createdAt?: string;
 }
@@ -291,7 +290,6 @@ export interface CreateDishRequest{
   price: number;
   description: string;
   image?: File;
-  dishAvailability: number;
 }
 
 export interface CreateCategoryRequest{

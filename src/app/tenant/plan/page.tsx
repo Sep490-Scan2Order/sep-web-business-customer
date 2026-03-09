@@ -94,15 +94,15 @@ export default function PlanPage() {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const response = await apiClient.get<PlanApiResponse>(API.PLAN.GETALL);
-        if (response.status === 200 && response.data.isSuccess) {
-          const filtered = response.data.data.filter(
-            (plan) => plan.isActive && !plan.isDeleted,
-          );
-          setActivePlans(filtered);
-        } else {
-          setActivePlans([]);
-        }
+        // const response = await apiClient.get<PlanApiResponse>(API.PLAN.GETALL);
+        // if (response.status === 200 && response.data.isSuccess) {
+        //   const filtered = response.data.data.filter(
+        //     (plan) => plan.isActive && !plan.isDeleted,
+        //   );
+        //   setActivePlans(filtered);
+        // } else {
+        //   setActivePlans([]);
+        // }
       } catch (error) {
         console.error("Failed to load plans", error);
         setActivePlans([]);
