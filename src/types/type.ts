@@ -16,7 +16,7 @@ export interface TenantDto {
   taxNumber?: string;
 }
 
-export interface TenantLoginRequest{
+export interface TenantLoginRequest {
   email: string;
   password: string;
 }
@@ -47,37 +47,37 @@ export interface User {
   phone?: string;
   role?: string;
   avatar?: string | null;
-  
+
   // Status
   isActive?: boolean;
   verified?: boolean;
-  
+
   // Bank info
   bankId?: string;
   cardNumber?: string;
   bankName?: string;
   bankLogo?: string;
   isVerifyBank?: boolean;
-  
+
   // Tax info
   taxNumber?: string | null;
   isVerifyTax?: boolean;
-  
+
   // Subscription info
   debtStartedAt?: string | null;
   subscriptionExpiryDate?: string | null;
   lastWarningSentAt?: string | null;
   totalDebtAmount?: number;
   planName?: string;
-  
+
   // Stats
   totalRestaurants?: number;
   totalDishes?: number;
   totalCategories?: number;
-  
+
   // Timestamps
   createdAt?: string;
-  
+
   // Fallback cho các field khác từ token
   [key: string]: any;
 }
@@ -260,19 +260,19 @@ export interface AddSystemBlogDtoResponse {
 }
 
 
-export interface BankInfo{
-   id: string;
-   name: string;
-   code: string;
-   bin: number;
-   short_name: string;
-   logo_url: string;
-   icon_url: string;
-   swift_code: string;
-   lookup_supported: number;
+export interface BankInfo {
+  id: string;
+  name: string;
+  code: string;
+  bin: number;
+  short_name: string;
+  logo_url: string;
+  icon_url: string;
+  swift_code: string;
+  lookup_supported: number;
 }
 
-export interface DishesDto{
+export interface DishesDto {
   id: number;
   categoryId?: number;
   categoryName: string;
@@ -285,18 +285,18 @@ export interface DishesDto{
   createdAt?: string;
 }
 
-export interface CreateDishRequest{
+export interface CreateDishRequest {
   dishName: string;
   price: number;
   description: string;
   image?: File;
 }
 
-export interface CreateCategoryRequest{
+export interface CreateCategoryRequest {
   categoryName: string;
 }
 
-export interface CategoryDto{
+export interface CategoryDto {
   id: number;
   tenantId: string;
   categoryName: string;
@@ -304,7 +304,7 @@ export interface CategoryDto{
   createdAt: string;
 }
 
-export interface CreateMenuTemplateRequest{
+export interface CreateMenuTemplateRequest {
   templateName: string;
   layoutConfigJson: string;
   themeColor: string;
@@ -312,7 +312,19 @@ export interface CreateMenuTemplateRequest{
   backgroundImageUrl?: File;
 }
 
-export interface ApplyMenuTemplateRequest{
+export interface ApplyMenuTemplateRequest {
   restaurantId: number;
   templateId: number;
+}
+
+export interface StaffDto {
+  id: string,
+  accountId: string,
+  restaurantId: number,
+  restaurantName: string,
+  name: string,
+  role: string,
+  avatar: string,
+  isActive: boolean,
+  createdAt: string
 }

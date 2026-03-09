@@ -23,6 +23,11 @@ export const API = {
     TENANT_WALLET: {
         DEPOSIT_VERIFY_TAX: "/TenantWallet/deposit-verify-tax",
     },
+    
+    STAFF:{
+        CREATE: "/Staff",
+        GET_ALL: "/Staff/get-all",
+    },
     AUTH: {
         TENANT_LOGIN: "/Auth/tenant-login",
         ADMINISTRATOR_LOGIN: "/Auth/administrator-login",
