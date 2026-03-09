@@ -14,6 +14,7 @@ interface BlogDetailModalProps {
   content?: string;
   colorTitle?: string;
   imageUrls?: string[];
+  thumbnailUrl?: string;
 }
 
 export default function BlogDetailModal({
@@ -26,45 +27,9 @@ export default function BlogDetailModal({
   content = "",
   colorTitle = "#000000",
   imageUrls = [],
+  thumbnailUrl,
 }: BlogDetailModalProps) {
   if (!isOpen || !blog) return null;
-
-  // Parse HTML content and replace image placeholders
-  const parseContent = () => {
-    if (!content) return null;
-
-    let parsedContent = content;
-    imageUrls.forEach((url, index) => {
-      const placeholder = `IMAGE_PLACEHOLDER_block-${index}`;
-      // Replace both the placeholder with block ID and sequential placeholders
-      parsedContent = parsedContent.replace(
-        new RegExp(`IMAGE_PLACEHOLDER_block-\\d+`, "g"),
-        (match) => {
-          // Try to match and replace in order
-          const parts = parsedContent.split(`<img src="${match}"`);
-          if (parts.length > 1 && imageUrls[index]) {
-            return url;
-          }
-          return match;
-        }
-      );
-    });
-
-    // Simple replacement - replace all placeholders with actual URLs
-    imageUrls.forEach((url, index) => {
-      parsedContent = parsedContent.replace(
-        /IMAGE_PLACEHOLDER_block-\d+/,
-        url
-      );
-    });
-
-    return (
-      <div
-        dangerouslySetInnerHTML={{ __html: parsedContent }}
-        className="prose prose-sm max-w-none"
-      />
-    );
-  };
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 p-4">
@@ -120,58 +85,68 @@ export default function BlogDetailModal({
               {/* Divider */}
               <hr className="my-6" />
 
+              {thumbnailUrl && (
+                <div className="mb-6 overflow-hidden rounded-lg border border-gray-200">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={thumbnailUrl}
+                    alt={`${blog.title} thumbnail`}
+                    className="h-56 w-full object-cover"
+                  />
+                </div>
+              )}
+
               {/* Blog Content */}
               <div className="prose prose-lg max-w-none">
                 {content ? (
                   <div
                     className="space-y-6"
                     dangerouslySetInnerHTML={{
-                      __html: content
-                        .replace(
-                          /IMAGE_PLACEHOLDER_block-\d+/g,
-                          (match) => {
-                            const index = imageUrls.findIndex(
-                              (_, i) =>
-                                match.includes(`block-${i}`) ||
-                                imageUrls.indexOf(_) ===
-                                  content.split(match).length - 2
-                            );
-                            return imageUrls[index] || match;
-                          }
-                        )
-                        // Style paragraphs
-                        .replace(
-                          /<p([^>]*)>/g,
-                          '<p$1 class="text-gray-700 leading-relaxed">'
-                        )
-                        // Style headings
-                        .replace(
-                          /<h1([^>]*)>/g,
-                          '<h1$1 class="text-3xl font-bold mt-6 mb-4">'
-                        )
-                        .replace(
-                          /<h2([^>]*)>/g,
-                          '<h2$1 class="text-2xl font-bold mt-6 mb-4">'
-                        )
-                        .replace(
-                          /<h3([^>]*)>/g,
-                          '<h3$1 class="text-xl font-semibold mt-4 mb-3">'
-                        )
-                        // Style images
-                        .replace(
-                          /<img([^>]*)>/g,
-                          '<img$1 class="rounded-lg shadow-md w-full h-auto my-6">'
-                        )
-                        // Style strong/bold
-                        .replace(
-                          /<strong([^>]*)>/g,
-                          '<strong$1 class="font-bold text-gray-900">'
-                        )
-                        // Style em/italic
-                        .replace(
-                          /<em([^>]*)>/g,
-                          '<em$1 class="italic text-gray-700">'
-                        ),
+                      __html: (() => {
+                        let imageIndex = 0;
+                        return content
+                          .replace(
+                            /IMAGE_PLACEHOLDER_block-\d+/g,
+                            () => {
+                              const url = imageUrls[imageIndex] || "";
+                              imageIndex++;
+                              return url;
+                            }
+                          )
+                          // Style paragraphs
+                          .replace(
+                            /<p([^>]*)>/g,
+                            '<p$1 class="text-gray-700 leading-relaxed">'
+                          )
+                          // Style headings
+                          .replace(
+                            /<h1([^>]*)>/g,
+                            '<h1$1 class="text-3xl font-bold mt-6 mb-4">'
+                          )
+                          .replace(
+                            /<h2([^>]*)>/g,
+                            '<h2$1 class="text-2xl font-bold mt-6 mb-4">'
+                          )
+                          .replace(
+                            /<h3([^>]*)>/g,
+                            '<h3$1 class="text-xl font-semibold mt-4 mb-3">'
+                          )
+                          // Style images
+                          .replace(
+                            /<img([^>]*)>/g,
+                            '<img$1 class="rounded-lg shadow-md w-full h-auto my-6">'
+                          )
+                          // Style strong/bold
+                          .replace(
+                            /<strong([^>]*)>/g,
+                            '<strong$1 class="font-bold text-gray-900">'
+                          )
+                          // Style em/italic
+                          .replace(
+                            /<em([^>]*)>/g,
+                            '<em$1 class="italic text-gray-700">'
+                          );
+                      })(),
                     }}
                   />
                 ) : (

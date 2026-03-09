@@ -226,6 +226,7 @@ export interface SystemBlogDto {
   content?: string;
   colorTitle?: string;
   imageUrl?: string | string[];
+  thumbnailUrl?: string;
 }
 
 // Blog Type Enum

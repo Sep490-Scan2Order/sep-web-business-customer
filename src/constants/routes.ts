@@ -10,7 +10,8 @@ export const ROUTES = {
       FORGOT_PASSWORD: "/pages/public/forgot-password",
       PLAN:"/pages/public/plan",
       ABOUT_US: "/pages/public/about-us",
-      FEATURES: "/pages/public/features",     
+      FEATURES: "/pages/public/features",   
+      BLOGS: "/pages/public/blogs",  
     },
 
     PRIVATE:{

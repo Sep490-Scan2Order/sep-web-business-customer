@@ -10,6 +10,8 @@ interface BlogsTableProps {
   getBlogTypeLabel: (type: string | BlogType) => string;
   getBlogTypeColor: (type: string | BlogType) => string;
   onViewDetail?: (blog: SystemBlogDto) => void;
+  onEdit?: (blog: SystemBlogDto) => void;
+  onDelete?: (blog: SystemBlogDto) => void;
 }
 
 export default function BlogsTable({
@@ -47,7 +49,7 @@ export default function BlogsTable({
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
             {loading ? (
-              <tr>
+              <tr key="loading-row">
                 <td colSpan={6} className="px-6 py-12 text-center">
                   <div className="flex items-center justify-center">
                     <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600"></div>
@@ -55,7 +57,7 @@ export default function BlogsTable({
                 </td>
               </tr>
             ) : blogs.length === 0 ? (
-              <tr>
+              <tr key="no-data-row">
                 <td colSpan={6} className="px-6 py-12 text-center">
                   <p className="text-sm text-gray-500">
                     Chưa có blog nào. Tạo blog đầu tiên!

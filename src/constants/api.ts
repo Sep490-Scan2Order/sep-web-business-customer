@@ -37,7 +37,13 @@ export const API = {
     },
     BLOG: {
         CREATE: "/SystemBlog",
-        GET_ALL: "/SystemBlog",
+        GET_ALL: (pageIndex: number = 1, pageSize: number = 7, blogType?: number) => {
+            let url = `/SystemBlog?pageIndex=${pageIndex}&pageSize=${pageSize}`;
+            if (blogType !== undefined) {
+                url += `&blogType=${blogType}`;
+            }
+            return url;
+        },
         GET_BY_ID: (id: number) => `/SystemBlog/${id}`,
     },
     CATEGORY:{

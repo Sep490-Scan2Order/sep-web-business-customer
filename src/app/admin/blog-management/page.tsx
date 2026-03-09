@@ -17,6 +17,13 @@ import BlogsTable from "@/src/components/ui/common/layout/BlogsTable";
 import CreateBlogModal from "@/src/components/ui/common/layout/CreateBlogModal";
 import BlogDetailModal from "@/src/components/ui/common/layout/BlogDetailModal";
 
+interface BlogListResponse {
+  items: SystemBlogDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
 export default function BlogManagementPage() {
   const [blogs, setBlogs] = useState<SystemBlogDto[]>([]);
   const [loading, setLoading] = useState(false);
@@ -33,18 +40,21 @@ export default function BlogManagementPage() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailContent, setDetailContent] = useState<string>("");
   const [detailImageUrls, setDetailImageUrls] = useState<string[]>([]);
+  const [detailThumbnailUrl, setDetailThumbnailUrl] = useState<string>("");
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string>("");
 
 
   // Fetch all blogs
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get<ApiResponse<SystemBlogDto[]>>(
-        API.BLOG.GET_ALL
+      const response = await apiClient.get<ApiResponse<BlogListResponse>>(
+        API.BLOG.GET_ALL(1, 50)
       );
 
-      if (response.data?.isSuccess && response.data.data) {
-        setBlogs(response.data.data);
+      if (response.data?.isSuccess && response.data.data?.items) {
+        setBlogs(response.data.data.items);
       } else {
         toast.error("Không thể tải danh sách blog");
       }
@@ -71,13 +81,14 @@ export default function BlogManagementPage() {
         const blog = response.data.data;
         setSelectedBlog(blog);
         setDetailContent(blog.content || "");
+        setDetailThumbnailUrl(typeof blog.thumbnailUrl === "string" ? blog.thumbnailUrl : "");
         
         // Parse imageUrl if it's a JSON string
         try {
-          const imageUrls = typeof blog.imageUrl === "string" 
-            ? JSON.parse(blog.imageUrl) 
-            : Array.isArray(blog.imageUrl) 
-            ? blog.imageUrl 
+          const imageUrls = typeof blog.imageUrl === "string"
+            ? (JSON.parse(blog.imageUrl) as string[])
+            : Array.isArray(blog.imageUrl)
+            ? blog.imageUrl
             : [];
           setDetailImageUrls(imageUrls as string[]);
         } catch {
@@ -106,6 +117,19 @@ export default function BlogManagementPage() {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleThumbnailUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      setThumbnailFile(null);
+      setThumbnailPreview("");
+      return;
+    }
+
+    setThumbnailFile(file);
+    const previewUrl = URL.createObjectURL(file);
+    setThumbnailPreview(previewUrl);
   };
 
   // Add new content block
@@ -206,20 +230,24 @@ export default function BlogManagementPage() {
 
       // Create FormData for multipart/form-data request
       const formDataToSend = new FormData();
-      formDataToSend.append("title", formData.title);
-      formDataToSend.append("colorTitle", formData.colorTitle);
-      formDataToSend.append("blogType", formData.blogType.toString());
+      formDataToSend.append("Title", formData.title);
+      formDataToSend.append("ColorTitle", formData.colorTitle);
+      formDataToSend.append("BlogType", formData.blogType.toString());
 
       // Convert blocks to HTML content
       const htmlContent = blocksToHtml();
-      formDataToSend.append("content", htmlContent);
+      formDataToSend.append("Content", htmlContent);
 
       // Append images from blocks
       contentBlocks.forEach((block) => {
         if (block.type === "image" && block.imageFile) {
-          formDataToSend.append("images", block.imageFile);
+          formDataToSend.append("Images", block.imageFile);
         }
       });
+
+      if (thumbnailFile) {
+        formDataToSend.append("Thumbnail", thumbnailFile);
+      }
 
       const response = await apiClient.post<
         ApiResponse<AddSystemBlogDtoResponse>
@@ -239,6 +267,8 @@ export default function BlogManagementPage() {
           blogType: BlogType.Announcement,
         });
         setContentBlocks([]);
+        setThumbnailFile(null);
+        setThumbnailPreview("");
         // Refresh blogs list
         fetchBlogs();
       } else {
@@ -340,11 +370,15 @@ export default function BlogManagementPage() {
           setShowCreateModal(false);
           setContentBlocks([]);
           setShowPreview(false);
+          setThumbnailFile(null);
+          setThumbnailPreview("");
         }}
         showPreview={showPreview}
         onTogglePreview={() => setShowPreview(!showPreview)}
         formData={formData}
         onFormChange={handleInputChange}
+        thumbnailPreview={thumbnailPreview}
+        onThumbnailUpload={handleThumbnailUpload}
         contentBlocks={contentBlocks}
         onAddBlock={addBlock}
         onUpdateBlock={updateBlock}
@@ -366,6 +400,7 @@ export default function BlogManagementPage() {
           setSelectedBlog(null);
           setDetailContent("");
           setDetailImageUrls([]);
+          setDetailThumbnailUrl("");
         }}
         blog={selectedBlog}
         loading={detailLoading}
@@ -374,6 +409,7 @@ export default function BlogManagementPage() {
         content={detailContent}
         colorTitle={selectedBlog?.colorTitle}
         imageUrls={detailImageUrls}
+        thumbnailUrl={detailThumbnailUrl}
       />
     </div>
   );

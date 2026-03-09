@@ -5,7 +5,7 @@ import apiClient from "@/src/services/apiClient";
 import { API } from "@/src/constants/api";
 import { ApiResponse, CategoryDto, DishesDto, Restaurant, ApplyMenuTemplateRequest } from "@/src/types/type";
 import { useAuth } from "@/src/hooks/useAuth";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 interface MenuTemplate {
   id: number;
@@ -245,7 +245,7 @@ export default function MenuTemplatePage() {
       const response = await applyTemplateToRestaurant(request);
       
       if (response.isSuccess) {
-        toast.success("Áp dụng template vô nhà hàng thành công");
+        toast.success("Bạn đã áp dụng template vào menu thành công");
       } else {
         toast.error(response.message || "Không thể áp dụng template");
       }

@@ -17,6 +17,8 @@ interface CreateBlogModalProps {
     blogType: BlogType;
   };
   onFormChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  thumbnailPreview?: string;
+  onThumbnailUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   contentBlocks: ContentBlock[];
   onAddBlock: (type: "text" | "image" | "heading") => void;
   onUpdateBlock: (id: string, updates: Partial<ContentBlock>) => void;
@@ -37,6 +39,8 @@ export default function CreateBlogModal({
   onTogglePreview,
   formData,
   onFormChange,
+  thumbnailPreview,
+  onThumbnailUpload,
   contentBlocks,
   onAddBlock,
   onUpdateBlock,
@@ -136,6 +140,28 @@ export default function CreateBlogModal({
                   onChange={onFormChange}
                   className="h-10 w-32 rounded-lg border border-gray-300 px-2 py-1"
                 />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Thumbnail
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={onThumbnailUpload}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+                />
+                {thumbnailPreview && (
+                  <div className="mt-3 overflow-hidden rounded-lg border border-gray-200">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={thumbnailPreview}
+                      alt="Thumbnail preview"
+                      className="h-40 w-full object-cover"
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Content Blocks */}

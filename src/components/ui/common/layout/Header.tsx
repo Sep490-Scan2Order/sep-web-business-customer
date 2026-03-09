@@ -77,6 +77,12 @@ const Header: React.FC<HeaderProps> = ({ className = "" }) => {
               >
                 Về chúng tôi
               </Link>
+              <Link
+                href={ROUTES.PAGES.PUBLIC.BLOGS}
+                className="text-white/90 hover:text-white font-medium text-base"
+              >
+                Blog
+              </Link>
             </>
           )}
           {isAuthenticated && (
