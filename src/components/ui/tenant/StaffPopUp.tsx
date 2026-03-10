@@ -28,7 +28,6 @@ export default function StaffPopUp({
   const [name, setName] = useState(staffData?.name || "");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
   const [restaurantId, setRestaurantId] = useState<number>(
     Number(staffData?.restaurantId) || Number(restaurants[0]?.id) || 0,
   );
@@ -43,7 +42,6 @@ export default function StaffPopUp({
     formData.append("name", name);
     formData.append("email", email);
     formData.append("phone", phone);
-    formData.append("password", password);
     formData.append("restaurantId", restaurantId.toString());
 
     if (staffData?.id) {
@@ -59,7 +57,6 @@ export default function StaffPopUp({
       name.trim() &&
       email.trim() &&
       phone.trim() &&
-      password.trim() &&
       !isLoading
     ) {
       e.preventDefault();
@@ -70,7 +67,7 @@ export default function StaffPopUp({
   };
 
   const isFormValid =
-    name.trim() && email.trim() && phone.trim() && password.trim();
+    name.trim() && email.trim() && phone.trim();
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 overflow-y-auto"
@@ -170,22 +167,6 @@ export default function StaffPopUp({
                   placeholder="Nhập số điện thoại..."
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  disabled={isLoading}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-slate-300 focus:bg-white disabled:cursor-not-allowed disabled:opacity-50"
-                />
-              </div>
-
-            {/* Password */}
-              <div>
-                <label className="text-sm font-medium text-slate-700 mb-2 block">
-                  Mật khẩu
-                </label>
-                <input
-                  type="tel"
-                  placeholder="Nhập số mật khẩu..."
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                   onKeyDown={handleKeyDown}
                   disabled={isLoading}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-slate-300 focus:bg-white disabled:cursor-not-allowed disabled:opacity-50"

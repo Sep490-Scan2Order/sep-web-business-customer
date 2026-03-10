@@ -77,6 +77,9 @@ export const API = {
         BUY_FIRST_SUBSCRIPTION: (planId: number) => `/Subscription?planId=${planId}`,
         BUY_UPGRADE_SUBSCRIPTION: (planId: number) => `/Subscription/upgrade-plan/${planId}`,
         RENEW_SUBSCRIPTION: "/Subscription/renew-subscription",
+    },
+    EMAIL:{
+        SEND: "/Email/send",
     }
 };
 
