@@ -426,3 +426,20 @@ export interface NotifyTenantCreateRequest {
   tenantIds: string[];
 }
 
+export type PlanApiItem = {
+  id: number,
+  name: string,
+  monthlyPrice: number,
+  yearlyPrice: number,
+  dailyRateMonth: number,
+  dailyRateYear: number,
+  level: number,
+  status: string,
+  features: {
+    maxStaff: number,
+    canUseCombo: boolean,
+    canUsePromotions: boolean,
+    canCustomMenuTemplate: boolean
+  };
+}
+

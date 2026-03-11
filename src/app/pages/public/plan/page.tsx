@@ -5,18 +5,8 @@ import { API } from "@/src/constants/api";
 import { ROUTES } from "@/src/constants/routes";
 import apiClient from "@/src/services/apiClient";
 import { useEffect, useState } from "react";
+import { PlanApiItem } from "@/src/types/type";
 
-type PlanApiItem = {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  durationInDays: number;
-  isActive: boolean;
-  createdAt: string;
-  updateAt: string;
-  isDeleted: boolean;
-};
 
 type PlanApiResponse = {
   isSuccess: boolean;
@@ -38,10 +28,7 @@ export default function PlanPage() {
       try {
         const response = await apiClient.get<PlanApiResponse>(API.PLAN.GETALL);
         if (response.status === 200 && response.data.isSuccess) {
-          const filtered = response.data.data.filter(
-            (plan) => plan.isActive && !plan.isDeleted
-          );
-          setActivePlans(filtered);
+          setActivePlans(response.data.data);
         } else {
           setActivePlans([]);
         }
@@ -131,21 +118,61 @@ export default function PlanPage() {
                   <h3 className="text-xl font-bold text-[rgb(var(--color-primary))]">
                     {plan.name}
                   </h3>
-                  <span className="rounded-full bg-[rgb(var(--color-accent-light))] px-3 py-1 text-xs font-semibold text-[rgb(var(--color-accent-dark))]">
-                    {Math.max(1, Math.ceil(plan.durationInDays / 30))} tháng
-                  </span>
+                   <span className="rounded-full bg-[rgb(var(--color-accent-light))] px-3 py-1 text-xs font-semibold text-[rgb(var(--color-accent-dark))]">
+                      1 tháng {/* Fixed duration display */}
+                    </span>
                 </div>
-                <p className="mt-2 text-sm text-gray-600">{plan.description}</p>
+              
+                  <div className="mt-6 flex items-end gap-2">
+                    <span className="text-3xl font-extrabold text-gray-900">
+                      {formatPrice(plan.monthlyPrice)}đ
+                    </span>
+                    <span className="text-sm text-gray-600">/tháng</span>
+                  </div>
 
-                <div className="mt-6 flex items-end gap-2">
-                  <span className="text-3xl font-extrabold text-gray-900">
-                    {formatPrice(plan.price)}đ
-                  </span>
-                  <span className="text-sm text-gray-600">/tháng</span>
-                </div>
-                <p className="mt-2 text-xs text-[rgb(var(--color-accent-dark))]">
-                  Cam kết tối thiểu {Math.max(1, Math.ceil(plan.durationInDays / 30))} tháng
-                </p>
+                  <div className="mt-4 text-sm text-[rgb(var(--color-accent-dark))]">
+                    <p className="mb-2 font-semibold">Các chức năng chính:</p>
+                    <ul className="space-y-1">
+                      {/* Always shows if > 0 */}
+                      {plan.features.maxStaff > 0 && (
+                        <li>
+                          - Quản lý tối đa {plan.features.maxStaff} nhân viên
+                        </li>
+                      )}
+
+                      {/* Shows standard if true, grayed-out/strikethrough if false */}
+                      <li
+                        className={
+                          plan.features.canCustomMenuTemplate
+                            ? ""
+                            : "text-gray-400 line-through"
+                        }
+                      >
+                        - Tùy chỉnh mẫu thực đơn
+                      </li>
+
+                      <li
+                        className={
+                          plan.features.canUseCombo
+                            ? ""
+                            : "text-gray-400 line-through"
+                        }
+                      >
+                        - Hỗ trợ tạo Combo
+                      </li>
+
+                      <li
+                        className={
+                          plan.features.canUsePromotions
+                            ? ""
+                            : "text-gray-400 line-through"
+                        }
+                      >
+                        - Quản lý Khuyến mãi
+                      </li>
+                    </ul>
+                  </div>
+
 
                 <Link
                   href={ROUTES.PAGES.PUBLIC.REGISTER}

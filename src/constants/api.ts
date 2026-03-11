@@ -74,9 +74,8 @@ export const API = {
         GET_MENU_BY_RESTAURANT_ID: (restaurantId: number) => `/MenuRestaurant/${restaurantId}`,
     },
     SUBSCRIPTION:{
-        BUY_FIRST_SUBSCRIPTION: (planId: number) => `/Subscription?planId=${planId}`,
-        BUY_UPGRADE_SUBSCRIPTION: (planId: number) => `/Subscription/upgrade-plan/${planId}`,
-        RENEW_SUBSCRIPTION: "/Subscription/renew-subscription",
+        PREVIEW: "/preview",
+        CREATE_PAYMENT: "/create-payment",
     },
     EMAIL:{
         SEND: "/Email/send",

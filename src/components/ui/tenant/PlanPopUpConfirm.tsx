@@ -1,18 +1,8 @@
 'use client'
+import { PlanApiItem } from '@/src/types/type'
 import { Edit2, Layers, Loader2, Plus, X } from 'lucide-react'
 import React from 'react'
 
-type PlanApiItem = {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  durationInDays: number;
-  isActive: boolean;
-  createdAt: string;
-  updateAt: string;
-  isDeleted: boolean;
-};
 
 interface PlanProps {
   onClose: () => void
