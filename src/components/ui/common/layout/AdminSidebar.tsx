@@ -17,6 +17,7 @@ import {
   Bot,
   Settings,
   Paperclip,
+  Bell,
 } from 'lucide-react'
 
 type NavItem = {
@@ -44,6 +45,7 @@ const sections: { label: string; items: NavItem[] }[] = [
       { label: 'Billing & Subscriptions', href: "/admin/billing-subscriptions", icon: CreditCard, hasChildren: true, match: 'prefix' },
       { label: 'Template Management', href: "/admin/template-management", icon: FileText, hasChildren: true, match: 'prefix' },
       { label: 'Blog Management', href: "/admin/blog-management", icon: Paperclip, hasChildren: true, match: 'prefix' },
+      { label: 'Notification Management', href: "/admin/notification-management", icon: Bell, hasChildren: true, match: 'prefix' },
     ],
   },
   {

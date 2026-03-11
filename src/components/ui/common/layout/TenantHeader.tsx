@@ -1,7 +1,8 @@
 'use client';
 import { useAuth } from '@/src/hooks/useAuth';
-import { UserInfo } from '@/src/types/type';
-import React from 'react'
+import { notificationService } from '@/src/services/notificationService';
+import { NotifyTenantDetailItem, UserInfo } from '@/src/types/type';
+import { useEffect, useRef, useState } from 'react';
 
 const IconBell = () => (
   <svg viewBox="0 0 24 24" className="h-4 w-4 stroke-slate-500" fill="none" stroke="currentColor" strokeWidth="1.6">
@@ -19,8 +20,132 @@ const IconSearch = () => (
 )
 
 export default function TenantHeader() {
-   const { user } = useAuth();
-   const tenantInfo = (user ?? null) as UserInfo | null
+  const DETAIL_PAGE_SIZE = 5;
+
+  const { user } = useAuth();
+  const tenantInfo = (user ?? null) as UserInfo | null;
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notificationItems, setNotificationItems] = useState<NotifyTenantDetailItem[]>([]);
+  const [detailPage, setDetailPage] = useState(1);
+  const [detailTotalCount, setDetailTotalCount] = useState(0);
+  const [isLoadingNotifications, setIsLoadingNotifications] = useState(false);
+  const [isUpdatingRead, setIsUpdatingRead] = useState(false);
+  const notificationPanelRef = useRef<HTMLDivElement | null>(null);
+
+  const totalDetailPages = Math.max(1, Math.ceil(detailTotalCount / DETAIL_PAGE_SIZE));
+
+  const loadUnreadCount = async () => {
+    if (!tenantInfo?.id) {
+      setUnreadCount(0);
+      return;
+    }
+
+    try {
+      const response = await notificationService.countNotifyTenantsByStatus(tenantInfo.id, 0);
+
+      if (response.data?.isSuccess) {
+        setUnreadCount(response.data.data ?? 0);
+      }
+    } catch (error) {
+      console.error('Error fetching unread notification count', error);
+    }
+  };
+
+  const loadNotificationDetails = async () => {
+    try {
+      setIsLoadingNotifications(true);
+      const response = await notificationService.getNotifyTenantDetails(detailPage, DETAIL_PAGE_SIZE);
+
+      if (response.data?.isSuccess && response.data.data) {
+        setNotificationItems(response.data.data.items || []);
+        setDetailTotalCount(response.data.data.totalCount || 0);
+      }
+    } catch (error) {
+      console.error('Error fetching notification details', error);
+    } finally {
+      setIsLoadingNotifications(false);
+    }
+  };
+
+  useEffect(() => {
+    loadUnreadCount();
+  }, [tenantInfo?.id]);
+
+  useEffect(() => {
+    if (!showNotifications) {
+      return;
+    }
+
+    loadNotificationDetails();
+  }, [detailPage, showNotifications]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!notificationPanelRef.current?.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+
+    if (showNotifications) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showNotifications]);
+
+  const formatDateTime = (value: string | null) => {
+    if (!value) return 'Chưa đọc';
+    return new Date(value).toLocaleString('vi-VN');
+  };
+
+  const markNotificationsAsRead = async (notificationIds: number[]) => {
+    if (notificationIds.length === 0) {
+      return true;
+    }
+
+    try {
+      setIsUpdatingRead(true);
+      const response = await notificationService.updateReadByTenant({
+        notificationIds,
+        readAt: new Date().toISOString(),
+        status: 1,
+      });
+
+      if (response.data?.isSuccess) {
+        await Promise.all([loadUnreadCount(), loadNotificationDetails()]);
+        return true;
+      }
+    } catch (error) {
+      console.error('Error updating read notifications', error);
+    } finally {
+      setIsUpdatingRead(false);
+    }
+
+    return false;
+  };
+
+  const handleOpenNotification = async (item: NotifyTenantDetailItem) => {
+    if (item.status === 0) {
+      await markNotificationsAsRead([item.notificationId]);
+    }
+
+    if (item.systemBlogUrl) {
+      window.open(item.systemBlogUrl, '_blank', 'noopener,noreferrer');
+    }
+
+    setShowNotifications(false);
+  };
+
+  const handleMarkAllAsRead = async () => {
+    const unreadIds = Array.from(
+      new Set(notificationItems.filter((item) => item.status === 0).map((item) => item.notificationId))
+    );
+
+    await markNotificationsAsRead(unreadIds);
+  };
 
   return (
     <header className="border-b border-slate-200 bg-white px-6 py-4">
@@ -50,13 +175,100 @@ export default function TenantHeader() {
             <span>{tenantInfo?.isActive ? "Active" : "Inactive"}</span>
           </button>
 
-          <button
-            type="button"
-            className="flex items-center justify-center rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50"
-            aria-label="Notifications"
-          >
-            <IconBell />
-          </button>
+          <div className="relative" ref={notificationPanelRef}>
+            <button
+              type="button"
+              className="relative flex items-center justify-center rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50"
+              aria-label="Notifications"
+              onClick={() => {
+                setDetailPage(1);
+                setShowNotifications((prev) => !prev);
+              }}
+            >
+              <IconBell />
+              {unreadCount > 0 ? (
+                <span className="absolute -right-1 -top-1 min-w-[18px] rounded-full bg-red-500 px-1.5 py-0.5 text-center text-[10px] font-semibold leading-none text-white">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              ) : null}
+            </button>
+
+            {showNotifications ? (
+              <div className="absolute right-0 top-12 z-50 w-[360px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
+                <div className="border-b border-slate-200 px-4 py-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">Thông báo</p>
+                      <p className="text-xs text-slate-500">Chưa đọc: {unreadCount}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={handleMarkAllAsRead}
+                        disabled={isUpdatingRead || unreadCount === 0}
+                        className="text-xs font-medium text-[rgb(var(--color-primary))] disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Đã đọc tất cả
+                      </button>
+                      <p className="text-xs text-slate-500">Trang {detailPage}/{totalDetailPages}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="max-h-[420px] overflow-y-auto">
+                  {isLoadingNotifications ? (
+                    <div className="px-4 py-6 text-center text-sm text-slate-500">Đang tải thông báo...</div>
+                  ) : notificationItems.length === 0 ? (
+                    <div className="px-4 py-6 text-center text-sm text-slate-500">Chưa có thông báo</div>
+                  ) : (
+                    <div className="divide-y divide-slate-100">
+                      {notificationItems.map((item, index) => (
+                        <button
+                          key={`${item.notificationId}-${item.sentAt}-${index}`}
+                          type="button"
+                          onClick={() => handleOpenNotification(item)}
+                          className={`w-full px-4 py-3 text-left transition hover:bg-slate-50 ${
+                            item.status === 0 ? 'bg-slate-50/80 text-slate-900' : 'text-slate-500'
+                          } ${item.systemBlogUrl ? 'cursor-pointer' : 'cursor-default'}`}
+                        >
+                          <p className={`text-sm ${item.status === 0 ? 'font-semibold' : 'font-medium'}`}>
+                            {item.notifyTitle}
+                          </p>
+                          <p className={`mt-1 text-xs ${item.status === 0 ? 'text-slate-700' : 'text-slate-400'}`}>
+                            {item.notifySub}
+                          </p>
+                          <div className={`mt-2 flex flex-col gap-1 text-[11px] ${item.status === 0 ? 'text-slate-600' : 'text-slate-400'}`}>
+                            <span>Gửi lúc: {formatDateTime(item.sentAt)}</span>
+                            <span>Đọc lúc: {formatDateTime(item.readAt)}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between border-t border-slate-200 px-4 py-3">
+                  <button
+                    type="button"
+                    onClick={() => setDetailPage((prev) => Math.max(1, prev - 1))}
+                    disabled={detailPage <= 1 || isLoadingNotifications || isUpdatingRead}
+                    className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Lùi lại
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setDetailPage((prev) => Math.min(totalDetailPages, prev + 1))}
+                    disabled={detailPage >= totalDetailPages || isLoadingNotifications || isUpdatingRead}
+                    className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Trang tiếp
+                  </button>
+                </div>
+              </div>
+            ) : null}
+          </div>
 
           <button
             type="button"

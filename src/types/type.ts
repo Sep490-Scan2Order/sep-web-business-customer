@@ -329,3 +329,100 @@ export interface StaffDto {
   isActive: boolean,
   createdAt: string
 }
+
+export interface BlogListResponse {
+  items: SystemBlogDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface TenantSummaryDto {
+  id: string;
+  accountId: string;
+  name: string;
+  phone: string;
+  email?: string;
+  taxNumber?: string;
+  bankName?: string;
+  cardNumber?: string;
+  status?: string;
+  planName?: string;
+  totalRestaurants?: number;
+  totalDishes?: number;
+  totalCategories?: number;
+}
+
+export interface NotificationCreateRequest {
+  notifyTitle: string;
+  notifySub: string;
+  systemBlogUrl: string;
+}
+
+export interface NotificationCreatedData {
+  id: number;
+  notifyTitle: string;
+  notifySub: string;
+  systemBlogUrl: string | null;
+  sentAt: string;
+}
+
+export interface NotificationItem {
+  notificationId: number;
+  notifyTitle: string;
+  notifySub: string;
+  notifyStatus: number;
+  systemBlogUrl: string | null;
+  sentAt: string;
+  notifyTenants: unknown[];
+  isDeleted: boolean;
+  createdAt: string;
+  id: number;
+  updatedAt: string | null;
+}
+
+export interface NotificationListResponse {
+  items: NotificationItem[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface NotifyTenantItem {
+  id: number;
+  notificationId: number;
+  tenantId: string;
+  notifyTenantStatus: number;
+  readAt: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface NotifyTenantDetailItem {
+  notificationId: number;
+  notifyTitle: string;
+  notifySub: string;
+  systemBlogUrl: string | null;
+  status: number;
+  sentAt: string;
+  readAt: string | null;
+}
+
+export interface NotifyTenantDetailListResponse {
+  items: NotifyTenantDetailItem[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface NotifyTenantUpdateReadRequest {
+  notificationIds: number[];
+  readAt: string;
+  status: number;
+}
+
+export interface NotifyTenantCreateRequest {
+  notificationId: number;
+  tenantIds: string[];
+}
+

@@ -81,6 +81,17 @@ export const API = {
     EMAIL:{
         SEND: "/Email/send",
         GUEST_SEND: "/Email/guest-send/id-domain"
+    },
+    NOTIFICATION:{
+        POST: "/Notification",
+        GET_ALL: (pageIndex: number = 1, pageSize: number = 7) => `/Notification?pageIndex=${pageIndex}&pageSize=${pageSize}`
+    },
+    NOTIFY_TENANT:{
+        POST: "/NotifyTenant",
+        GET_ALL: "/NotifyTenant",
+        COUNT_BY_TENANT_ID: (tenantId: string, notifyTenantStatus: number) => `/NotifyTenant/count/${tenantId}?notifyTenantStatus=${notifyTenantStatus}`,
+        UPDATE_READ_BY_TENANT_ID: `/NotifyTenant/update-read-by-tenant`,
+        DETAILS: (pageIndex: number = 1, pageSize: number = 5) => `/NotifyTenant/details?pageIndex=${pageIndex}&pageSize=${pageSize}`,
     }
 };
 
