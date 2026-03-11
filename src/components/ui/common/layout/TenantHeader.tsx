@@ -1,8 +1,9 @@
 'use client';
 import { useAuth } from '@/src/hooks/useAuth';
+import { useRealtime } from '@/src/hooks/useRealtime';
 import { notificationService } from '@/src/services/notificationService';
 import { NotifyTenantDetailItem, UserInfo } from '@/src/types/type';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const IconBell = () => (
   <svg viewBox="0 0 24 24" className="h-4 w-4 stroke-slate-500" fill="none" stroke="currentColor" strokeWidth="1.6">
@@ -67,6 +68,20 @@ export default function TenantHeader() {
       setIsLoadingNotifications(false);
     }
   };
+
+  const handleCountChanged = useCallback((count: number) => {
+    setUnreadCount(count);
+  }, []);
+
+  const handleListChanged = useCallback(() => {
+    loadNotificationDetails();
+  }, [detailPage, showNotifications]);
+
+  useRealtime({
+    tenantId: tenantInfo?.id,
+    onCountChanged: handleCountChanged,
+    onListChanged: handleListChanged,
+  });
 
   useEffect(() => {
     loadUnreadCount();
