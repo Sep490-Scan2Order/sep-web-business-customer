@@ -12,6 +12,7 @@ export const ROUTES = {
       ABOUT_US: "/pages/public/about-us",
       FEATURES: "/pages/public/features",   
       BLOGS: "/pages/public/blogs",  
+      TERMS_AND_POLICIES: "/pages/public/terms-and-policies",
     },
 
     PRIVATE:{

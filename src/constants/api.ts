@@ -80,6 +80,7 @@ export const API = {
     },
     EMAIL:{
         SEND: "/Email/send",
+        GUEST_SEND: "/Email/guest-send/id-domain"
     }
 };
 

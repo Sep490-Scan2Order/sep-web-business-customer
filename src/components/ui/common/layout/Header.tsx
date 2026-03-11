@@ -83,6 +83,12 @@ const Header: React.FC<HeaderProps> = ({ className = "" }) => {
               >
                 Blog
               </Link>
+              <Link
+                href={ROUTES.PAGES.PUBLIC.TERMS_AND_POLICIES}
+                className="text-white/90 hover:text-white font-medium text-base"
+              >
+                Điều khoản & Chính sách
+              </Link>
             </>
           )}
           {isAuthenticated && (
@@ -110,6 +116,12 @@ const Header: React.FC<HeaderProps> = ({ className = "" }) => {
                 className="text-white/90 hover:text-white font-medium text-base"
               >
                 Về chúng tôi
+              </Link>
+              <Link
+                href={ROUTES.PAGES.PUBLIC.TERMS_AND_POLICIES}
+                className="text-white/90 hover:text-white font-medium text-base"
+              >
+                Điều khoản & Chính sách
               </Link>
               <Link
                 href={TENANT_ROUTES.DASHBOARD}
@@ -168,6 +180,7 @@ const Header: React.FC<HeaderProps> = ({ className = "" }) => {
               >
                 Đăng ký
               </Link>
+              
             </div>
           )}
         </div>
