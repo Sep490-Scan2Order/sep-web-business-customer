@@ -45,6 +45,7 @@ jobs:
               -p 3000:3000 \
               --restart unless-stopped \
               -e NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }} \
+              -e NEXT_PUBLIC_SIGNALR_HUB_URL=${{ secrets.NEXT_PUBLIC_SIGNALR_HUB_URL }} \
               ${{ secrets.DOCKER_USERNAME }}/s2o-tenant-web:latest
             
             docker image prune -af
