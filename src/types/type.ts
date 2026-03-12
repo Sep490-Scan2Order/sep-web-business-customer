@@ -443,3 +443,34 @@ export type PlanApiItem = {
   };
 }
 
+export type SubscriptionTenantInfo = {
+  restaurantId: number,
+  restaurantName: string,
+  address: string,
+  isActive: boolean,
+  currentSubscriptionId: number,
+  currentPlanId: number,
+  currentPlanName: string,
+  startDate: string,
+  endDate: string,
+  status: string
+}
+
+export type PreviewSubscriptionResponse = {
+  totalAmountToPay: number,
+    details: [
+      {
+        restaurantId: number,
+        restaurantName: string,
+        actionType: number,
+        targetPlanName: string,
+        cycle: number,
+        quantity: number,
+        basePrice: number,
+        balanceConverted: number,
+        amountToPay: number,
+        message: string
+      }
+    ]
+}
+

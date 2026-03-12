@@ -74,8 +74,9 @@ export const API = {
         GET_MENU_BY_RESTAURANT_ID: (restaurantId: number) => `/MenuRestaurant/${restaurantId}`,
     },
     SUBSCRIPTION:{
-        PREVIEW: "/preview",
-        CREATE_PAYMENT: "/create-payment",
+        PREVIEW: "/subscription/preview",
+        CREATE_PAYMENT: "/subscription/create-payment",
+        GET_SUBSCRIPTION_BY_TENANT: "/subscription/get-by-tenant",
     },
     EMAIL:{
         SEND: "/Email/send",
