@@ -26,6 +26,7 @@ jobs:
           push: true
           build-args: |
             NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+            NEXT_PUBLIC_SIGNALR_HUB_URL=${{ secrets.NEXT_PUBLIC_SIGNALR_HUB_URL }}
           tags: ${{ secrets.DOCKER_USERNAME }}/s2o-tenant-web:latest
 
       - name: Deploy to VPS via SSH
