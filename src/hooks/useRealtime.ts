@@ -7,28 +7,35 @@ import { useAuth } from '@/src/hooks/useAuth';
 
 interface UseRealtimeOptions {
   tenantId: string | undefined;
-  onCountChanged: (count: number) => void;
-  onListChanged: () => void;
+  onCountChanged?: (count: number) => void;
+  onListChanged?: () => void;
+  onProfileChanged?: () => void;
 }
 
 export function useRealtime({
   tenantId,
   onCountChanged,
   onListChanged,
+  onProfileChanged,
 }: UseRealtimeOptions) {
   const { token } = useAuth();
 
   // Keep latest callbacks in refs to avoid reconnecting on every render
   const onCountChangedRef = useRef(onCountChanged);
   const onListChangedRef = useRef(onListChanged);
+  const onProfileChangedRef = useRef(onProfileChanged);
 
   useEffect(() => {
     onCountChangedRef.current = onCountChanged;
-  });
+  }, [onCountChanged]);
 
   useEffect(() => {
     onListChangedRef.current = onListChanged;
-  });
+  }, [onListChanged]);
+
+  useEffect(() => {
+    onProfileChangedRef.current = onProfileChanged;
+  }, [onProfileChanged]);
 
   useEffect(() => {
     if (!tenantId || !token) return;
@@ -55,11 +62,15 @@ export function useRealtime({
     });
 
     connection.on('CountChanged', (count: number) => {
-      onCountChangedRef.current(count);
+      onCountChangedRef.current?.(count);
     });
 
     connection.on('ListChanged', () => {
-      onListChangedRef.current();
+      onListChangedRef.current?.();
+    });
+
+    connection.on('ProfileChanged', () => {
+      onProfileChangedRef.current?.();
     });
 
     const start = async () => {

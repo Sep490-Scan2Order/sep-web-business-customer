@@ -9,7 +9,6 @@ import { Search, X, Check } from 'lucide-react';
 
 interface BankVerifyFormData {
   cardNumber: string;
-  accountName: string;
   bankId: string;
   bankCode?: string;
 }
@@ -37,7 +36,6 @@ export default function TenantVerifyBankModelPopup({
   const [qrMessage, setQrMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState<BankVerifyFormData>({
     cardNumber: '',
-    accountName: '',
     bankId: '',
     bankCode: '',
   });
@@ -73,7 +71,7 @@ export default function TenantVerifyBankModelPopup({
     if (isOpen) return;
     setSelectedBank(null);
     setSearchQuery('');
-    setFormData({ cardNumber: '', accountName: '', bankId: '' });
+    setFormData({ cardNumber: '', bankId: '' });
     setQrUrl(null);
     setQrMessage(null);
     setIsSubmitting(false);
@@ -112,29 +110,16 @@ export default function TenantVerifyBankModelPopup({
       toast.error('Vui lòng nhập số thẻ');
       return;
     }
-    if (!formData.accountName.trim()) {
-      toast.error('Vui lòng nhập tên tài khoản');
-      return;
-    }
     try {
       setIsSubmitting(true);
-      const bankNameResponse = await apiClient.post(API.TENANT.SEARCH_BANK_NAME_BY_CARD_NUMBER, { 
+      const bankNameResponse = await apiClient.post(API.TENANT.SEARCH_BANK_NAME_BY_CARD_NUMBER, {
           bank: formData.bankCode,
           account: formData.cardNumber,
       });
-      console.log('Bank name response:', bankNameResponse);
-      if (bankNameResponse.data?.isSuccess) {
-        if(!bankNameResponse.data?.data?.data?.ownerName) {
-          toast.error('Không xác thực được tên tài khoản');
-          return;
-        }
-        const retrievedAccountName = bankNameResponse.data.data.data.ownerName;
-        if (retrievedAccountName.toLowerCase() !== formData.accountName.toLowerCase()) {
-          toast.error('Tên tài khoản không khớp với số thẻ');
-          return;
-        }
-      } else {
-        toast.error('Không xác thực được tên tài khoản');
+
+      const lookupResult = bankNameResponse.data?.data;
+      if (!bankNameResponse.data?.isSuccess || !lookupResult?.success) {
+        toast.error(lookupResult?.msg || 'Thông tin tài khoản ngân hàng không hợp lệ');
         return;
       }
 
@@ -150,7 +135,8 @@ export default function TenantVerifyBankModelPopup({
       }
     } catch (error) {
       console.error('Error verifying bank info:', error);
-      toast.error('Error verifying bank information');
+      const backendMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message;
+      toast.error(backendMessage || 'Error verifying bank information');
     } finally {
       setIsSubmitting(false);
     }
@@ -190,7 +176,7 @@ export default function TenantVerifyBankModelPopup({
                 </div>
               ) : null}
               <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-                Sau khi giao dịch được xác nhận, trạng thái sẽ được đồng bộ tự động.
+                Vui lòng chuyển đúng 10.000 VND theo QR. Sau khi giao dịch được xác nhận, trạng thái sẽ đồng bộ tự động.
               </div>
               <div className="flex gap-3">
                 <button
@@ -289,26 +275,12 @@ export default function TenantVerifyBankModelPopup({
                   />
                 </div>
 
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-slate-700">
-                    Tên chủ tài khoản <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="accountName"
-                    value={formData.accountName}
-                    onChange={handleInputChange}
-                    placeholder="Nhập tên chủ tài khoản không dấu"
-                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-                  />
-                </div>
-
                 <div className="flex gap-3 pt-4">
                   <button
                     type="button"
                     onClick={() => {
                       setSelectedBank(null);
-                      setFormData({ cardNumber: '', accountName: '', bankId: '' });
+                      setFormData({ cardNumber: '', bankId: '' });
                     }}
                     className="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
                   >
