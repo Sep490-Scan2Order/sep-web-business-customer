@@ -20,10 +20,7 @@ export const API = {
         UPDATE_BANK_INFO: "/Tenant/update-bank-info?bankId=",
         GET_TENANT_BY_ID: (id: string) => `/Tenant/${id}`,
     },
-    TENANT_WALLET: {
-        DEPOSIT_VERIFY_TAX: "/TenantWallet/deposit-verify-tax",
-    },
-    
+
     STAFF:{
         CREATE: "/Staff",
         GET_ALL: "/Staff/get-all",

@@ -23,7 +23,7 @@ const IconSearch = () => (
 export default function TenantHeader() {
   const DETAIL_PAGE_SIZE = 5;
 
-  const { user } = useAuth();
+  const { user, refreshUserInfo } = useAuth();
   const tenantInfo = (user ?? null) as UserInfo | null;
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -81,6 +81,9 @@ export default function TenantHeader() {
     tenantId: tenantInfo?.id,
     onCountChanged: handleCountChanged,
     onListChanged: handleListChanged,
+    onProfileChanged: () => {
+      refreshUserInfo();
+    },
   });
 
   useEffect(() => {
