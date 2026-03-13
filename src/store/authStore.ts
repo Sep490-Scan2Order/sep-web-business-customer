@@ -4,6 +4,21 @@ import { jwtDecode } from 'jwt-decode';
 import { User, AuthState } from '@/src/types/type';
 import { getTenantById } from '@/src/services/tenantService';
 
+/**
+ * Kiểm tra token JWT đã hết hạn chưa.
+ * Trả về true nếu token hết hạn (hoặc không hợp lệ).
+ */
+export const isTokenExpired = (token: string): boolean => {
+  try {
+    const decoded = jwtDecode<{ exp: number }>(token);
+    // exp tính bằng giây, Date.now() tính bằng mili-giây
+    // Trừ 30 giây để dự phòng clock-skew giữa client / server
+    return Date.now() >= decoded.exp * 1000 - 30_000;
+  } catch {
+    return true; // Token không decode được → coi như đã hết hạn
+  }
+};
+
 interface AuthStateWithHydration extends AuthState {
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
@@ -80,6 +95,10 @@ export const useAuthStore = create<AuthStateWithHydration>()(
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
+        // Nếu token trong localStorage đã hết hạn khi load lại trang → xóa auth ngay
+        if (state?.token && isTokenExpired(state.token)) {
+          state.logout();
+        }
       },
     }
   )

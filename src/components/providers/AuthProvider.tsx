@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/src/hooks/useAuth';
-import { useHasHydrated } from '@/src/store/authStore';
+import { useHasHydrated, isTokenExpired } from '@/src/store/authStore';
 import { toast } from 'react-toastify';
 
 interface AuthProviderProps {
@@ -41,7 +41,7 @@ export function AuthProvider({
   loginMessage = 'Vui lòng đăng nhập để tiếp tục',
   accessDeniedMessage = 'Bạn không có quyền truy cập trang này',
 }: AuthProviderProps) {
-  const { user, isAuthenticated } = useAuth();
+  const { user, token, isAuthenticated, logout } = useAuth();
   const hasHydrated = useHasHydrated();
   const router = useRouter();
   const pathname = usePathname();
@@ -54,6 +54,17 @@ export function AuthProvider({
     }
 
     const checkAuth = () => {
+      // Kiểm tra token hết hạn trước — xử lý trường hợp isAuthenticated vẫn true trong store nhưng JWT đã invalid
+      if (token && isTokenExpired(token)) {
+        logout();
+        toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', {
+          position: 'top-right',
+          autoClose: 4000,
+        });
+        router.replace(redirectTo);
+        return;
+      }
+
       // Kiểm tra authentication
       if (!isAuthenticated || !user) {
         toast.error(loginMessage, {
@@ -86,7 +97,7 @@ export function AuthProvider({
     };
 
     checkAuth();
-  }, [hasHydrated, isAuthenticated, user, router, pathname, requiredRole, redirectTo, loginMessage, accessDeniedMessage]);
+  }, [hasHydrated, isAuthenticated, user, token, logout, router, pathname, requiredRole, redirectTo, loginMessage, accessDeniedMessage]);
 
   // Hiển thị loading trong khi check auth
   if (isChecking) {
