@@ -77,6 +77,8 @@ export const API = {
         PREVIEW: "/subscription/preview",
         CREATE_PAYMENT: "/subscription/create-payment",
         GET_SUBSCRIPTION_BY_TENANT: "/subscription/get-by-tenant",
+        GET_SUBSCRIPTION_PAYMENT_STATUS: (orderCode: number) => `/subscription/payment-status/${orderCode}`,
+        CANCEL_PAYMENT: (orderCode: number) => `/subscription/cancel-payment/${orderCode}`,
     },
     EMAIL:{
         SEND: "/Email/send",

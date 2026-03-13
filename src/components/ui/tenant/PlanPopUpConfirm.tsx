@@ -1,6 +1,7 @@
 'use client'
-import { PlanApiItem, PreviewSubscriptionResponse } from '@/src/types/type'
-import { Edit2, Layers, Loader2, Calendar, ShoppingCart, X } from 'lucide-react'
+import { PlanApiItem, PreviewSubscriptionResponse, SubscriptionTenantInfo } from '@/src/types/type'
+import { AxiosError } from 'axios'
+import { Loader2, Calendar, ShoppingCart, X, CreditCard } from 'lucide-react'
 import React, { useState } from 'react'
 import apiClient from "@/src/services/apiClient";
 import { API } from "@/src/constants/api";
@@ -8,29 +9,28 @@ import { toast } from "react-toastify";
 
 interface PlanProps {
   onClose: () => void;
-  planData: PlanApiItem;
-  restaurantId: number;
+  selectedPlan: PlanApiItem | null; 
+  targetRestaurants: SubscriptionTenantInfo[]; 
 }
 
-export default function PlanPopUpConfirm({ onClose, planData, restaurantId }: PlanProps) {
+export default function PlanPopUpConfirm({ onClose, selectedPlan, targetRestaurants }: PlanProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [cycle, setCycle] = useState<number>(1); 
   const [quantity, setQuantity] = useState<number>(1);
   const [previewData, setPreviewData] = useState<PreviewSubscriptionResponse>(); 
 
-  // Hàm tạo Request Payload chung
+  // Hàm tạo Request Payload hỗ trợ đa nhà hàng
   const getPayload = () => ({
-    items: [
-      {
-        restaurantId: restaurantId,
-        targetPlanId: planData.id,
-        cycle: Number(cycle),
-        quantity: Number(quantity)
-      }
-    ]
+    items: targetRestaurants.map(r => ({
+      restaurantId: r.restaurantId,
+      // Nếu có selectedPlan (Đổi gói/Đăng ký) thì lấy ID mới, 
+      // Ngược lại (Gia hạn) thì lấy ID gói hiện tại của nhà hàng đó
+      targetPlanId: selectedPlan ? selectedPlan.id : (r.currentPlanId || 0),
+      cycle: Number(cycle),
+      quantity: Number(quantity)
+    }))
   });
 
-  // 1. Gọi API PREVIEW
   const handlePreview = async () => {
     setIsLoading(true);
     try {
@@ -40,72 +40,86 @@ export default function PlanPopUpConfirm({ onClose, planData, restaurantId }: Pl
       } else {
         toast.error(response.data.message || "Không thể lấy thông tin thanh toán");
       }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Có lỗi xảy ra khi xem trước");
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      toast.error(axiosError.response?.data?.message || "Có lỗi xảy ra khi xem trước");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 2. Gọi API CREATE_PAYMENT
   const handlePayment = async () => {
     setIsLoading(true);
     try {
       const response = await apiClient.post(API.SUBSCRIPTION.CREATE_PAYMENT, getPayload());
-      console.log("Create Payment Response:", response.data); 
-      
       if (response.data.isSuccess && response.data.data) {
-        const paymentUrl = response.data.data; 
-        toast.success("Đang chuyển hướng đến cổng thanh toán...");
-        
-        // Cách 1: Chuyển hướng trực tiếp (Khuyên dùng)
-        // Lưu ý: Dùng cách này, bạn phải đảm bảo backend có cấu hình URL trả về (ReturnUrl)
-        // để sau khi thanh toán xong, user quay lại đúng web của bạn.
-        //window.location.href = paymentUrl;
-        
-        // Cách 2: Mở tab mới (Dễ bị trình duyệt chặn do cơ chế chặn popup)
-         window.open(paymentUrl, '_blank'); 
-         onClose(); 
-         
-
+        toast.success("Đang chuyển hướng thanh toán...");
+        window.location.href = response.data.data; // Chuyển hướng sang VNPay/Momo
+        return; 
       } else {
         toast.error(response.data.message || "Tạo thanh toán thất bại");
       }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Có lỗi xảy ra khi thanh toán");
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      toast.error(axiosError.response?.data?.message || "Có lỗi xảy ra khi thanh toán");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg rounded-2xl bg-white shadow-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 overflow-y-auto"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-3xl my-8 rounded-xl border border-slate-200 bg-white shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* Header */}
-        <div className="bg-emerald-600 px-8 py-6 flex justify-between items-center text-white">
+        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <div>
-            <h2 className="text-2xl font-bold">Xác nhận gói dịch vụ</h2>
-            <p className="text-sm text-emerald-100 mt-1">Gói mục tiêu: {planData.name}</p>
+            <h2 className="text-lg font-semibold text-slate-900">Xác nhận gói dịch vụ</h2>
+            <p className="text-sm text-slate-500 mt-0.5">
+              {selectedPlan ? `Gói mục tiêu: ${selectedPlan.name}` : 'Gia hạn gói hiện tại'} 
+              <span className="ml-1 font-medium">({targetRestaurants.length} nhà hàng)</span>
+            </p>
           </div>
-          <button onClick={onClose} className="rounded-lg bg-white/20 p-2 hover:bg-white/30 transition-all">
+
+          <button
+            onClick={onClose}
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            disabled={isLoading}
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-8 space-y-5">
-          {/* Chưa Preview -> Hiện form nhập */}
+        <div className="max-h-[65vh] overflow-y-auto p-6 space-y-5">
           {!previewData ? (
             <>
+              {selectedPlan && (
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Gói đã chọn</p>
+                  <p className="mt-1 text-base font-semibold text-slate-900">{selectedPlan.name}</p>
+                  <div className="mt-2 flex flex-wrap gap-3 text-sm text-slate-600">
+                    <span>Tháng: {selectedPlan.monthlyPrice.toLocaleString('vi-VN')} VND</span>
+                    <span>Năm: {selectedPlan.yearlyPrice.toLocaleString('vi-VN')} VND</span>
+                  </div>
+                </div>
+              )}
+
               <div>
-                <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
-                  <Calendar className="h-4 w-4 text-emerald-600" /> Chu kỳ đăng ký
+                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700">
+                  <Calendar className="h-4 w-4 text-slate-500" /> Chu kỳ đăng ký
                 </label>
                 <select 
                   value={cycle} 
                   onChange={(e) => setCycle(Number(e.target.value))}
-                  className="w-full rounded-xl border border-gray-300 p-2.5 outline-none focus:border-emerald-500"
+                  disabled={isLoading}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-300 focus:bg-white disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <option value={1}>Theo Tháng</option>
                   <option value={2}>Theo Năm</option>
@@ -113,59 +127,98 @@ export default function PlanPopUpConfirm({ onClose, planData, restaurantId }: Pl
               </div>
 
               <div>
-                <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
-                  <ShoppingCart className="h-4 w-4 text-emerald-600" /> Số lượng (Tháng/Năm)
+                <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700">
+                  <ShoppingCart className="h-4 w-4 text-slate-500" /> Số lượng (Tháng/Năm)
                 </label>
                 <input 
                   type="number" 
                   min="1" 
                   value={quantity}
-                  onChange={(e) => setQuantity(Number(e.target.value))}
-                  className="w-full rounded-xl border border-gray-300 p-2.5 outline-none focus:border-emerald-500"
+                  onChange={(e) => setQuantity(Number(e.target.value) || 0)}
+                  disabled={isLoading}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-300 focus:bg-white disabled:cursor-not-allowed disabled:opacity-50"
                 />
+                <p className="mt-1 text-xs text-slate-500">Ví dụ: 3 tương đương 3 tháng hoặc 3 năm tùy chu kỳ.</p>
               </div>
             </>
           ) : (
-            /* Đã Preview -> Hiện hóa đơn tính toán */
-            <div className="rounded-xl bg-slate-50 p-5 border border-slate-200 space-y-3">
-              <h3 className="font-semibold text-slate-800 border-b pb-2">Chi tiết thanh toán</h3>
-              {previewData.details.map((detail: PreviewSubscriptionResponse['details'][0], index: number) => (
-                <div key={index} className="space-y-2 text-sm text-slate-600">
-                  <div className="flex justify-between">
-                    <span>Nhà hàng:</span> <span className="font-medium text-slate-900">{detail.restaurantName}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Giá gốc:</span> <span>{detail.basePrice.toLocaleString("vi-VN")} VND</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Số dư quy đổi (nếu có):</span> <span className="text-orange-600">-{detail.balanceConverted.toLocaleString("vi-VN")} VND</span>
-                  </div>
-                  <div className="flex justify-between font-bold text-lg text-emerald-700 pt-2 border-t">
-                    <span>Tổng cần thanh toán:</span> <span>{detail.amountToPay.toLocaleString("vi-VN")} VND</span>
-                  </div>
-                  {detail.message && <p className="text-xs text-blue-600 italic mt-1">{detail.message}</p>}
+            <div className="space-y-4">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <h3 className="text-sm font-semibold text-slate-800">Chi tiết thanh toán</h3>
+
+                <div className="mt-3 space-y-3">
+                  {previewData.details.map((detail: PreviewSubscriptionResponse['details'][0], index: number) => (
+                    <div key={index} className="rounded-xl border border-slate-200 bg-white p-3 text-sm text-slate-600">
+                      <div className="mb-2 flex items-start justify-between gap-2 border-b border-slate-100 pb-2">
+                        <span className="font-medium text-slate-900">{detail.restaurantName}</span>
+                        <span className="font-medium text-slate-900">{detail.targetPlanName}</span>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between">
+                          <span>Chu kỳ:</span>
+                          <span>{detail.cycle === 1 ? 'Theo Tháng' : 'Theo Năm'} x {detail.quantity}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Giá gốc:</span>
+                          <span>{detail.basePrice.toLocaleString('vi-VN')} VND</span>
+                        </div>
+                        {detail.balanceConverted > 0 && (
+                          <div className="flex justify-between text-orange-600">
+                            <span>Số dư quy đổi:</span>
+                            <span>{detail.balanceConverted.toLocaleString('vi-VN')} VND</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between pt-1 font-semibold text-slate-900">
+                          <span>Thành tiền:</span>
+                          <span>{detail.amountToPay.toLocaleString('vi-VN')} VND</span>
+                        </div>
+                        {detail.message && (
+                          <p className="rounded-md bg-slate-50 px-2 py-1 text-xs text-slate-500">{detail.message}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3">
+                <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                  <CreditCard className="h-4 w-4 text-slate-500" />
+                  Tổng cần thanh toán
+                </div>
+                <p className="text-base font-semibold text-slate-900">
+                  {previewData.totalAmountToPay.toLocaleString('vi-VN')} VND
+                </p>
+              </div>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 bg-slate-50 px-8 py-5 border-t">
-          {/* Nút Quay lại nếu đã Preview */}
-          {previewData && (
+        <div className="flex items-center justify-end gap-2 border-t border-slate-200 px-6 py-4">
+          <button
+            onClick={onClose}
+            disabled={isLoading}
+            className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Hủy bỏ
+          </button>
+
+          {previewData ? (
             <button
               onClick={() => setPreviewData(undefined)}
-              className="rounded-xl border border-slate-300 px-6 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+              disabled={isLoading}
+              className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Chọn lại
+              Chỉnh sửa
             </button>
-          )}
+          ) : null}
 
           <button
             onClick={!previewData ? handlePreview : handlePayment}
             disabled={isLoading || quantity < 1}
-            className="group flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/30 transition-all hover:bg-emerald-700 disabled:opacity-50"
+            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
             {!previewData ? "Xem trước tính toán" : "Xác nhận thanh toán"}
