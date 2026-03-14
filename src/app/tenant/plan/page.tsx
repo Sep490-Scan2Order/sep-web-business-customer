@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import PlanPopUpConfirm from "@/src/components/ui/tenant/PlanPopUpConfirm";
 import { PlanApiItem, SubscriptionTenantInfo } from "@/src/types/type";
 import PlanPopUpInfo from "@/src/components/ui/tenant/PlanPopUpInfo";
-import { ArrowUpDown, Plus, Search, SlidersHorizontal, CheckSquare } from "lucide-react";
+import { ArrowUpDown, Plus, Search, SlidersHorizontal } from "lucide-react";
 
 export default function PlanPage() {
   const [activePlans, setActivePlans] = useState<PlanApiItem[]>([]);
@@ -19,6 +19,7 @@ export default function PlanPage() {
   // State quản lý thao tác (Đơn lẻ hoặc Hàng loạt)
   const [targetRestaurants, setTargetRestaurants] = useState<SubscriptionTenantInfo[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<PlanApiItem | null>(null);
+  const [planId, setPlanId] = useState<number | null>(null);
 
   // State cho Filter & Checkbox
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -34,7 +35,7 @@ export default function PlanPage() {
         ]);
         if (subRes.data.isSuccess) setSubscriptionTenantInfo(subRes.data.data);
         if (planRes.data.isSuccess) setActivePlans(planRes.data.data);
-      } catch (error) {
+      } catch {
         toast.error("Không thể tải thông tin hệ thống");
       }
     };
@@ -71,6 +72,11 @@ export default function PlanPage() {
 
   // Xử lý Logic Mua/Nâng cấp/Hạ cấp (Cần chọn Plan)
   const handleActionChangePlan = (restaurants: SubscriptionTenantInfo[]) => {
+    const currentPlanIds = Array.from(
+      new Set(restaurants.map((restaurant) => restaurant.currentPlanId).filter((id) => id > 0))
+    );
+
+    setPlanId(currentPlanIds.length === 1 ? currentPlanIds[0] : null);
     setTargetRestaurants(restaurants);
     setShowInfoModal(true); // Mở modal chọn gói
   };
@@ -99,6 +105,7 @@ export default function PlanPage() {
   const handleSelectPlanSubmit = (planId: number) => {
     const selected = activePlans.find((plan) => plan.id === planId) || null;
     setSelectedPlan(selected);
+    setPlanId(null);
     setShowInfoModal(false);
     setShowConfirmModal(true);
   };
@@ -258,9 +265,13 @@ export default function PlanPage() {
       {/* MODAL 1: Chọn gói (Chỉ mở khi nâng/hạ cấp/đăng ký) */}
       {showInfoModal && (
         <PlanPopUpInfo
-          onClose={() => setShowInfoModal(false)}
+          onClose={() => {
+            setShowInfoModal(false);
+            setPlanId(null);
+          }}
           onSubmit={handleSelectPlanSubmit}
           planData={activePlans}
+          planId={planId}
         />
       )}
 
@@ -268,8 +279,8 @@ export default function PlanPage() {
       {showConfirmModal && targetRestaurants.length > 0 && (
         <PlanPopUpConfirm
           onClose={() => setShowConfirmModal(false)}
-          selectedPlan={selectedPlan} // null nếu là gia hạn hàng loạt nhiều plan khác nhau
-          targetRestaurants={targetRestaurants} // Mảng các nhà hàng đang được chọn
+          selectedPlan={selectedPlan} 
+          targetRestaurants={targetRestaurants} 
         />
       )}
     </div>

@@ -9,12 +9,14 @@ import {
   ChevronRight,
   ChevronDown,
   LayoutDashboard,
-  Layers,
   Store,
   Users,
   UtensilsCrossed,
   LogOut,
   Settings,
+  SquareMenu,
+  NotepadText,
+  TicketPercent,
 } from "lucide-react";
 import { ROUTES, TENANT_ROUTES } from "@/src/constants/routes";
 import { useAuth } from "@/src/hooks/useAuth";
@@ -89,10 +91,17 @@ const sections: { label: string; items: NavItem[] }[] = [
       {
         label: "Menu Template",
         href: TENANT_ROUTES.MENU_TEMPLATE,
-        icon: Layers,
+        icon: SquareMenu,
         hasChildren: true,
         match: "prefix",
       },
+      {
+        label: "Promotion",
+        href: TENANT_ROUTES.PROMOTION,
+        icon: TicketPercent,
+        hasChildren: true,
+        match: "prefix",
+      }
     ],
   },
   {
@@ -101,7 +110,7 @@ const sections: { label: string; items: NavItem[] }[] = [
       {
         label: "Plans",
         href: TENANT_ROUTES.PLAN,
-        icon: Settings,
+        icon: NotepadText,
         match: "prefix",
       },
     ],

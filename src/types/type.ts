@@ -25,7 +25,7 @@ export interface ApiResponse<T> {
   isSuccess: boolean;
   message: string;
   data?: T;
-  errors?: any;
+  errors?: unknown;
   timestamp?: string;
 }
 
@@ -79,7 +79,7 @@ export interface User {
   createdAt?: string;
 
   // Fallback cho các field khác từ token
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface LoginResponse {
@@ -121,7 +121,7 @@ export interface CompleteForgotPasswordRequest {
 
 export interface ResetPasswordResponse {
   resetToken?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface ProvinceSummary {
@@ -458,19 +458,113 @@ export type SubscriptionTenantInfo = {
 
 export type PreviewSubscriptionResponse = {
   totalAmountToPay: number,
-    details: [
-      {
-        restaurantId: number,
-        restaurantName: string,
-        actionType: number,
-        targetPlanName: string,
-        cycle: number,
-        quantity: number,
-        basePrice: number,
-        balanceConverted: number,
-        amountToPay: number,
-        message: string
-      }
-    ]
+  details: [
+    {
+      restaurantId: number,
+      restaurantName: string,
+      actionType: number,
+      targetPlanName: string,
+      cycle: number,
+      quantity: number,
+      basePrice: number,
+      balanceConverted: number,
+      amountToPay: number,
+      message: string
+    }
+  ]
 }
 
+export enum PromotionType {
+  Standard = 0,
+  HappyHour = 1,
+  Clearance = 2,
+  WeeklySpecial = 3,
+}
+
+export enum PromotionScope {
+  Dish = 0,
+  Order = 1,
+}
+
+export enum DiscountType {
+  Percentage = 0,
+  FixedAmount = 1,
+}
+
+export enum PromotionDaysOfWeek {
+  None = 0,
+  Sunday = 1 << 0,    // 1 
+  Monday = 1 << 1,    // 2 
+  Tuesday = 1 << 2,   // 4
+  Wednesday = 1 << 3, // 8 
+  Thursday = 1 << 4,  // 16
+  Friday = 1 << 5,    // 32 
+  Saturday = 1 << 6,  // 64 
+
+  Weekdays = Monday | Tuesday | Wednesday | Thursday | Friday, // 62
+  Weekend = Saturday | Sunday, // 65
+  All = 127
+}
+
+export const PROMOTION_PRIORITY_DEFAULTS: Record<PromotionType, number> = {
+  [PromotionType.Standard]: 10,
+  [PromotionType.HappyHour]: 80,
+  [PromotionType.Clearance]: 100,
+  [PromotionType.WeeklySpecial]: 50,
+};
+
+export type PromotionUpsertPayload = {
+  id?: number,
+  name: string,
+  type: number,
+  discountType: number,
+  discountValue: number,
+  maxDiscountValue: number,
+  minOrderValue: number,
+  startDate: string | null,
+  endDate: string | null,
+  dailyStartTime: string | null,
+  dailyEndTime: string | null,
+  daysOfWeek: number,
+  isGlobal: boolean,
+  priority: number,
+  scope: number,
+  dishIds: number[] | null,
+  restaurantIds: number[] | null,
+}
+
+export type PromotionDto = {
+  id?: number,
+  name: string,
+  type: number,
+  discountType: number,
+  discountValue: number,
+  maxDiscountValue: number,
+  minOrderValue: number,
+  startDate: string,
+  endDate: string,
+  dailyStartTime: string | null,
+  dailyEndTime: string | null,
+  daysOfWeek: number,
+  isGlobal: boolean,
+  priority: number,
+  scope: number,
+  dishIds: number[] | null,
+  restaurantIds: number[] | null
+}
+
+export type PromotionResponse = {
+  isSuccess: boolean,
+  message: string,
+  data: {
+    items: PromotionDto[];
+    totalCount: number;
+    pageNumber: number;
+    pageSize: number;
+    totalPages: number;
+    hasPreviousPage: boolean;
+    hasNextPage: boolean;
+  },
+  errors?: null;
+  timestamp: string;
+}

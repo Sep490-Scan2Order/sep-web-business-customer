@@ -91,6 +91,12 @@ export const API = {
         COUNT_BY_TENANT_ID: (tenantId: string, notifyTenantStatus: number) => `/NotifyTenant/count/${tenantId}?notifyTenantStatus=${notifyTenantStatus}`,
         UPDATE_READ_BY_TENANT_ID: `/NotifyTenant/update-read-by-tenant`,
         DETAILS: (pageIndex: number = 1, pageSize: number = 5) => `/NotifyTenant/details?pageIndex=${pageIndex}&pageSize=${pageSize}`,
+    },
+    PROMOTION:{
+        GET_BY_TENANT: "/Promotion/tenant-logged-in",
+        CREATE: "/Promotion",
+        UPDATE: "/Promotion",
+        DELETE: (id: number) => `/Promotion/${id}`,
     }
 };
 

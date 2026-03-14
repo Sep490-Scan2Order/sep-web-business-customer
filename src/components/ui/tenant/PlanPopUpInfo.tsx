@@ -6,9 +6,10 @@ interface PlanProps {
   onClose: () => void
   onSubmit: (planId: number) => void
   planData: PlanApiItem[] | null
+  planId?: number | null
 }
 
-export default function PlanPopUpInfo({ onClose, onSubmit, planData }: PlanProps) {
+export default function PlanPopUpInfo({ onClose, onSubmit, planData, planId }: PlanProps) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const selectedPlan = planData?.find((plan) => plan.id === selectedId) || null;
 
@@ -40,13 +41,22 @@ export default function PlanPopUpInfo({ onClose, onSubmit, planData }: PlanProps
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
               {planData.map((plan) => {
                 const isSelected = selectedId === plan.id;
+                const isCurrentPlan = planId === plan.id;
 
                 return (
                   <button
                     key={plan.id}
                     type="button"
-                    onClick={() => setSelectedId(plan.id)}
+                    disabled={isCurrentPlan}
+                    onClick={() => {
+                      if (!isCurrentPlan) {
+                        setSelectedId(plan.id);
+                      }
+                    }}
                     className={`text-left rounded-xl border p-4 transition-colors ${
+                      isCurrentPlan
+                        ? 'cursor-not-allowed border-slate-200 bg-slate-100 opacity-60'
+                        :
                       isSelected
                         ? 'border-slate-900 bg-white ring-1 ring-slate-900/10'
                         : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-white'
@@ -56,6 +66,9 @@ export default function PlanPopUpInfo({ onClose, onSubmit, planData }: PlanProps
                       <div>
                         <p className="text-base font-semibold text-slate-900">{plan.name}</p>
                         <p className="text-xs text-slate-500">Cấp độ: {plan.level}</p>
+                        {isCurrentPlan && (
+                          <p className="mt-1 text-xs font-medium text-slate-600">Gói hiện tại</p>
+                        )}
                       </div>
                       {isSelected && (
                         <span className="rounded-full bg-slate-900 p-1 text-white">
