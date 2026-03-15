@@ -1,13 +1,22 @@
 "use client";
 import { PromotionDto } from "@/src/types/type";
-import { Edit2, Plus, Search, UtensilsCrossed, Trash2 } from "lucide-react";
+import { Edit2, Eye, Plus, Search, UtensilsCrossed, Trash2 } from "lucide-react";
 import  { useState } from "react";
 
 interface PromotionListProps {
   promotions: PromotionDto[];
   onCreateClick: () => void;
+  onViewDetailClick: (promotion: PromotionDto) => void;
   onEditClick: (promotion: PromotionDto) => void;
   onDeleteClick: (promotionId: number) => void;
+  currentPage: number;
+  pageSize: number;
+  totalPages: number;
+  totalCount: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+  onPageChange: (page: number) => void;
+  isLoading?: boolean;
 }
 
 const PROMOTION_TYPE_LABELS: Record<number, string> = {
@@ -25,8 +34,17 @@ const PROMOTION_SCOPE_LABELS: Record<number, string> = {
 export default function PromotionList({
   promotions,
   onCreateClick,
+  onViewDetailClick,
   onEditClick,
   onDeleteClick,
+  currentPage,
+  pageSize,
+  totalPages,
+  totalCount,
+  hasPreviousPage,
+  hasNextPage,
+  onPageChange,
+  isLoading = false,
 }: PromotionListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [pendingDeletePromotion, setPendingDeletePromotion] = useState<PromotionDto | null>(null);
@@ -118,6 +136,33 @@ export default function PromotionList({
     setPendingDeletePromotion(null);
   };
 
+  const getVisiblePages = (activePage: number, pageCount: number) => {
+    if (pageCount <= 7) {
+      return Array.from({ length: pageCount }, (_, i) => i + 1);
+    }
+
+    const pages: Array<number | string> = [1];
+    const start = Math.max(2, activePage - 1);
+    const end = Math.min(pageCount - 1, activePage + 1);
+
+    if (start > 2) {
+      pages.push("start-ellipsis");
+    }
+
+    for (let page = start; page <= end; page += 1) {
+      pages.push(page);
+    }
+
+    if (end < pageCount - 1) {
+      pages.push("end-ellipsis");
+    }
+
+    pages.push(pageCount);
+    return pages;
+  };
+
+  const visiblePages = getVisiblePages(currentPage, totalPages);
+
   return (
     <div className="p-6">
       {/* Header Section */}
@@ -163,7 +208,7 @@ export default function PromotionList({
                 <th className="border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 whitespace-nowrap">Thời gian áp dụng</th>
                 <th className="border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 whitespace-nowrap">Phạm vi</th>
                 <th className="border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 whitespace-nowrap">Trạng thái</th>
-                <th className="border-b-2 border-gray-200 px-4 py-2 text-center text-sm font-medium text-gray-700">Chỉnh sửa</th>
+                <th className="border-b-2 border-gray-200 px-4 py-2 text-center text-sm font-medium text-gray-700">Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -173,9 +218,10 @@ export default function PromotionList({
                 return (
                   <tr
                     key={`${promotion.name}-${promotion.startDate}-${index}`}
-                    className="border-b border-gray-200 transition-colors hover:bg-slate-50"
+                    onClick={() => onViewDetailClick(promotion)}
+                    className="cursor-pointer border-b border-gray-200 transition-colors hover:bg-slate-50"
                   >
-                    <td className="px-2 py-2 text-sm text-gray-600 whitespace-nowrap">{index + 1}</td>
+                    <td className="px-2 py-2 text-sm text-gray-600 whitespace-nowrap">{(currentPage - 1) * pageSize + index + 1}</td>
                     <td className="px-4 py-2 text-sm text-gray-600 whitespace-nowrap">
                       <div className="font-medium text-slate-800 whitespace-nowrap">{promotion.name}</div>
                       <div className="mt-1 flex items-center gap-2 text-xs text-slate-500">
@@ -232,8 +278,23 @@ export default function PromotionList({
                     <td className="px-4 py-2 text-sm text-gray-600">
                       <div className="flex items-center justify-center">
                         <button
-                          onClick={() => onEditClick(promotion)}
-                          className="cursor-pointer inline-flex items-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onViewDetailClick(promotion);
+                          }}
+                          className="cursor-pointer inline-flex w-16 items-center justify-center gap-1.5 rounded-md border border-slate-200 bg-white px-2 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                        >
+                          <Eye className="h-3.5 w-3.5" />
+                          Xem
+                        </button>
+                      </div>
+                      <div className="mt-2 flex items-center justify-center">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEditClick(promotion);
+                          }}
+                          className="cursor-pointer inline-flex w-16 items-center justify-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-2 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100"
                         >
                           <Edit2 className="h-3.5 w-3.5" />
                           Sửa
@@ -241,9 +302,12 @@ export default function PromotionList({
                       </div>
                       <div className="mt-2 flex items-center justify-center">
                         <button
-                          onClick={() => openDeleteConfirm(promotion)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openDeleteConfirm(promotion);
+                          }}
                           disabled={promotion.id === undefined || promotion.id === null}
-                          className="cursor-pointer inline-flex items-center gap-1.5 rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100"
+                          className="cursor-pointer inline-flex w-16 items-center justify-center gap-1.5 rounded-md border border-red-200 bg-red-50 px-2 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                           Xóa
@@ -270,6 +334,53 @@ export default function PromotionList({
               ? "Thử tìm kiếm với từ khóa khác"
               : "Nhấn nút 'Thêm khuyến mãi' để bắt đầu"}
           </p>
+        </div>
+      )}
+
+      {totalPages > 0 && (
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4">
+          <div className="text-xs text-slate-500">
+            Trang {currentPage}/{totalPages} • Tổng {totalCount} khuyến mãi
+          </div>
+
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => onPageChange(currentPage - 1)}
+              disabled={!hasPreviousPage || isLoading}
+              className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Prev
+            </button>
+
+            {visiblePages.map((page, index) =>
+              typeof page === "number" ? (
+                <button
+                  key={page}
+                  onClick={() => onPageChange(page)}
+                  disabled={isLoading}
+                  className={`min-w-8 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                    currentPage === page
+                      ? "border-slate-900 bg-slate-900 text-white"
+                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  {page}
+                </button>
+              ) : (
+                <span key={`${page}-${index}`} className="px-1 text-xs text-slate-400">
+                  ...
+                </span>
+              ),
+            )}
+
+            <button
+              onClick={() => onPageChange(currentPage + 1)}
+              disabled={!hasNextPage || isLoading}
+              className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
 

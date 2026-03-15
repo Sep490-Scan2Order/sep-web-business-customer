@@ -60,6 +60,8 @@ export const API = {
         UPDATE_DISH: (categoryId: number, dishId: number) => `/Dish/update-dish/${categoryId}/${dishId}`,
         UPDATE_DISH_AVALABILITY: (dishId: number) => `/Dish/update-dish-availability/${dishId}`,
         GET_ALL_BY_TENANT_ID: (tenantId: string) => `/Dish/get-dish-by-tenantId/${tenantId}`,
+        CREATE_COMBO: (categoryId: number) => `/Dish/create-combo/${categoryId}`,
+        GET_DETAIL_COMBO: (dishID: number) => `/Dish/get-combo-by-id/${dishID}`,
     },
     MENU_TEMPLATE: {
         CREATE: "/MenuTemplate",
@@ -93,7 +95,8 @@ export const API = {
         DETAILS: (pageIndex: number = 1, pageSize: number = 5) => `/NotifyTenant/details?pageIndex=${pageIndex}&pageSize=${pageSize}`,
     },
     PROMOTION:{
-        GET_BY_TENANT: "/Promotion/tenant-logged-in",
+        GET_BY_TENANT: (pageNumber: number = 1, pageSize: number = 10) =>
+            `/Promotion/tenant-logged-in?pageNumber=${pageNumber}&pageSize=${pageSize}`,
         CREATE: "/Promotion",
         UPDATE: "/Promotion",
         DELETE: (id: number) => `/Promotion/${id}`,

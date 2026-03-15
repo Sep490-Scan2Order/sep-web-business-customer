@@ -282,6 +282,7 @@ export interface DishesDto {
   description: string;
   imageUrl?: string;
   image?: string;
+  type?: number;
   isAvailable: boolean;
   createdAt?: string;
 }

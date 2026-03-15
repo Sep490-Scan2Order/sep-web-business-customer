@@ -1,27 +1,55 @@
 'use client'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import PromotionList from '@/src/components/ui/tenant/PromotionList';
+import PromotionDetailPopUp from '@/src/components/ui/tenant/PromotionDetailPopUp';
 import PromotionPopUp from '@/src/components/ui/tenant/PromotionPopUp';
 import { API } from '@/src/constants/api';
 import apiClient from '@/src/services/apiClient';
 import { DishesDto, PromotionDto, PromotionResponse, PromotionUpsertPayload, Restaurant } from '@/src/types/type';
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
 
+const toPositiveInt = (value: string | null, fallback: number) => {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed < 1) {
+    return fallback;
+  }
+
+  return Math.floor(parsed);
+};
+
 export default function PromotionPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [promotions, setPromotions] = useState<PromotionDto[]>([]);
   const [showPromotionModal, setShowPromotionModal] = useState(false);
   const [selectedPromotion, setSelectedPromotion] = useState<PromotionDto | null>(null);
+  const [detailPromotion, setDetailPromotion] = useState<PromotionDto | null>(null);
   const [dishes, setDishes] = useState<DishesDto[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const pageNumber = toPositiveInt(searchParams.get('pageNumber') ?? searchParams.get('pageIndex'), 1);
+  const pageSize = toPositiveInt(searchParams.get('pageSize'), 10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [hasPreviousPage, setHasPreviousPage] = useState(false);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const currentPage = Math.min(pageNumber, Math.max(1, totalPages));
 
    const [loading, setLoading] = useState<boolean>(false);
 
-    const fetchPromotions = async () => {
+    const fetchPromotions = useCallback(async () => {
       setLoading(true);
       try {
-        const response = await apiClient.get<PromotionResponse>(API.PROMOTION.GET_BY_TENANT);
+        const response = await apiClient.get<PromotionResponse>(
+          API.PROMOTION.GET_BY_TENANT(pageNumber, pageSize),
+        );
         if (response.data.isSuccess) {
-          setPromotions(response.data.data.items);
+          setPromotions(response.data.data.items ?? []);
+          setTotalPages(Math.max(1, response.data.data.totalPages ?? 1));
+          setTotalCount(response.data.data.totalCount ?? 0);
+          setHasPreviousPage(Boolean(response.data.data.hasPreviousPage));
+          setHasNextPage(Boolean(response.data.data.hasNextPage));
           return;
         }
 
@@ -38,23 +66,60 @@ export default function PromotionPage() {
       } finally {
         setLoading(false);
       }
-    };
+    }, [pageNumber, pageSize]);
 
     // Fetch promotions data
     useEffect(() => {
       fetchPromotions();
-    }, []);
+    }, [fetchPromotions]);
 
-    const handleCreateClick = () => {
-      getAllDishes();
-      getAllRestaurants();
+    const handlePageChange = (nextPage: number) => {
+      const boundedPage = Math.max(1, Math.min(nextPage, Math.max(1, totalPages)));
+      if (boundedPage === pageNumber) {
+        return;
+      }
+
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('pageNumber', String(boundedPage));
+      params.set('pageSize', String(pageSize));
+      params.delete('pageIndex');
+
+      router.push(`${pathname}?${params.toString()}`);
+    };
+
+    const ensureReferenceData = async () => {
+      const fetchTasks: Promise<void>[] = [];
+
+      if (dishes.length === 0) {
+        fetchTasks.push(getAllDishes());
+      }
+
+      if (restaurants.length === 0) {
+        fetchTasks.push(getAllRestaurants());
+      }
+
+      if (fetchTasks.length > 0) {
+        await Promise.all(fetchTasks);
+      }
+    };
+
+    const handleCreateClick = async () => {
+      await ensureReferenceData();
+      setDetailPromotion(null);
       setSelectedPromotion(null);
       setShowPromotionModal(true);
     }
 
-    const handleEditClick = (promotionDto: PromotionDto) => {
-      getAllDishes();
-      getAllRestaurants();
+    const handleViewDetailClick = async (promotionDto: PromotionDto) => {
+      await ensureReferenceData();
+      setShowPromotionModal(false);
+      setSelectedPromotion(null);
+      setDetailPromotion(promotionDto);
+    }
+
+    const handleEditClick = async (promotionDto: PromotionDto) => {
+      await ensureReferenceData();
+      setDetailPromotion(null);
       setSelectedPromotion(promotionDto);
       setShowPromotionModal(true);
     }
@@ -152,7 +217,7 @@ export default function PromotionPage() {
         if (response.data.isSuccess) {
           setDishes(response.data.data);
         }
-      }catch (error) {
+      } catch (error) {
         console.error("Error fetching dishes:", error);
       }
     }
@@ -174,10 +239,28 @@ export default function PromotionPage() {
     <div>
       <PromotionList 
         onCreateClick={handleCreateClick}
+        onViewDetailClick={handleViewDetailClick}
         promotions={promotions} 
         onEditClick={handleEditClick}
         onDeleteClick={handleDeletePromotion}
+        currentPage={currentPage}
+        pageSize={pageSize}
+        totalPages={totalPages}
+        totalCount={totalCount}
+        hasPreviousPage={hasPreviousPage}
+        hasNextPage={hasNextPage}
+        onPageChange={handlePageChange}
+        isLoading={loading}
       />
+
+      {detailPromotion && (
+        <PromotionDetailPopUp
+          promotion={detailPromotion}
+          dishes={dishes}
+          restaurants={restaurants}
+          onClose={() => setDetailPromotion(null)}
+        />
+      )}
 
       {showPromotionModal && (
         <PromotionPopUp 

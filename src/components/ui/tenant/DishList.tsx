@@ -1,16 +1,20 @@
 import React, { useState } from "react";
 import { DishesDto } from "@/src/types/type";
-import { Search, Plus, Edit2, UtensilsCrossed } from "lucide-react";
+import { Search, Plus, Edit2, Eye, UtensilsCrossed } from "lucide-react";
 
 interface DishListProps {
   dishes: DishesDto[];
   onCreateClick: () => void;
+  onCreateComboClick: () => void;
+  onDishClick: (dish: DishesDto) => void;
   onEditClick: (dish: DishesDto) => void;
 }
 
 export default function DishList({
   dishes,
   onCreateClick,
+  onCreateComboClick,
+  onDishClick,
   onEditClick,
 }: DishListProps) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -45,13 +49,23 @@ export default function DishList({
           <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Dish Management</div>
           <div className="text-lg font-semibold text-slate-900">Món ăn</div>
         </div>
-        <button
-          onClick={onCreateClick}
-          className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
-        >
-          <Plus className="h-4 w-4" />
-          Thêm món ăn
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onCreateClick}
+            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+          >
+            <Plus className="h-4 w-4" />
+            Thêm món ăn
+          </button>
+
+          <button
+            onClick={onCreateComboClick}
+            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            <Plus className="h-4 w-4" />
+            Tạo combo
+          </button>
+        </div>
       </div>
 
       {/* Search Bar */}
@@ -87,9 +101,15 @@ export default function DishList({
                 {categoryDishes.map((dish) => (
                   <div
                     key={dish.id}
-                    onClick={() => onEditClick(dish)}
+                    onClick={() => onDishClick(dish)}
                     className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors hover:bg-slate-50 cursor-pointer"
                   >
+                    {dish.type === 1 && (
+                      <div className="absolute left-0 top-0 z-10 rounded-br-lg bg-rose-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">
+                        Combo
+                      </div>
+                    )}
+
                     {/* Image */}
                     {dish.imageUrl && (
                       <div className="relative aspect-video overflow-hidden">
@@ -121,6 +141,16 @@ export default function DishList({
                           </div>
                           <div className="mt-2">
                             <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
+                              dish.type === 1
+                                ? 'bg-violet-50 text-violet-700'
+                                : 'bg-blue-50 text-blue-700'
+                            }`}>
+                              <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                              {dish.type === 1 ? 'Combo ' : 'Món ăn'}
+                            </span>
+                          </div>
+                          <div className="mt-2">
+                            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
                               dish.isAvailable 
                                 ? 'bg-emerald-50 text-emerald-600' 
                                 : 'bg-slate-100 text-slate-600'
@@ -130,15 +160,29 @@ export default function DishList({
                             </span>
                           </div>
                         </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onEditClick(dish);
-                          }}
-                          className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </button>
+                        {dish.type === 1 ? (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDishClick(dish);
+                            }}
+                            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
+                            title="Xem chi tiet combo"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEditClick(dish);
+                            }}
+                            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
+                            title="Chinh sua mon an"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>

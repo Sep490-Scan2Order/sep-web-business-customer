@@ -1,5 +1,7 @@
 "use client";
 import DishList from "@/src/components/ui/tenant/DishList";
+import ComboDetailPopUp from "@/src/components/ui/tenant/ComboDetailPopUp";
+import ComboPopUp from "@/src/components/ui/tenant/ComboPopUp";
 import DishPopUp from "@/src/components/ui/tenant/DishPopUp";
 import { API } from "@/src/constants/api";
 import { useAuth } from "@/src/hooks/useAuth";
@@ -15,7 +17,13 @@ export default function DishPage() {
   const [categories, setCategories] = useState<CategoryDto[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [showDishModal, setShowDishModal] = useState(false);
+  const [showComboModal, setShowComboModal] = useState(false);
+  const [showComboDetailModal, setShowComboDetailModal] = useState(false);
+  const [comboDetailLoading, setComboDetailLoading] = useState(false);
+  const [selectedCombo, setSelectedCombo] = useState<DishesDto | null>(null);
+  const [comboItems, setComboItems] = useState<DishesDto[]>([]);
   const [selectedDish, setSelectedDish] = useState<DishesDto | null>(null);
+  const hasSelectableDish = dishes.some((dish) => dish.type !== 1);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,13 +67,78 @@ export default function DishPage() {
       toast.warning("Vui lòng tạo danh mục trước khi thêm món ăn");
       return;
     }
+    setShowComboModal(false);
+    setShowComboDetailModal(false);
     setSelectedDish(null);
     setShowDishModal(true);
   };
 
+  const handleCreateComboClick = () => {
+    if (categories.length === 0) {
+      toast.warning("Vui lòng tạo danh mục trước khi tạo combo");
+      return;
+    }
+
+    if (!hasSelectableDish) {
+      toast.warning("Cần có ít nhất 1 món ăn để tạo combo");
+      return;
+    }
+
+    setShowDishModal(false);
+    setShowComboDetailModal(false);
+    setSelectedDish(null);
+    setShowComboModal(true);
+  };
+
   const handleUpdateClick = (dish: DishesDto) => {
+    setShowComboModal(false);
+    setShowComboDetailModal(false);
     setSelectedDish(dish);
     setShowDishModal(true);
+  };
+
+  const handleViewComboDetail = async (combo: DishesDto) => {
+    setComboDetailLoading(true);
+    setSelectedCombo(combo);
+    setComboItems([]);
+    setShowDishModal(false);
+    setShowComboModal(false);
+    setShowComboDetailModal(true);
+
+    try {
+      const response = await apiClient.get<{
+        isSuccess: boolean;
+        message: string;
+        data: DishesDto[];
+      }>(API.DISHES.GET_DETAIL_COMBO(combo.id));
+
+      if (response.data.isSuccess) {
+        setComboItems(response.data.data ?? []);
+        return;
+      }
+
+      toast.error(response.data.message || "Khong the tai chi tiet combo");
+    } catch (error: unknown) {
+      const backendMessage = (
+        error as { response?: { data?: { message?: string } } }
+      ).response?.data?.message;
+      toast.error(
+        backendMessage ||
+          (error as { message?: string }).message ||
+          "Co loi xay ra khi tai chi tiet combo",
+      );
+    } finally {
+      setComboDetailLoading(false);
+    }
+  };
+
+  const handleDishCardClick = (dish: DishesDto) => {
+    if (dish.type === 1) {
+      void handleViewComboDetail(dish);
+      return;
+    }
+
+    handleUpdateClick(dish);
   };
 
   const handleCreateDish = async (categoryId: number,formData: FormData) => {
@@ -140,6 +213,41 @@ export default function DishPage() {
     }
   };
 
+  const handleCreateCombo = async (categoryId: number, formData: FormData) => {
+    setLoading(true);
+    try {
+      const response = await apiClient.post(
+        API.DISHES.CREATE_COMBO(categoryId),
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      if (response.data.isSuccess) {
+        setDishes((prev) => [...prev, response.data.data]);
+        toast.success("Tạo combo thành công");
+        setShowComboModal(false);
+        return;
+      }
+
+      toast.error(response.data.message || "Không thể tạo combo");
+    } catch (error: unknown) {
+      const backendMessage = (
+        error as { response?: { data?: { message?: string } } }
+      ).response?.data?.message;
+      toast.error(
+        backendMessage ||
+          (error as { message?: string }).message ||
+          "Có lỗi xảy ra khi tạo combo",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div>
       {dishes.length === 0 ? (
@@ -161,12 +269,21 @@ export default function DishPage() {
               </p>
             </div>
             {categories.length > 0 && (
-              <button
-                onClick={handleCreateClick}
-                className="rounded-lg bg-orange-600 px-6 py-3 font-medium text-white hover:bg-orange-700"
-              >
-                Tạo món ăn
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleCreateClick}
+                  className="rounded-lg bg-orange-600 px-6 py-3 font-medium text-white hover:bg-orange-700"
+                >
+                  Tạo món ăn
+                </button>
+                <button
+                  onClick={handleCreateComboClick}
+                  disabled={!hasSelectableDish}
+                  className="rounded-lg border border-slate-200 bg-slate-900 px-6 py-3 font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Tạo combo
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -174,6 +291,8 @@ export default function DishPage() {
         <DishList
           dishes={dishes}
           onCreateClick={handleCreateClick}
+          onCreateComboClick={handleCreateComboClick}
+          onDishClick={handleDishCardClick}
           onEditClick={handleUpdateClick}
         />
       )}
@@ -189,6 +308,29 @@ export default function DishPage() {
           onUpdate={handleUpdateDish}
           isLoading={loading}
           dishData={selectedDish}
+        />
+      )}
+
+      {showComboModal && (
+        <ComboPopUp
+          categories={categories}
+          dishes={dishes}
+          onClose={() => setShowComboModal(false)}
+          onSubmit={handleCreateCombo}
+          isLoading={loading}
+        />
+      )}
+
+      {showComboDetailModal && selectedCombo && (
+        <ComboDetailPopUp
+          combo={selectedCombo}
+          comboItems={comboItems}
+          isLoading={comboDetailLoading}
+          onClose={() => {
+            setShowComboDetailModal(false);
+            setSelectedCombo(null);
+            setComboItems([]);
+          }}
         />
       )}
     </div>
