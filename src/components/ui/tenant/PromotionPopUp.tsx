@@ -96,6 +96,7 @@ export default function PromotionPopUp({
   const [dailyStartTime, setDailyStartTime] = useState(toInputTime(promotionData?.dailyStartTime));
   const [dailyEndTime, setDailyEndTime] = useState(toInputTime(promotionData?.dailyEndTime));
   const [daysOfWeek, setDaysOfWeek] = useState<number>(Number(promotionData?.daysOfWeek) || PromotionDaysOfWeek.None);
+  const [isActive, setIsActive] = useState<boolean>(Boolean(promotionData?.isActive ?? true));
   const [isGlobal, setIsGlobal] = useState(Boolean(promotionData?.isGlobal ?? true));
   const [scope, setScope] = useState<PromotionScope>(promotionData ? initialScope : PromotionScope.Dish);
   const [priority, setPriority] = useState<number>(
@@ -239,6 +240,7 @@ export default function PromotionPopUp({
           : null,
       daysOfWeek: type === PromotionType.WeeklySpecial ? daysOfWeek : 0,
       isGlobal,
+      isActive,
       priority,
       scope,
       dishIds:
@@ -254,6 +256,7 @@ export default function PromotionPopUp({
     }
 
     onSubmit(payload);
+    console.log("Submitted promotion data:", payload);
   };
 
   const handleGlobalChange = (checked: boolean) => {
@@ -518,6 +521,26 @@ export default function PromotionPopUp({
               Khi bật, payload sẽ gửi restaurantIds = null và dishIds = null.
             </p>
           </div>
+
+          {promotionData && (
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <label className="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={isActive}
+                  onChange={(e) => setIsActive(e.target.checked)}
+                  disabled={isLoading}
+                  className="rounded border-slate-300"
+                />
+                Bật khuyến mãi (isActive)
+              </label>
+              <p className="mt-1 text-xs text-slate-500">
+                {isActive
+                  ? "Khuyến mãi đang hoạt động và có thể áp dụng nếu thỏa điều kiện thời gian."
+                  : "Khuyến mãi đang tắt và sẽ không được áp dụng cho đơn hàng."}
+              </p>
+            </div>
+          )}
 
           {!isGlobal && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

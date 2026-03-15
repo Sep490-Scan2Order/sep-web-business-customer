@@ -1,5 +1,5 @@
 "use client";
-import { PromotionDto } from "@/src/types/type";
+import { PromotionDaysOfWeek, PromotionDto, PromotionType } from "@/src/types/type";
 import { Edit2, Eye, Plus, Search, UtensilsCrossed, Trash2 } from "lucide-react";
 import  { useState } from "react";
 
@@ -30,6 +30,16 @@ const PROMOTION_SCOPE_LABELS: Record<number, string> = {
   0: "Theo món",
   1: "Theo hóa đơn",
 };
+
+const DAY_OPTIONS: Array<{ label: string; value: PromotionDaysOfWeek }> = [
+  { label: "Chủ nhật", value: PromotionDaysOfWeek.Sunday },
+  { label: "Thứ 2", value: PromotionDaysOfWeek.Monday },
+  { label: "Thứ 3", value: PromotionDaysOfWeek.Tuesday },
+  { label: "Thứ 4", value: PromotionDaysOfWeek.Wednesday },
+  { label: "Thứ 5", value: PromotionDaysOfWeek.Thursday },
+  { label: "Thứ 6", value: PromotionDaysOfWeek.Friday },
+  { label: "Thứ 7", value: PromotionDaysOfWeek.Saturday },
+];
 
 export default function PromotionList({
   promotions,
@@ -82,6 +92,14 @@ export default function PromotionList({
 
   const getPromotionTypeLabel = (promotionType: number) => {
     return PROMOTION_TYPE_LABELS[promotionType] ?? `Loại ${promotionType}`;
+  };
+
+  const getAppliedDayLabels = (promotion: PromotionDto) => {
+    if (promotion.type !== PromotionType.WeeklySpecial || promotion.daysOfWeek <= 0) {
+      return [];
+    }
+
+    return DAY_OPTIONS.filter((day) => (promotion.daysOfWeek & day.value) !== 0).map((day) => day.label);
   };
 
   const getStatus = (promotion: PromotionDto) => {
@@ -257,7 +275,7 @@ export default function PromotionList({
                       )}
                       {promotion.type === 3 && promotion.daysOfWeek > 0 && (
                         <div className="text-xs text-slate-500">
-                          Ngày áp dụng: {promotion.daysOfWeek}
+                          Ngày áp dụng: {getAppliedDayLabels(promotion).join(", ")}
                         </div>
                       )}
                     </td>
@@ -269,10 +287,10 @@ export default function PromotionList({
                     </td>
                     <td className="px-4 py-2 text-sm text-gray-600 whitespace-nowrap">
                       <span
-                        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${status.className}`}
+                        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${promotion.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
                       >
                         <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                        {status.label}
+                        {promotion.isActive ? "Đang hoạt động" : "Không hoạt động"}
                       </span>
                     </td>
                     <td className="px-4 py-2 text-sm text-gray-600">

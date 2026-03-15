@@ -516,6 +516,7 @@ export const PROMOTION_PRIORITY_DEFAULTS: Record<PromotionType, number> = {
 
 export type PromotionUpsertPayload = {
   id?: number,
+  isActive?: boolean,
   name: string,
   type: number,
   discountType: number,
@@ -536,6 +537,7 @@ export type PromotionUpsertPayload = {
 
 export type PromotionDto = {
   id?: number,
+  isActive: boolean,
   name: string,
   type: number,
   discountType: number,
