@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import apiClient from "@/src/services/apiClient";
 import { API } from "@/src/constants/api";
 import { ApiResponse } from "@/src/types/type";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 import {
   MenuTemplateCategory,
   CanvasConfig,
@@ -67,6 +67,39 @@ interface TemplateLayoutConfig {
     backgroundMode?: "color" | "image";
     backgroundColor?: string;
     backgroundImageUrl?: string;
+  };
+  /**
+   * Cấu hình header trên app customer (back, search, cart)
+   */
+  header?: {
+    showBackButton: boolean;
+    showSearch: boolean;
+    searchPlaceholder: string;
+    showCart: boolean;
+  };
+  /**
+   * Cấu hình dãy chip category bên dưới header
+   */
+  chips?: {
+    showAllChip: boolean;
+    allChipLabel: string;
+    categoryChipStyle: "pill" | "outline";
+  };
+  /**
+   * Cấu hình card món ăn + nút thêm vào giỏ
+   */
+  card?: {
+    imageSize: "sm" | "md" | "lg";
+    borderRadius: number;
+    showPromotionBadge: boolean;
+    showOriginalPriceStrikethrough: boolean;
+    priceColorMode: "theme" | "red";
+    showStockLine: boolean;
+    addToCartButton: {
+      show: boolean;
+      label: string;
+      shape: "pill" | "rounded";
+    };
   };
   slots?: FixedLayoutSlot[];
   dataMapping?: DataMapping;
@@ -349,8 +382,10 @@ export default function TemplateManagementPage() {
     try {
       setUpdating(true);
 
+      // Build đầy đủ layout để BE lưu xuống LayoutConfigJson
       const updatedLayout: TemplateLayoutConfig = {
         ...selectedLayout,
+        version: selectedLayout.version ?? 1,
         canvas: {
           width: selectedLayout.canvas?.width ?? 1000,
           height: selectedLayout.canvas?.height ?? 800,
@@ -360,6 +395,30 @@ export default function TemplateManagementPage() {
             editBackgroundMode === "image" && editBackgroundImageUrl.trim()
               ? editBackgroundImageUrl.trim()
               : undefined,
+        },
+        header: {
+          showBackButton: true,
+          showSearch: true,
+          searchPlaceholder: "Tìm món ăn, đồ uống...",
+          showCart: true,
+        },
+        chips: {
+          showAllChip: true,
+          allChipLabel: "Tất cả",
+          categoryChipStyle: "pill",
+        },
+        card: {
+          imageSize: "md",
+          borderRadius: 12,
+          showPromotionBadge: true,
+          showOriginalPriceStrikethrough: true,
+          priceColorMode: "theme",
+          showStockLine: true,
+          addToCartButton: {
+            show: true,
+            label: "+ Thêm vào giỏ",
+            shape: "pill",
+          },
         },
       };
 
