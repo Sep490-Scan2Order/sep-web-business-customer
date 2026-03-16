@@ -36,11 +36,19 @@ interface MenuSection {
 }
 
 interface DataMapping {
-  categories: {
+  menu?: {
+    source: string;
+    categoryField: string;
+    dishesField: string;
+    dishDisplayFields: string[];
+    promotionFields: string[];
+  };
+  // Legacy fields for older templates
+  categories?: {
     source: string;
     displayField: string;
   };
-  dishes: {
+  dishes?: {
     source: string;
     groupBy: string;
     displayFields: string[];
@@ -364,16 +372,28 @@ export default function TemplateManagementPage() {
               : undefined,
         },
         slots: FIXED_SLOTS,
-        // Lưu dataMapping thay vì menuStructure
+        // Lưu dataMapping nguồn menu thống nhất theo restaurant
         dataMapping: {
-          categories: {
-            source: "API.CATEGORY.GET_ALL_BY_TENANT_ID(tenantId)",
-            displayField: "categoryName",
-          },
-          dishes: {
-            source: "API.DISHES.GET_ALL_BY_TENANT_ID(tenantId)",
-            groupBy: "categoryId",
-            displayFields: ["dishName", "price", "description"],
+          menu: {
+            source: "API.RESTAURANT.GET_MENU(restaurantId)",
+            categoryField: "categoryName",
+            dishesField: "dishes",
+            dishDisplayFields: [
+              "dishName",
+              "price",
+              "discountedPrice",
+              "description",
+              "promotionLabel",
+              "hasPromotion",
+            ],
+            promotionFields: [
+              "promotionName",
+              "promotionLabel",
+              "expiredAt",
+              "promoType",
+              "hasPromotion",
+              "discountedPrice",
+            ],
           },
         },
       });
@@ -411,7 +431,7 @@ export default function TemplateManagementPage() {
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Template Management</h1>
             <p className="mt-2 text-slate-600">
-              Tạo template menu với layout cố định. Tenant sẽ đổ data thật (category/dishes) vào template này.
+              Tạo template menu với layout cố định. Tenant sẽ đổ data thật từ API menu nhà hàng vào template này.
             </p>
           </div>
           <button
@@ -521,17 +541,45 @@ export default function TemplateManagementPage() {
                   <h3 className="mb-3 font-semibold text-blue-900">
                     📋 Data Mapping Rules (Tenant sẽ đổ data thật vào)
                   </h3>
-                  {selectedTemplateLayout?.dataMapping ? (
+                  {selectedTemplateLayout?.dataMapping?.menu ? (
                     <div className="space-y-3 text-sm">
                       <div className="rounded-lg border border-blue-200 bg-white p-3">
-                        <p className="font-semibold text-slate-900">Categories:</p>
+                        <p className="font-semibold text-slate-900">Menu Source:</p>
+                        <ul className="mt-1 space-y-1 text-slate-700">
+                          <li>• Source: <code className="rounded bg-slate-100 px-1 py-0.5">{selectedTemplateLayout.dataMapping.menu.source}</code></li>
+                          <li>• Category Field: <code className="rounded bg-slate-100 px-1 py-0.5">{selectedTemplateLayout.dataMapping.menu.categoryField}</code></li>
+                          <li>• Dishes Field: <code className="rounded bg-slate-100 px-1 py-0.5">{selectedTemplateLayout.dataMapping.menu.dishesField}</code></li>
+                        </ul>
+                      </div>
+                      <div className="rounded-lg border border-blue-200 bg-white p-3">
+                        <p className="font-semibold text-slate-900">Dish & Promotion Fields:</p>
+                        <ul className="mt-1 space-y-1 text-slate-700">
+                          <li>• Dish Display Fields: {selectedTemplateLayout.dataMapping.menu.dishDisplayFields.map((field) => (
+                            <code key={field} className="mr-1 rounded bg-slate-100 px-1 py-0.5">{field}</code>
+                          ))}</li>
+                          <li>• Promotion Fields: {selectedTemplateLayout.dataMapping.menu.promotionFields.map((field) => (
+                            <code key={field} className="mr-1 rounded bg-slate-100 px-1 py-0.5">{field}</code>
+                          ))}</li>
+                        </ul>
+                      </div>
+                      <p className="text-xs text-blue-700">
+                        ℹ️ Tenant sẽ gọi API menu theo restaurant để lấy dữ liệu đã group category và áp dụng promotion.
+                      </p>
+                    </div>
+                  ) : selectedTemplateLayout?.dataMapping?.categories && selectedTemplateLayout?.dataMapping?.dishes ? (
+                    <div className="space-y-3 text-sm">
+                      <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-amber-800">
+                        ⚠️ Template cũ đang dùng mapping tách category/dish.
+                      </div>
+                      <div className="rounded-lg border border-blue-200 bg-white p-3">
+                        <p className="font-semibold text-slate-900">Categories (Legacy):</p>
                         <ul className="mt-1 space-y-1 text-slate-700">
                           <li>• Source: <code className="rounded bg-slate-100 px-1 py-0.5">{selectedTemplateLayout.dataMapping.categories.source}</code></li>
                           <li>• Display Field: <code className="rounded bg-slate-100 px-1 py-0.5">{selectedTemplateLayout.dataMapping.categories.displayField}</code></li>
                         </ul>
                       </div>
                       <div className="rounded-lg border border-blue-200 bg-white p-3">
-                        <p className="font-semibold text-slate-900">Dishes:</p>
+                        <p className="font-semibold text-slate-900">Dishes (Legacy):</p>
                         <ul className="mt-1 space-y-1 text-slate-700">
                           <li>• Source: <code className="rounded bg-slate-100 px-1 py-0.5">{selectedTemplateLayout.dataMapping.dishes.source}</code></li>
                           <li>• Group By: <code className="rounded bg-slate-100 px-1 py-0.5">{selectedTemplateLayout.dataMapping.dishes.groupBy}</code></li>
@@ -540,9 +588,6 @@ export default function TemplateManagementPage() {
                           ))}</li>
                         </ul>
                       </div>
-                      <p className="text-xs text-blue-700">
-                        ℹ️ Tenant sẽ gọi các API trên để lấy category và dish thật của họ, dữ liệu sẽ được render theo layout này.
-                      </p>
                     </div>
                   ) : (
                     <div className="text-sm text-amber-700">
@@ -600,7 +645,7 @@ export default function TemplateManagementPage() {
                                 🎨 Template này sử dụng <strong>Data Mapping</strong>
                               </p>
                               <p className="text-xs">
-                                Tenant sẽ đổ category và dish thật của họ vào layout này.
+                                Tenant sẽ lấy menu từ API <code className="rounded bg-slate-100 px-1">/Restaurant/{'{restaurantId}'}/menu</code> để render layout này.
                               </p>
                               <div className="mt-4 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4">
                                 <p className="text-xs text-slate-500">Ví dụ khi render:</p>
@@ -818,8 +863,7 @@ export default function TemplateManagementPage() {
             <p className="font-semibold">ℹ️ Lưu ý: Phần này CHỈ dùng để preview UI</p>
             <p className="mt-1 text-xs text-blue-700">
               Category/Dish mà bạn nhập ở đây <strong>KHÔNG</strong> được lưu vào database. 
-              Khi tenant sử dụng template, họ sẽ đổ data thật từ API <code className="rounded bg-blue-100 px-1">API.CATEGORY.GET_ALL_BY_TENANT_ID(tenantId)</code> 
-              và <code className="rounded bg-blue-100 px-1">API.DISHES.GET_ALL_BY_TENANT_ID(tenantId)</code> vào layout này.
+              Khi tenant sử dụng template, họ sẽ đổ data thật từ API <code className="rounded bg-blue-100 px-1">API.RESTAURANT.GET_MENU(restaurantId)</code> vào layout này.
             </p>
           </div>
           

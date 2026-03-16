@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import apiClient from "@/src/services/apiClient";
 import { API } from "@/src/constants/api";
-import { ApiResponse, CategoryDto, DishesDto, Restaurant, ApplyMenuTemplateRequest } from "@/src/types/type";
+import { ApiResponse, MenuCategoryDto, Restaurant, ApplyMenuTemplateRequest } from "@/src/types/type";
 import { useAuth } from "@/src/hooks/useAuth";
 import { toast } from "react-toastify";
 
@@ -54,16 +54,9 @@ const getMenuTemplateById = async (
   return response.data;
 };
 
-const getCategoriesByTenant = async (tenantId: string): Promise<ApiResponse<CategoryDto[]>> => {
-  const response = await apiClient.get<ApiResponse<CategoryDto[]>>(
-    API.CATEGORY.GET_ALL_BY_TENANT_ID(tenantId)
-  );
-  return response.data;
-};
-
-const getDishesByTenant = async (tenantId: string): Promise<ApiResponse<DishesDto[]>> => {
-  const response = await apiClient.get<ApiResponse<DishesDto[]>>(
-    API.DISHES.GET_ALL_BY_TENANT_ID(tenantId)
+const getMenuByRestaurant = async (restaurantId: number): Promise<ApiResponse<MenuCategoryDto[]>> => {
+  const response = await apiClient.get<ApiResponse<MenuCategoryDto[]>>(
+    API.RESTAURANT.GET_MENU(restaurantId)
   );
   return response.data;
 };
@@ -87,8 +80,8 @@ const applyTemplateToRestaurant = async (request: ApplyMenuTemplateRequest): Pro
 export default function MenuTemplatePage() {
   const { user } = useAuth();
   const [templates, setTemplates] = useState<MenuTemplate[]>([]);
-  const [categories, setCategories] = useState<CategoryDto[]>([]);
-  const [dishes, setDishes] = useState<DishesDto[]>([]);
+  const [restaurantMenu, setRestaurantMenu] = useState<MenuCategoryDto[]>([]);
+  const [menuLoading, setMenuLoading] = useState(false);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
@@ -113,31 +106,15 @@ export default function MenuTemplatePage() {
         return;
       }
 
-      // Load tất cả data song song với tenantId từ user hiện tại
-      // (tất cả restaurants của tenant đều có cùng tenantId)
-      const [templatesRes, restaurantsRes, categoriesRes, dishesRes] = await Promise.all([
+      const [templatesRes, restaurantsRes] = await Promise.all([
         getAllMenuTemplates(),
         getRestaurantsByTenant(),
-        getCategoriesByTenant(user.id),
-        getDishesByTenant(user.id),
       ]);
 
       if (templatesRes.isSuccess && templatesRes.data) {
         setTemplates(templatesRes.data);
       } else {
         toast.error(templatesRes.message || "Failed to load templates");
-      }
-
-      if (categoriesRes.isSuccess && categoriesRes.data) {
-        setCategories(categoriesRes.data);
-      } else {
-        toast.error(categoriesRes.message || "Failed to load categories");
-      }
-
-      if (dishesRes.isSuccess && dishesRes.data) {
-        setDishes(dishesRes.data);
-      } else {
-        toast.error(dishesRes.message || "Failed to load dishes");
       }
 
       if (restaurantsRes.isSuccess && restaurantsRes.data) {
@@ -214,20 +191,31 @@ export default function MenuTemplatePage() {
     }
   };
 
-  const groupDishesByCategory = () => {
-    const grouped: { [categoryId: number]: DishesDto[] } = {};
-    dishes.forEach((dish) => {
-      if (dish.categoryId) {
-        if (!grouped[dish.categoryId]) {
-          grouped[dish.categoryId] = [];
+  useEffect(() => {
+    if (!selectedRestaurant?.id) {
+      setRestaurantMenu([]);
+      return;
+    }
+    const fetchMenu = async () => {
+      try {
+        setMenuLoading(true);
+        const menuRes = await getMenuByRestaurant(selectedRestaurant.id);
+        if (menuRes.isSuccess && menuRes.data) {
+          setRestaurantMenu(menuRes.data);
+        } else {
+          toast.error(menuRes.message || "Không thể tải menu nhà hàng");
+          setRestaurantMenu([]);
         }
-        grouped[dish.categoryId].push(dish);
+      } catch (error) {
+        console.error("Error loading restaurant menu:", error);
+        toast.error("Có lỗi xảy ra khi tải menu nhà hàng");
+        setRestaurantMenu([]);
+      } finally {
+        setMenuLoading(false);
       }
-    });
-    return grouped;
-  };
-
-  const dishesByCategory = groupDishesByCategory();
+    };
+    fetchMenu();
+  }, [selectedRestaurant?.id]);
 
   const handleApplyTemplate = async () => {
     if (!selectedTemplate || !selectedRestaurant) {
@@ -275,7 +263,7 @@ export default function MenuTemplatePage() {
       </div>
 
       {/* Data Summary */}
-      <div className="mb-6 grid gap-4 md:grid-cols-4">
+      <div className="mb-6 grid gap-4 md:grid-cols-3">
         <div className="rounded-lg border border-slate-200 bg-white p-4">
           <p className="text-sm text-slate-500">Available Templates</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{templates.length}</p>
@@ -285,12 +273,13 @@ export default function MenuTemplatePage() {
           <p className="mt-1 text-2xl font-bold text-slate-900">{restaurants.length}</p>
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-4">
-          <p className="text-sm text-slate-500">Your Categories</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{categories.length}</p>
-        </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-4">
-          <p className="text-sm text-slate-500">Your Dishes</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{dishes.length}</p>
+          <p className="text-sm text-slate-500">Menu Categories</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">
+            {menuLoading ? "..." : restaurantMenu.length}
+          </p>
+          {!selectedRestaurant && (
+            <p className="mt-1 text-xs text-slate-400">Chọn nhà hàng để xem</p>
+          )}
         </div>
       </div>
 
@@ -304,12 +293,11 @@ export default function MenuTemplatePage() {
         </div>
       )}
 
-      {(categories.length === 0 || dishes.length === 0) && (
+      {selectedRestaurant && !menuLoading && restaurantMenu.length === 0 && (
         <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4">
           <p className="text-sm font-semibold text-amber-900">⚠️ Chưa có dữ liệu menu</p>
           <p className="mt-1 text-xs text-amber-700">
-            Bạn cần thêm categories và dishes trước khi xem preview menu. 
-            Hãy vào trang quản lý để thêm dữ liệu.
+            Nhà hàng này chưa có dữ liệu menu. Hãy thêm categories và dishes trước khi xem preview.
           </p>
         </div>
       )}
@@ -478,7 +466,11 @@ export default function MenuTemplatePage() {
                 className="mt-4 rounded-lg border p-4"
                 style={{ borderColor: selectedTemplate.themeColor }}
               >
-                {categories.length === 0 ? (
+                {menuLoading ? (
+                  <div className="py-8 text-center text-slate-500">
+                    <p className="text-sm">Đang tải menu...</p>
+                  </div>
+                ) : restaurantMenu.length === 0 ? (
                   <div className="py-8 text-center text-slate-500">
                     <p>Chưa có category nào</p>
                     <p className="mt-1 text-xs">
@@ -486,8 +478,8 @@ export default function MenuTemplatePage() {
                     </p>
                   </div>
                 ) : (
-                  categories.map((category) => (
-                    <div key={category.id} className="mb-4 last:mb-0">
+                  restaurantMenu.map((category) => (
+                    <div key={category.categoryId} className="mb-4 last:mb-0">
                       <h4
                         className="text-lg font-semibold"
                         style={{ color: selectedTemplate.themeColor }}
@@ -495,26 +487,58 @@ export default function MenuTemplatePage() {
                         {category.categoryName}
                       </h4>
                       <ul className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-2">
-                        {dishesByCategory[category.id]?.length > 0 ? (
-                          dishesByCategory[category.id].map((dish) => (
+                        {category.dishes.length > 0 ? (
+                          category.dishes.map((dish) => (
                             <li
-                              key={dish.id}
-                              className="rounded border border-slate-200 bg-white px-3 py-2 text-sm"
+                              key={dish.dishId}
+                              className={`rounded border bg-white px-3 py-2 text-sm ${dish.isSoldOut ? "opacity-60" : "border-slate-200"}`}
                             >
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                  <p className="font-medium text-slate-900">
-                                    {dish.dishName}
-                                  </p>
-                                  {dish.description && (
-                                    <p className="mt-1 text-xs text-slate-500">
-                                      {dish.description}
-                                    </p>
-                                  )}
+                              <div className="flex items-start gap-2">
+                                {dish.imageUrl && (
+                                  <img
+                                    src={dish.imageUrl}
+                                    alt={dish.dishName}
+                                    className="h-12 w-12 flex-shrink-0 rounded object-cover"
+                                  />
+                                )}
+                                <div className="flex flex-1 items-start justify-between">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-1">
+                                      <p className="font-medium text-slate-900">
+                                        {dish.dishName}
+                                      </p>
+                                      {dish.isSoldOut && (
+                                        <span className="rounded bg-slate-200 px-1 py-0.5 text-xs text-slate-500">
+                                          Hết
+                                        </span>
+                                      )}
+                                    </div>
+                                    {dish.description && (
+                                      <p className="mt-0.5 text-xs text-slate-500 line-clamp-2">
+                                        {dish.description}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <div className="ml-2 text-right">
+                                    {dish.hasPromotion ? (
+                                      <>
+                                        <p className="text-xs text-slate-400 line-through">
+                                          {dish.price.toLocaleString()}₫
+                                        </p>
+                                        <p className="font-semibold text-red-600">
+                                          {dish.discountedPrice.toLocaleString()}₫
+                                        </p>
+                                        <span className="inline-block rounded bg-red-100 px-1 py-0.5 text-xs font-medium text-red-700">
+                                          {dish.promotionLabel}
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <p className="font-semibold text-slate-900">
+                                        {dish.price.toLocaleString()}₫
+                                      </p>
+                                    )}
+                                  </div>
                                 </div>
-                                <p className="ml-2 font-semibold text-slate-900">
-                                  {dish.price.toLocaleString()}₫
-                                </p>
                               </div>
                             </li>
                           ))
@@ -543,10 +567,10 @@ export default function MenuTemplatePage() {
           {selectedLayout.dataMapping && (
             <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
               <p className="text-sm font-semibold text-blue-900">
-                ℹ️ Template này đang sử dụng data thật của bạn
+                ℹ️ Template này đang sử dụng data thật của bạn (bao gồm khuyến mãi)
               </p>
               <p className="mt-1 text-xs text-blue-700">
-                Categories: {categories.length} | Dishes: {dishes.length}
+                Categories: {restaurantMenu.length} | Dishes: {restaurantMenu.reduce((acc, c) => acc + c.dishes.length, 0)}
               </p>
             </div>
           )}

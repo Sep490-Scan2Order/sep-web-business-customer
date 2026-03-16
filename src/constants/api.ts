@@ -36,6 +36,7 @@ export const API = {
         UPDATE: (id: string) => `/Restaurant/${id}`,
         DELETE: (id: string) => `/Restaurant/${id}`,
         GET_RESTAURANT_DETAIL_BY_SLUG: (slug: string) => `/Restaurant/${slug}`,
+        GET_MENU: (restaurantId: number) => `/Restaurant/${restaurantId}/menu`,
     },
     BLOG: {
         CREATE: "/SystemBlog",

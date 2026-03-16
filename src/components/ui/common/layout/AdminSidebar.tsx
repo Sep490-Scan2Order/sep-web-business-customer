@@ -18,7 +18,12 @@ import {
   Settings,
   Paperclip,
   Bell,
+  LogOut,
 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'react-toastify'
+import { useAuth } from '@/src/hooks/useAuth'
+import { ROUTES } from '@/src/constants/routes'
 
 type NavItem = {
   label: string
@@ -61,9 +66,17 @@ export default function AdminSidebar() {
  const pathname = usePathname() || ''
   const [collapsed, setCollapsed] = React.useState(false)
   const sidebarWidth = collapsed ? 'w-20' : 'w-72'
+  const router = useRouter()
+  const { logout } = useAuth()
+
+  const handleLogOut = async () => {
+    logout()
+    toast.success('Đăng xuất thành công')
+    router.push(ROUTES.PAGES.PUBLIC.ADMIN_LOGIN)
+  }
 
   return (
-    <aside className={`flex h-screen ${sidebarWidth} shrink-0 flex-col border-r border-slate-200 bg-white px-4 py-5 transition-all`}>
+    <aside className={`sticky top-0 flex h-screen ${sidebarWidth} shrink-0 flex-col border-r border-slate-200 bg-white px-4 py-5 transition-all`}>
       <div className={`mb-6 flex items-center gap-3 ${collapsed ? 'justify-center' : 'px-2'}`}>
         {!collapsed ? <div className="h-8 w-8 rounded-full bg-slate-200" /> : null}
         {!collapsed ? (
@@ -133,6 +146,16 @@ export default function AdminSidebar() {
           </div>
         ))}
       </nav>
+
+      <div
+        className={`mt-auto cursor-pointer flex items-center gap-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 hover:bg-red-100 ${collapsed ? 'justify-center' : ''}`}
+        onClick={handleLogOut}
+      >
+        <button className="cursor-pointer flex items-center gap-2">
+          <LogOut className="h-4 w-4" />
+          {!collapsed ? <span className="text-sm font-medium">Logout</span> : null}
+        </button>
+      </div>
 
     </aside>
   )

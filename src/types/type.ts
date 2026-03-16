@@ -287,6 +287,29 @@ export interface DishesDto {
   createdAt?: string;
 }
 
+export interface MenuDishDto {
+  dishId: number;
+  dishName: string;
+  description: string;
+  imageUrl: string;
+  price: number;
+  isSoldOut: boolean;
+  discountedPrice: number;
+  promotionName: string;
+  promotionLabel: string;
+  expiredAt: string;
+  promoType: number;
+  type: number;
+  dishAvailabilityStock: number;
+  hasPromotion: boolean;
+}
+
+export interface MenuCategoryDto {
+  categoryId: number;
+  categoryName: string;
+  dishes: MenuDishDto[];
+}
+
 export interface CreateDishRequest {
   dishName: string;
   price: number;
