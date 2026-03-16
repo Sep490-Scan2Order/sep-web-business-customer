@@ -6,6 +6,8 @@ import { API } from "@/src/constants/api";
 import { ApiResponse, MenuCategoryDto, Restaurant, ApplyMenuTemplateRequest } from "@/src/types/type";
 import { useAuth } from "@/src/hooks/useAuth";
 import { toast } from "react-toastify";
+import { MenuTemplateCategory, CanvasConfig } from "@/src/types/menuTemplate";
+import { MenuTemplatePreview } from "@/src/components/ui/common/menu/MenuTemplatePreview";
 
 interface MenuTemplate {
   id: number;
@@ -426,154 +428,29 @@ export default function MenuTemplatePage() {
             </div>
           </div>
 
-          <div className="overflow-auto rounded-lg border border-slate-300 bg-slate-50 p-4">
-            <div
-              className="relative mx-auto rounded-lg border border-slate-300 p-6"
-              style={{
-                width: selectedLayout.canvas?.width ?? 1000,
-                minHeight: selectedLayout.canvas?.height ?? 800,
-                fontFamily: selectedTemplate.fontFamily,
-                backgroundColor:
-                  selectedLayout.canvas?.backgroundColor ?? "#FFFFFF",
-                backgroundImage:
-                  selectedLayout.canvas?.backgroundMode === "image" &&
-                  selectedLayout.canvas?.backgroundImageUrl
-                    ? `url(${selectedLayout.canvas.backgroundImageUrl})`
-                    : undefined,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            >
-              {/* Header */}
-              <header
-                className="rounded-lg border p-4"
-                style={{
-                  borderColor: selectedTemplate.themeColor,
-                  color: selectedTemplate.themeColor,
-                  minHeight: 90,
-                }}
-              >
-                <h3 className="text-xl font-bold">
-                  {selectedRestaurant?.restaurantName || selectedTemplate.templateName}
-                </h3>
-                <p className="text-sm text-slate-600">
-                  {selectedRestaurant?.address || "Menu Template với Data Thật"}
-                </p>
-              </header>
-
-              {/* Menu Content with Real Data */}
-              <section
-                className="mt-4 rounded-lg border p-4"
-                style={{ borderColor: selectedTemplate.themeColor }}
-              >
-                {menuLoading ? (
-                  <div className="py-8 text-center text-slate-500">
-                    <p className="text-sm">Đang tải menu...</p>
-                  </div>
-                ) : restaurantMenu.length === 0 ? (
-                  <div className="py-8 text-center text-slate-500">
-                    <p>Chưa có category nào</p>
-                    <p className="mt-1 text-xs">
-                      Hãy thêm category để xem menu hiển thị
-                    </p>
-                  </div>
-                ) : (
-                  restaurantMenu.map((category) => (
-                    <div key={category.categoryId} className="mb-4 last:mb-0">
-                      <h4
-                        className="text-lg font-semibold"
-                        style={{ color: selectedTemplate.themeColor }}
-                      >
-                        {category.categoryName}
-                      </h4>
-                      <ul className="mt-2 grid grid-cols-1 gap-2 md:grid-cols-2">
-                        {category.dishes.length > 0 ? (
-                          category.dishes.map((dish) => (
-                            <li
-                              key={dish.dishId}
-                              className={`rounded border bg-white px-3 py-2 text-sm ${dish.isSoldOut ? "opacity-60" : "border-slate-200"}`}
-                            >
-                              <div className="flex items-start gap-2">
-                                {dish.imageUrl && (
-                                  <img
-                                    src={dish.imageUrl}
-                                    alt={dish.dishName}
-                                    className="h-12 w-12 flex-shrink-0 rounded object-cover"
-                                  />
-                                )}
-                                <div className="flex flex-1 items-start justify-between">
-                                  <div className="flex-1">
-                                    <div className="flex items-center gap-1">
-                                      <p className="font-medium text-slate-900">
-                                        {dish.dishName}
-                                      </p>
-                                      {dish.isSoldOut && (
-                                        <span className="rounded bg-slate-200 px-1 py-0.5 text-xs text-slate-500">
-                                          Hết
-                                        </span>
-                                      )}
-                                    </div>
-                                    {dish.description && (
-                                      <p className="mt-0.5 text-xs text-slate-500 line-clamp-2">
-                                        {dish.description}
-                                      </p>
-                                    )}
-                                  </div>
-                                  <div className="ml-2 text-right">
-                                    {dish.hasPromotion ? (
-                                      <>
-                                        <p className="text-xs text-slate-400 line-through">
-                                          {dish.price.toLocaleString()}₫
-                                        </p>
-                                        <p className="font-semibold text-red-600">
-                                          {dish.discountedPrice.toLocaleString()}₫
-                                        </p>
-                                        <span className="inline-block rounded bg-red-100 px-1 py-0.5 text-xs font-medium text-red-700">
-                                          {dish.promotionLabel}
-                                        </span>
-                                      </>
-                                    ) : (
-                                      <p className="font-semibold text-slate-900">
-                                        {dish.price.toLocaleString()}₫
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            </li>
-                          ))
-                        ) : (
-                          <li className="col-span-2 py-2 text-center text-xs text-slate-400">
-                            Chưa có món nào trong category này
-                          </li>
-                        )}
-                      </ul>
+          <div className="flex items-stretch justify-center rounded-2xl border border-slate-200 bg-slate-50 p-6">
+            {menuLoading ? (
+              <div className="flex flex-1 items-center justify-center text-sm text-slate-400">
+                Đang tải menu...
+              </div>
+            ) : (
+              <div className="flex w-full items-center justify-center">
+                <div className="relative flex h-[780px] w-[420px] items-center justify-center rounded-[40px] border border-slate-200 bg-slate-900/5 px-4 py-6">
+                  <div className="relative h-full w-full overflow-hidden rounded-[32px] border border-slate-300 bg-slate-100 shadow-lg">
+                    <div className="absolute inset-x-1 top-2 mx-auto h-1.5 w-24 rounded-full bg-slate-300" />
+                    <div className="mt-5 h-[700px] w-full overflow-hidden">
+                      <MenuTemplatePreview
+                        categories={restaurantMenu as unknown as MenuTemplateCategory[]}
+                        canvas={selectedLayout.canvas as CanvasConfig | undefined}
+                        themeColor={selectedTemplate.themeColor}
+                        fontFamily={selectedTemplate.fontFamily}
+                      />
                     </div>
-                  ))
-                )}
-              </section>
-
-              {/* Footer */}
-              <footer
-                className="mt-4 rounded-lg border p-3 text-sm text-slate-600"
-                style={{ borderColor: selectedTemplate.themeColor }}
-              >
-                Footer / Ghi chú
-              </footer>
-            </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-
-          {/* Data Mapping Info */}
-          {selectedLayout.dataMapping && (
-            <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
-              <p className="text-sm font-semibold text-blue-900">
-                ℹ️ Template này đang sử dụng data thật của bạn (bao gồm khuyến mãi)
-              </p>
-              <p className="mt-1 text-xs text-blue-700">
-                Categories: {restaurantMenu.length} | Dishes: {restaurantMenu.reduce((acc, c) => acc + c.dishes.length, 0)}
-              </p>
-            </div>
-          )}
         </div>
       )}
     </div>
