@@ -367,7 +367,6 @@ export default function TemplateManagementPage() {
         ...selectedTemplate,
         themeColor: editThemeColor,
         fontFamily: editFontFamily,
-        isActive: editIsActive,
         backgroundImageUrl:
           editBackgroundMode === "image" && editBackgroundImageUrl.trim()
             ? editBackgroundImageUrl.trim()
