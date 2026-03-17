@@ -594,3 +594,40 @@ export type PromotionResponse = {
   errors?: null;
   timestamp: string;
 }
+
+// ===== Admin Dashboard Types =====
+
+export interface AdminSummaryMetrics {
+  totalTenants: number;
+  totalRestaurants: number;
+  platformRevenue: number;
+  activeAccounts: number;
+}
+
+export interface RevenueTrendItem {
+  month: string;
+  revenue: number;
+}
+
+export interface PlanDistributionItem {
+  planName: string;
+  percentage: number;
+  count: number;
+}
+
+export interface TopPerformingRestaurant {
+  restaurantId: number;
+  restaurantName: string;
+  currentPlan: string;
+  totalOrders: number;
+  totalRevenue: number;
+  avatarUrl: string;
+}
+
+export interface ExpiringSubscription {
+  restaurantId: number;
+  restaurantName: string;
+  planName: string;
+  daysRemaining: number;
+  expirationDate: string;
+}

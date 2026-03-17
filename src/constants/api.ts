@@ -102,7 +102,14 @@ export const API = {
         CREATE: "/Promotion",
         UPDATE: "/Promotion",
         DELETE: (id: number) => `/Promotion/${id}`,
-    }
+    },
+    ADMIN: {
+        SUMMARY_METRICS: "/Admin/summary-metrics",
+        REVENUE_TRENDS: (months: number = 6) => `/Admin/revenue-trends?months=${months}`,
+        PLAN_DISTRIBUTION: "/Admin/plan-distribution",
+        TOP_PERFORMING_RESTAURANTS: (top: number = 5) => `/Admin/top-performing-restaurants?top=${top}`,
+        EXPIRING_SUBSCRIPTIONS: (daysThreshold: number = 30) => `/Admin/expiring-subscriptions?daysThreshold=${daysThreshold}`,
+    },
 };
 
 export const BANK_API = {

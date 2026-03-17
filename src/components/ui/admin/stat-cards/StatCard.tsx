@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 interface Props {
   title: string;
   value: string;
-  trend: string;
+  trend?: string;
   icon: ReactNode;
 }
 
@@ -16,10 +16,9 @@ export default function StatCard({ title, value, trend, icon }: Props) {
 
           <h2 className="text-2xl font-semibold mt-1">{value}</h2>
 
-          <p className="text-green-500 text-sm mt-1">{trend}</p>
+          {trend && <p className="text-green-500 text-sm mt-1">{trend}</p>}
         </div>
-
-        <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl text-white">
+        <div className="p-3 bg-gradient-to-br to-black from-back rounded-xl text-black">
           {icon}
         </div>
       </div>
