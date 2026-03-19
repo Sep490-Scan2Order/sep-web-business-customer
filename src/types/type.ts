@@ -287,6 +287,11 @@ export interface DishesDto {
   createdAt?: string;
 }
 
+export interface ComboDto {
+  dish: DishesDto;
+  quantity: number;
+}
+
 export interface MenuDishDto {
   dishId: number;
   dishName: string;
@@ -294,6 +299,7 @@ export interface MenuDishDto {
   imageUrl: string;
   price: number;
   isSoldOut: boolean;
+  isSelling: boolean;
   discountedPrice: number;
   promotionName: string;
   promotionLabel: string;

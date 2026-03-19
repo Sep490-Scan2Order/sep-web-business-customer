@@ -85,6 +85,10 @@ const sections: { label: string; items: NavItem[] }[] = [
             label: "Dish",
             href: TENANT_ROUTES.DISH,
           },
+          {
+            label: "Branch Dish Management",
+            href: TENANT_ROUTES.BRANCH_DISH_MANAGEMENT,
+          }
         ],
         match: "prefix",
       },

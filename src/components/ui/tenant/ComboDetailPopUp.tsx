@@ -1,10 +1,10 @@
-import { DishesDto } from "@/src/types/type";
+import { ComboDto } from "@/src/types/type";
 import React from "react";
 import { Loader2, Package2, X } from "lucide-react";
 
 interface ComboDetailPopUpProps {
-  combo: DishesDto;
-  comboItems: DishesDto[];
+  combo: ComboDto;
+  comboItems: ComboDto[];
   onClose: () => void;
   isLoading?: boolean;
 }
@@ -34,7 +34,7 @@ export default function ComboDetailPopUp({
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <div>
             <h2 className="text-lg font-semibold text-slate-900">Chi tiết combo</h2>
-            <p className="text-sm text-slate-500">{combo.dishName}</p>
+            <p className="text-sm text-slate-500">{combo.dish.dishName}</p>
           </div>
 
           <button
@@ -54,7 +54,7 @@ export default function ComboDetailPopUp({
 
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
               <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Giá combo</div>
-              <div className="mt-1 text-sm font-medium text-slate-800">{formatPrice(combo.price)}</div>
+              <div className="mt-1 text-sm font-medium text-slate-800">{formatPrice(combo.dish.price)}</div>
             </div>
           </div>
 
@@ -73,17 +73,18 @@ export default function ComboDetailPopUp({
               <div className="space-y-3">
                 {comboItems.map((item) => (
                   <div
-                    key={`${combo.id}-${item.id}`}
+                    key={`${combo.dish.id}-${item.dish.id}`}
                     className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2"
                   >
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-medium text-slate-800">{item.dishName}</div>
-                      {item.description && (
-                        <div className="truncate text-xs text-slate-500">{item.description}</div>
+                      <div className="truncate text-sm font-medium text-slate-800">{item.dish.dishName}</div>
+                      {item.dish.description && (
+                        <div className="truncate text-xs text-slate-500">{item.dish.description}</div>
                       )}
-                        <div className="mt-1 text-[11px] text-slate-500">(Món ăn)</div>
+                        <div className="mt-1 text-[11px] text-slate-500 font-bold">Số lượng: {item.quantity}</div>
                     </div>
-                    <div className="text-sm font-medium text-slate-700">{formatPrice(item.price)}</div>
+                    
+                    <div className="text-sm font-medium text-slate-700">{formatPrice(item.dish.price)}</div>
                   </div>
                 ))}
               </div>

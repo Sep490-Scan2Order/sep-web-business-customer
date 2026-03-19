@@ -161,7 +161,8 @@ export default function DishList({
                           </div>
                         </div>
                         {dish.type === 1 ? (
-                          <button
+                          <div>
+                            <button
                             onClick={(e) => {
                               e.stopPropagation();
                               onDishClick(dish);
@@ -171,6 +172,17 @@ export default function DishList({
                           >
                             <Eye className="h-4 w-4" />
                           </button>
+                           <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEditClick(dish);
+                            }}
+                            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
+                            title="Chinh sua mon an"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </button>
+                          </div>
                         ) : (
                           <button
                             onClick={(e) => {

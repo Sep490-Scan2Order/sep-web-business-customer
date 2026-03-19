@@ -6,7 +6,7 @@ import DishPopUp from "@/src/components/ui/tenant/DishPopUp";
 import { API } from "@/src/constants/api";
 import { useAuth } from "@/src/hooks/useAuth";
 import apiClient from "@/src/services/apiClient";
-import { DishesDto, CategoryDto } from "@/src/types/type";
+import { DishesDto, CategoryDto, ComboDto } from "@/src/types/type";
 import { Plus } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -20,8 +20,8 @@ export default function DishPage() {
   const [showComboModal, setShowComboModal] = useState(false);
   const [showComboDetailModal, setShowComboDetailModal] = useState(false);
   const [comboDetailLoading, setComboDetailLoading] = useState(false);
-  const [selectedCombo, setSelectedCombo] = useState<DishesDto | null>(null);
-  const [comboItems, setComboItems] = useState<DishesDto[]>([]);
+  const [selectedCombo, setSelectedCombo] = useState<ComboDto | null>(null);
+  const [comboItems, setComboItems] = useState<ComboDto[]>([]);
   const [selectedDish, setSelectedDish] = useState<DishesDto | null>(null);
   const hasSelectableDish = dishes.some((dish) => dish.type !== 1);
 
@@ -97,7 +97,7 @@ export default function DishPage() {
     setShowDishModal(true);
   };
 
-  const handleViewComboDetail = async (combo: DishesDto) => {
+  const handleViewComboDetail = async (combo: ComboDto) => {
     setComboDetailLoading(true);
     setSelectedCombo(combo);
     setComboItems([]);
@@ -109,8 +109,8 @@ export default function DishPage() {
       const response = await apiClient.get<{
         isSuccess: boolean;
         message: string;
-        data: DishesDto[];
-      }>(API.DISHES.GET_DETAIL_COMBO(combo.id));
+        data: ComboDto[];
+      }>(API.DISHES.GET_DETAIL_COMBO(combo.dish.id));
 
       if (response.data.isSuccess) {
         setComboItems(response.data.data ?? []);
@@ -134,7 +134,7 @@ export default function DishPage() {
 
   const handleDishCardClick = (dish: DishesDto) => {
     if (dish.type === 1) {
-      void handleViewComboDetail(dish);
+      void handleViewComboDetail({ dish, quantity: 1 });
       return;
     }
 
