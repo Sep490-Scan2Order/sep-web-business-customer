@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { X, MapPin, Upload } from 'lucide-react'
+import { X, MapPin, Upload, Loader2, Plus } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { ProvinceSummary, DistrictSummary } from '@/src/types/type'
 
@@ -22,6 +22,7 @@ interface TenantInfoRequirementProps {
   onClose: () => void
   onSubmit: (info: TenantInfo) => void
   isLoading?: boolean
+  mode?: 'create' | 'edit'
 }
 
 export default function TenantInfoRequirement({
@@ -29,6 +30,7 @@ export default function TenantInfoRequirement({
   onClose,
   onSubmit,
   isLoading = false,
+  mode = 'create',
 }: TenantInfoRequirementProps) {
   const [formData, setFormData] = React.useState<TenantInfo>({
     restaurantName: '',
@@ -187,31 +189,37 @@ export default function TenantInfoRequirement({
 
   if (!isOpen) return null
 
+  const isEditMode = mode === 'edit'
+  const modalTitle = isEditMode ? 'Cập nhật nhà hàng' : 'Tạo nhà hàng mới'
+  const modalDescription = isEditMode
+    ? 'Chỉnh sửa thông tin nhà hàng'
+    : 'Thêm thông tin nhà hàng để bắt đầu quản lý'
+  const submitLabel = isEditMode ? 'Cập nhật' : 'Tạo mới'
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-lg">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="relative my-8 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-lg">
         {/* Header với close button */}
-        <div className="mb-6 flex items-center justify-between sticky top-0 bg-white pb-4">
-          <h2 className="text-xl font-semibold text-slate-900">Thông tin nhà hàng</h2>
+        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900">{modalTitle}</h2>
+            <p className="text-sm text-slate-500">{modalDescription}</p>
+          </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close dialog"
-            className="flex items-center justify-center rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="cursor-pointer rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <p className="mb-6 text-sm text-slate-500">
-          Vui lòng điền các thông tin nhà hàng để tiếp tục
-        </p>
-
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 p-6">
           {/* Tên nhà hàng */}
           <div>
-            <label htmlFor="restaurantName" className="block text-sm font-medium text-slate-700">
+            <label htmlFor="restaurantName" className="mb-2 block text-sm font-medium text-slate-700">
               Tên nhà hàng <span className="text-red-500">*</span>
             </label>
             <input
@@ -221,14 +229,14 @@ export default function TenantInfoRequirement({
               value={formData.restaurantName}
               onChange={handleChange}
               required
-              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-slate-300 focus:bg-white"
               placeholder="Nhập tên nhà hàng"
             />
           </div>
 
           {/* Số điện thoại */}
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-slate-700">
+            <label htmlFor="phone" className="mb-2 block text-sm font-medium text-slate-700">
               Số điện thoại <span className="text-red-500">*</span>
             </label>
             <input
@@ -238,7 +246,7 @@ export default function TenantInfoRequirement({
               value={formData.phone}
               onChange={handleChange}
               required
-              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-slate-300 focus:bg-white"
               placeholder="Nhập số điện thoại"
             />
           </div>
@@ -247,7 +255,7 @@ export default function TenantInfoRequirement({
           {locationServiceAvailable ? (
             <div className="space-y-3">
               <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                <MapPin className="h-4 w-4 text-emerald-600" />
+                <MapPin className="h-4 w-4 text-slate-500" />
                 Địa chỉ <span className="text-red-500">*</span>
               </label>
               
@@ -258,7 +266,7 @@ export default function TenantInfoRequirement({
                     value={selectedProvinceCode}
                     onChange={handleProvinceChange}
                     required
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-300 focus:bg-white"
                   >
                     <option value="">Chọn Tỉnh/Thành phố</option>
                     {provinces.map((province) => (
@@ -276,7 +284,7 @@ export default function TenantInfoRequirement({
                     onChange={handleDistrictChange}
                     required
                     disabled={!selectedProvinceCode}
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 disabled:bg-slate-100 disabled:cursor-not-allowed"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-300 focus:bg-white disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <option value="">Chọn Quận/Huyện</option>
                     {districts.map((district) => (
@@ -295,13 +303,13 @@ export default function TenantInfoRequirement({
                 value={formData.address}
                 onChange={handleChange}
                 placeholder="Số nhà, tên đường (tùy chọn)"
-                className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-slate-300 focus:bg-white"
               />
             </div>
           ) : (
             <div>
               <label htmlFor="address" className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                <MapPin className="h-4 w-4 text-emerald-600" />
+                <MapPin className="h-4 w-4 text-slate-500" />
                 Địa chỉ
               </label>
               <input
@@ -310,7 +318,7 @@ export default function TenantInfoRequirement({
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-slate-300 focus:bg-white"
                 placeholder="Nhập địa chỉ đầy đủ"
               />
             </div>
@@ -319,7 +327,7 @@ export default function TenantInfoRequirement({
           {/* Latitude & Longitude */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="latitude" className="block text-sm font-medium text-slate-700">
+              <label htmlFor="latitude" className="mb-2 block text-sm font-medium text-slate-700">
                 Vĩ độ (Latitude)
               </label>
               <input
@@ -329,13 +337,13 @@ export default function TenantInfoRequirement({
                 step="any"
                 value={formData.latitude || ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, latitude: e.target.value ? parseFloat(e.target.value) : undefined }))}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-slate-300 focus:bg-white"
                 placeholder="VD: 21.0285"
               />
             </div>
 
             <div>
-              <label htmlFor="longitude" className="block text-sm font-medium text-slate-700">
+              <label htmlFor="longitude" className="mb-2 block text-sm font-medium text-slate-700">
                 Kinh độ (Longitude)
               </label>
               <input
@@ -345,7 +353,7 @@ export default function TenantInfoRequirement({
                 step="any"
                 value={formData.longitude || ''}
                 onChange={(e) => setFormData(prev => ({ ...prev, longitude: e.target.value ? parseFloat(e.target.value) : undefined }))}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-slate-300 focus:bg-white"
                 placeholder="VD: 105.8542"
               />
             </div>
@@ -353,7 +361,7 @@ export default function TenantInfoRequirement({
 
           {/* Mô tả */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-slate-700">
+            <label htmlFor="description" className="mb-2 block text-sm font-medium text-slate-700">
               Mô tả
             </label>
             <textarea
@@ -362,7 +370,7 @@ export default function TenantInfoRequirement({
               value={formData.description}
               onChange={handleChange}
               rows={3}
-              className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 resize-none"
+              className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-slate-300 focus:bg-white"
               placeholder="Mô tả về nhà hàng của bạn..."
             />
           </div>
@@ -396,7 +404,7 @@ export default function TenantInfoRequirement({
               
               {/* Upload Button */}
               <label className="flex-1 cursor-pointer">
-                <div className="flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-6 hover:border-emerald-500 hover:bg-emerald-50 transition-colors">
+                <div className="flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-6 transition-colors hover:border-slate-400">
                   <Upload className="h-5 w-5 text-slate-400" />
                   <span className="text-sm text-slate-600">
                     {formData.image ? 'Chọn ảnh khác' : 'Chọn ảnh nhà hàng'}
@@ -416,21 +424,31 @@ export default function TenantInfoRequirement({
           </div>
 
           {/* Actions */}
-          <div className="mt-6 flex gap-3 sticky bottom-0 bg-white pt-4">
+          <div className="flex items-center justify-end gap-2 border-t border-slate-200 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              className="cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
               disabled={isLoading}
             >
-              Hủy
+              Hủy bỏ
             </button>
             <button
               type="submit"
-              className="flex-1 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+              className="cursor-pointer flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
               disabled={isLoading}
             >
-              {isLoading ? 'Đang xử lý...' : 'Tạo nhà hàng'}
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Đang xử lý...
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4" />
+                  {submitLabel}
+                </>
+              )}
             </button>
           </div>
         </form>

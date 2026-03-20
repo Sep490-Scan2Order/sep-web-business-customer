@@ -174,6 +174,7 @@ export interface Restaurant {
   totalOrder: number;
   createdAt: string;
   distanceKm: number | null;
+  minCashAmount: number;
 }
 
 export interface AdministratorLoginRequest {

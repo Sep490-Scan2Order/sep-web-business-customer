@@ -118,6 +118,25 @@ export default function BranchDishRestaurantDetailPage() {
     }
   };
 
+  const handleSyncDishes = async () => {
+    try{
+      const response = await apiClient.post<ApiResponse<unknown>>(API.BRANCH_DISH_CONFIG.SYNC_DISHES_TO_BRANCH);
+
+      if (response.data.isSuccess) {
+        toast.success('Đồng bộ món ăn thành công');
+      } else {
+        toast.error(response.data.message || 'Không thể đồng bộ món ăn');
+      }
+    }catch (error: unknown) {
+      const backendMessage = (
+        error as { response?: { data?: { message?: string } } }
+      ).response?.data?.message;
+      toast.error(backendMessage || 'Có lỗi xảy ra khi đồng bộ món ăn');
+    }finally{
+      await loadData();
+    }
+  };
+
   if (!restaurantId) {
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center gap-3 p-6">
@@ -140,6 +159,7 @@ export default function BranchDishRestaurantDetailPage() {
       togglingDishIds={togglingDishIds}
       onBack={() => router.push('/tenant/branch-dish-management')}
       onToggleDish={handleToggleDish}
+      onSyncDishes={handleSyncDishes}
     />
   );
 }

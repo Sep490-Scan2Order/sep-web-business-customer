@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
+import { Search, Plus, Store } from 'lucide-react'
 
 export interface Restaurant {
   id: string
@@ -18,46 +19,104 @@ interface RestaurantListProps {
 
 export default function RestaurantList({ restaurants, onCreateClick }: RestaurantListProps) {
   const router = useRouter()
+  const [searchTerm, setSearchTerm] = React.useState('')
+
+  const filteredRestaurants = React.useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase()
+    if (!normalizedSearch) {
+      return restaurants
+    }
+
+    return restaurants.filter((restaurant) => restaurant.name.toLowerCase().includes(normalizedSearch))
+  }, [restaurants, searchTerm])
+
   return (
-    <div>
+    <div className="p-6">
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-semibold text-slate-900">QUẢN LÝ NHÀ HÀNG</h2>
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Restaurant Management</div>
+          <div className="text-lg font-semibold text-slate-900">Nhà hàng</div>
+        </div>
         <button
           onClick={onCreateClick}
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+          className="cursor-pointer flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
         >
-          + Thêm nhà hàng
+          <Plus className="h-4 w-4" />
+          Thêm nhà hàng
         </button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {restaurants.map((restaurant) => (
-          <div
-            key={restaurant.id}
-            onClick={() => {
-              if (restaurant.slug) {
-                const encodedSlug = encodeURIComponent(restaurant.slug)
-                router.push(`/tenant/restaurant/${encodedSlug}`)
-              }
-            }}
-            className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-          >
-            <div 
-              className="aspect-video bg-emerald-600 bg-cover bg-center"
-              style={{
-                backgroundImage: restaurant.image 
-                  ? `url(${restaurant.image})` 
-                  : undefined
-              }}
-            />
-            <div className="p-4">
-              <p className="text-sm font-medium text-slate-700 truncate">
-                {restaurant.name}
-              </p>
-            </div>
-          </div>
-        ))}
+      <div className="mb-6">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Tìm kiếm nhà hàng..."
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 pl-9 text-sm text-slate-600 outline-none placeholder:text-slate-400 focus:border-slate-300 focus:bg-white"
+          />
+        </div>
       </div>
+
+      {filteredRestaurants.length > 0 ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredRestaurants.map((restaurant) => (
+            <div
+              key={restaurant.id}
+              onClick={() => {
+                if (restaurant.slug) {
+                  const encodedSlug = encodeURIComponent(restaurant.slug)
+                  router.push(`/tenant/restaurant/${encodedSlug}`)
+                }
+              }}
+              className="group cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors hover:bg-slate-50"
+            >
+              {restaurant.image ? (
+                <div className="relative aspect-video overflow-hidden bg-slate-100">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={restaurant.image}
+                    alt={restaurant.name}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="flex aspect-video items-center justify-center bg-slate-100">
+                  <Store className="h-8 w-8 text-slate-400" />
+                </div>
+              )}
+
+              <div className="p-4">
+                <p className="line-clamp-1 text-sm font-semibold text-slate-900">{restaurant.name}</p>
+
+                <div className="mt-2">
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${
+                      restaurant.status === 'active' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                    {restaurant.status === 'active' ? 'Hoạt động' : 'Tạm dừng'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white py-12">
+          <div className="rounded-full bg-slate-100 p-4">
+            <Store className="h-8 w-8 text-slate-400" />
+          </div>
+          <h3 className="mt-4 text-sm font-medium text-slate-900">
+            {searchTerm ? 'Không tìm thấy nhà hàng' : 'Chưa có nhà hàng nào'}
+          </h3>
+          <p className="mt-1 text-xs text-slate-500">
+            {searchTerm ? 'Thử tìm kiếm với từ khóa khác' : 'Nhấn nút Thêm nhà hàng để bắt đầu'}
+          </p>
+        </div>
+      )}
     </div>
   )
 }

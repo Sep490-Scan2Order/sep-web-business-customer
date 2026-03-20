@@ -38,6 +38,7 @@ export const API = {
         GET_RESTAURANT_DETAIL_BY_SLUG: (slug: string) => `/Restaurant/${slug}`,
         GET_MENU: (restaurantId: number) => `/Restaurant/${restaurantId}/menu`,
         GET_MENU_ALL: (restaurantId: number) => `/Restaurant/${restaurantId}/menu-all`,
+        CONFIG_MIN_CASH_AMOUNT: (restaurantId: number, minCashAmount: number) => `/Restaurant/config-min-cash-amount?restaurantId=${restaurantId}&minCashAmount=${minCashAmount}`,
     },
     BLOG: {
         CREATE: "/SystemBlog",
@@ -113,6 +114,7 @@ export const API = {
     },
     BRANCH_DISH_CONFIG: {
         UPDATE_IS_SELLING: (restaurantId: number, dishId: number, isSelling: boolean) => `/BranchDishConfig/update-is-selling/${restaurantId}/${dishId}?isSelling=${isSelling}`,
+        SYNC_DISHES_TO_BRANCH: "/BranchDishConfig/sync-dishes-to-branches",
     },
 };
 

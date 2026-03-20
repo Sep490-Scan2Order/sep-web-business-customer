@@ -12,6 +12,7 @@ interface BranchDishMenuListProps {
   togglingDishIds: Set<number>;
   onBack: () => void;
   onToggleDish: (restaurantId: number, dishId: number, isSelling: boolean) => void | Promise<void>;
+  onSyncDishes: () => void | Promise<void>;
 }
 
 interface PendingToggleAction {
@@ -34,6 +35,7 @@ export default function BranchDishMenuList({
   togglingDishIds,
   onBack,
   onToggleDish,
+  onSyncDishes,
 }: BranchDishMenuListProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [pendingToggleAction, setPendingToggleAction] = useState<PendingToggleAction | null>(null);
@@ -156,6 +158,12 @@ export default function BranchDishMenuList({
               ? 'Thử đổi từ khóa để xem thêm món'
               : 'Bạn có thể tạo menu ở trang Menu Template trước'}
           </p>
+          <button
+            onClick={onSyncDishes}
+            className="mt-3 rounded-lg bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
+          >
+            Đồng bộ món ăn
+          </button>
         </div>
       ) : (
         <div className="space-y-4">
@@ -204,7 +212,7 @@ export default function BranchDishMenuList({
                               : 'bg-emerald-50 text-emerald-700'
                           }`}
                         >
-                          {isLocked ? 'Đang khóa' : 'Đang mở'}
+                          {isLocked ? 'Ngừng bán' : 'Mở bán'}
                         </span>
 
                         <button
@@ -234,7 +242,7 @@ export default function BranchDishMenuList({
                           ) : (
                             <Lock className="h-3.5 w-3.5" />
                           )}
-                          {isLocked ? 'Mở món' : 'Khóa món'}
+                          {isLocked ? 'Mở bán' : 'Ngừng bán'}
                         </button>
                       </div>
                     </div>
@@ -251,10 +259,10 @@ export default function BranchDishMenuList({
         title="Xác nhận thao tác"
         message={
           pendingToggleAction
-            ? `Bạn có chắc muốn ${pendingToggleAction.nextIsSelling ? 'mở' : 'khóa'} món ${pendingToggleAction.dishName}?`
+            ? `Bạn có chắc muốn ${pendingToggleAction.nextIsSelling ? 'mở' : 'ngừng'} bán món ${pendingToggleAction.dishName}?`
             : 'Bạn có chắc muốn thực hiện hành động này không?'
         }
-        confirmText={pendingToggleAction?.nextIsSelling ? 'Mở món' : 'Khóa món'}
+        confirmText={pendingToggleAction?.nextIsSelling ? 'Mở bán' : 'Ngừng bán'}
         cancelText="Hủy"
         confirmVariant={pendingToggleAction?.nextIsSelling ? 'default' : 'danger'}
         isLoading={confirmLoading}
