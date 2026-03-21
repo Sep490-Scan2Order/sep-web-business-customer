@@ -1,12 +1,38 @@
 import React from 'react'
 import { Restaurant } from '@/src/types/type'
 import { MapPin, Phone, Store } from 'lucide-react'
+import { API } from '@/src/constants/api'
 
 interface Props {
   restaurant: Restaurant
+  imageVersion?: number
 }
 
-const RestaurantHeroCard = React.memo(function RestaurantHeroCard({ restaurant }: Props) {
+const RestaurantHeroCard = React.memo(function RestaurantHeroCard({ restaurant, imageVersion }: Props) {
+  const imageSrc = React.useMemo(() => {
+    const rawImage = restaurant.image
+    if (!rawImage?.trim()) {
+      return ''
+    }
+
+    const normalizedPath = rawImage.trim().replace(/\\/g, '/')
+    const isAbsolute = /^(https?:)?\/\//i.test(normalizedPath)
+    const isInlineData = normalizedPath.startsWith('data:') || normalizedPath.startsWith('blob:')
+
+    const baseUrl = API.BASE_URL?.replace(/\/$/, '')
+    const absoluteUrl =
+      isAbsolute || isInlineData || !baseUrl
+        ? normalizedPath
+        : `${baseUrl}/${normalizedPath.replace(/^\/+/, '')}`
+
+    if (!imageVersion) {
+      return absoluteUrl
+    }
+
+    const separator = absoluteUrl.includes('?') ? '&' : '?'
+    return `${absoluteUrl}${separator}v=${imageVersion}`
+  }, [imageVersion, restaurant.image])
+
   const activeStatus = restaurant.isActive
     ? { label: 'Hoạt động', classes: 'bg-emerald-50 text-emerald-600' }
     : { label: 'Không hoạt động', classes: 'bg-slate-100 text-slate-600' }
@@ -19,10 +45,10 @@ const RestaurantHeroCard = React.memo(function RestaurantHeroCard({ restaurant }
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
       <div className="grid gap-0 lg:grid-cols-[280px_1fr]">
         <div className="relative aspect-[4/3] overflow-hidden bg-slate-100 lg:aspect-auto lg:min-h-[240px]">
-          {restaurant.image ? (
+          {imageSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={restaurant.image}
+              src={imageSrc}
               alt={restaurant.restaurantName}
               className="h-full w-full object-cover"
             />

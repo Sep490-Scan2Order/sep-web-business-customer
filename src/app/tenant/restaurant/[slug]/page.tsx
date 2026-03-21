@@ -28,6 +28,7 @@ export default function RestaurantDetailPage() {
 
   // Restaurant data
   const [restaurant, setRestaurant] = React.useState<Restaurant | null>(null)
+  const [restaurantImageVersion, setRestaurantImageVersion] = React.useState<number | undefined>(undefined)
   const [isLoading, setIsLoading] = React.useState(true)
 
   // QR Menu state
@@ -40,6 +41,11 @@ export default function RestaurantDetailPage() {
   const [minCashAmountInput, setMinCashAmountInput] = React.useState('')
   const [isSavingMinCashAmount, setIsSavingMinCashAmount] = React.useState(false)
 
+  const applyRestaurantData = React.useCallback((value: Restaurant) => {
+    setRestaurant(value)
+    setRestaurantImageVersion(Date.now())
+  }, [])
+
   // Fetch restaurant data
   React.useEffect(() => {
     const fetchRestaurantDetail = async () => {
@@ -47,7 +53,7 @@ export default function RestaurantDetailPage() {
         setIsLoading(true)
         const response = await getRestaurantDetail(slug)
         if (response.isSuccess && response.data) {
-          setRestaurant(response.data)
+          applyRestaurantData(response.data)
           setQrLoadFailed(false)
         } else {
           toast.error(response.message || 'Không thể tải thông tin nhà hàng')
@@ -63,7 +69,7 @@ export default function RestaurantDetailPage() {
     if (slug) {
       fetchRestaurantDetail()
     }
-  }, [slug])
+  }, [applyRestaurantData, slug])
 
   const handleRefreshQr = React.useCallback(async () => {
     if (!slug) return
@@ -73,7 +79,7 @@ export default function RestaurantDetailPage() {
       const response = await getRestaurantDetail(slug)
 
       if (response.isSuccess && response.data) {
-        setRestaurant(response.data)
+        applyRestaurantData(response.data)
         setQrPreviewKey(Date.now())
         setQrLoadFailed(false)
         toast.success('Đã cập nhật QR mới nhất')
@@ -86,7 +92,7 @@ export default function RestaurantDetailPage() {
     } finally {
       setIsRefreshingQr(false)
     }
-  }, [slug])
+  }, [applyRestaurantData, slug])
 
   const handleOpenMinCashAmountModal = React.useCallback(() => {
     setMinCashAmountInput(restaurant?.minCashAmount?.toString() || '')
@@ -116,7 +122,7 @@ export default function RestaurantDetailPage() {
         // Fetch latest restaurant data
         const updatedData = await getRestaurantDetail(slug)
         if (updatedData.isSuccess && updatedData.data) {
-          setRestaurant(updatedData.data)
+          applyRestaurantData(updatedData.data)
         }
         return
       }
@@ -127,7 +133,7 @@ export default function RestaurantDetailPage() {
     } finally {
       setIsSavingMinCashAmount(false)
     }
-  }, [minCashAmountInput, restaurant, slug])
+  }, [applyRestaurantData, minCashAmountInput, restaurant, slug])
 
   const handleCloseMinCashModal = React.useCallback(() => {
     setIsMinCashAmountModalOpen(false)
@@ -135,8 +141,8 @@ export default function RestaurantDetailPage() {
   }, [])
 
   const handleLocationUpdated = React.useCallback((updatedRestaurant: Restaurant) => {
-    setRestaurant(updatedRestaurant)
-  }, [])
+    applyRestaurantData(updatedRestaurant)
+  }, [applyRestaurantData])
 
   if (isLoading) {
     return (
@@ -161,7 +167,7 @@ export default function RestaurantDetailPage() {
 
         <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
           <div className="space-y-6">
-            <RestaurantHeroCard restaurant={restaurant} />
+            <RestaurantHeroCard restaurant={restaurant} imageVersion={restaurantImageVersion} />
 
             <RestaurantGeneralInfo
               restaurant={restaurant}

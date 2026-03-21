@@ -2,7 +2,8 @@
 
 import React from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, Plus, Store } from 'lucide-react'
+import { Search, Plus, Store, Pencil } from 'lucide-react'
+import { API } from '@/src/constants/api'
 
 export interface Restaurant {
   id: string
@@ -10,16 +11,41 @@ export interface Restaurant {
   status?: 'active' | 'inactive'
   image?: string
   slug?: string
+  imageVersion?: number
 }
 
 interface RestaurantListProps {
   restaurants: Restaurant[]
   onCreateClick: () => void
+  onEditClick: (restaurantId: string) => void
 }
 
-export default function RestaurantList({ restaurants, onCreateClick }: RestaurantListProps) {
+export default function RestaurantList({ restaurants, onCreateClick, onEditClick }: RestaurantListProps) {
   const router = useRouter()
   const [searchTerm, setSearchTerm] = React.useState('')
+
+  const resolveImageSrc = React.useCallback((image?: string, imageVersion?: number) => {
+    if (!image?.trim()) {
+      return ''
+    }
+
+    const normalizedPath = image.trim().replace(/\\/g, '/')
+    const isAbsolute = /^(https?:)?\/\//i.test(normalizedPath)
+    const isInlineData = normalizedPath.startsWith('data:') || normalizedPath.startsWith('blob:')
+
+    const baseUrl = API.BASE_URL?.replace(/\/$/, '')
+    const absoluteUrl =
+      isAbsolute || isInlineData || !baseUrl
+        ? normalizedPath
+        : `${baseUrl}/${normalizedPath.replace(/^\/+/, '')}`
+
+    if (!imageVersion) {
+      return absoluteUrl
+    }
+
+    const separator = absoluteUrl.includes('?') ? '&' : '?'
+    return `${absoluteUrl}${separator}v=${imageVersion}`
+  }, [])
 
   const filteredRestaurants = React.useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase()
@@ -61,7 +87,10 @@ export default function RestaurantList({ restaurants, onCreateClick }: Restauran
 
       {filteredRestaurants.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredRestaurants.map((restaurant) => (
+          {filteredRestaurants.map((restaurant) => {
+            const imageSrc = resolveImageSrc(restaurant.image, restaurant.imageVersion)
+
+            return (
             <div
               key={restaurant.id}
               onClick={() => {
@@ -70,13 +99,25 @@ export default function RestaurantList({ restaurants, onCreateClick }: Restauran
                   router.push(`/tenant/restaurant/${encodedSlug}`)
                 }
               }}
-              className="group cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors hover:bg-slate-50"
+              className="group relative cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors hover:bg-slate-50"
             >
-              {restaurant.image ? (
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  onEditClick(restaurant.id)
+                }}
+                className="absolute right-2 top-2 z-10 cursor-pointer rounded-lg border border-slate-200 bg-white/95 p-1.5 text-slate-600 shadow-sm transition-colors hover:bg-white"
+                aria-label={`Sửa thông tin ${restaurant.name}`}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+
+              {imageSrc ? (
                 <div className="relative aspect-video overflow-hidden bg-slate-100">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={restaurant.image}
+                    src={imageSrc}
                     alt={restaurant.name}
                     className="h-full w-full object-cover"
                   />
@@ -102,7 +143,8 @@ export default function RestaurantList({ restaurants, onCreateClick }: Restauran
                 </div>
               </div>
             </div>
-          ))}
+            )
+          })}
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white py-12">

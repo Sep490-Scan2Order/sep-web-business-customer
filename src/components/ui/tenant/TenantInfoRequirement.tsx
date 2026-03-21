@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { X, MapPin, Upload, Loader2, Plus } from 'lucide-react'
+import { X, MapPin, Upload, Loader2, Plus, Save } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { ProvinceSummary, DistrictSummary } from '@/src/types/type'
 
@@ -23,6 +23,14 @@ interface TenantInfoRequirementProps {
   onSubmit: (info: TenantInfo) => void
   isLoading?: boolean
   mode?: 'create' | 'edit'
+  initialData?: Partial<TenantInfo> & { imageUrl?: string }
+}
+
+const defaultFormData: TenantInfo = {
+  restaurantName: '',
+  phone: '',
+  description: '',
+  address: '',
 }
 
 export default function TenantInfoRequirement({
@@ -31,13 +39,9 @@ export default function TenantInfoRequirement({
   onSubmit,
   isLoading = false,
   mode = 'create',
+  initialData,
 }: TenantInfoRequirementProps) {
-  const [formData, setFormData] = React.useState<TenantInfo>({
-    restaurantName: '',
-    phone: '',
-    description: '',
-    address: '',
-  })
+  const [formData, setFormData] = React.useState<TenantInfo>(defaultFormData)
   
   const [provinces, setProvinces] = useState<ProvinceSummary[]>([])
   const [districts, setDistricts] = useState<DistrictSummary[]>([])
@@ -45,6 +49,28 @@ export default function TenantInfoRequirement({
   const [selectedDistrictCode, setSelectedDistrictCode] = useState('')
   const [locationServiceAvailable, setLocationServiceAvailable] = useState(true)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!isOpen) {
+      return
+    }
+
+    setFormData({
+      restaurantName: initialData?.restaurantName ?? '',
+      phone: initialData?.phone ?? '',
+      description: initialData?.description ?? '',
+      address: initialData?.address ?? '',
+      latitude: initialData?.latitude,
+      longitude: initialData?.longitude,
+      image: undefined,
+      provinceCode: '',
+      districtCode: '',
+    })
+    setSelectedProvinceCode('')
+    setSelectedDistrictCode('')
+    setDistricts([])
+    setImagePreview(initialData?.imageUrl ?? null)
+  }, [initialData, isOpen])
 
 
   // Load provinces from API
@@ -190,6 +216,7 @@ export default function TenantInfoRequirement({
   if (!isOpen) return null
 
   const isEditMode = mode === 'edit'
+  const requireLocationSelection = !isEditMode
   const modalTitle = isEditMode ? 'Cập nhật nhà hàng' : 'Tạo nhà hàng mới'
   const modalDescription = isEditMode
     ? 'Chỉnh sửa thông tin nhà hàng'
@@ -256,7 +283,7 @@ export default function TenantInfoRequirement({
             <div className="space-y-3">
               <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
                 <MapPin className="h-4 w-4 text-slate-500" />
-                Địa chỉ <span className="text-red-500">*</span>
+                Địa chỉ {requireLocationSelection ? <span className="text-red-500">*</span> : null}
               </label>
               
               <div className="grid grid-cols-2 gap-3">
@@ -265,7 +292,7 @@ export default function TenantInfoRequirement({
                   <select
                     value={selectedProvinceCode}
                     onChange={handleProvinceChange}
-                    required
+                    required={requireLocationSelection}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-300 focus:bg-white"
                   >
                     <option value="">Chọn Tỉnh/Thành phố</option>
@@ -282,7 +309,7 @@ export default function TenantInfoRequirement({
                   <select
                     value={selectedDistrictCode}
                     onChange={handleDistrictChange}
-                    required
+                    required={requireLocationSelection}
                     disabled={!selectedProvinceCode}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-300 focus:bg-white disabled:cursor-not-allowed disabled:opacity-50"
                   >
@@ -445,7 +472,7 @@ export default function TenantInfoRequirement({
                 </>
               ) : (
                 <>
-                  <Plus className="h-4 w-4" />
+                  {isEditMode ? <Save className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
                   {submitLabel}
                 </>
               )}
