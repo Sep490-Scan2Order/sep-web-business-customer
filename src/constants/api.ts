@@ -71,6 +71,7 @@ export const API = {
         GET_ALL: "/MenuTemplate",
         GET_BY_ID: (id: number) => `/MenuTemplate/${id}`,
         UPDATE: (id: number) => `/MenuTemplate/${id}`,
+        GENERATE_HOLIDAY_AI: "/MenuTemplate/generate-holiday-ai",
     },
     MENU_RESTAURANT: {
         APPLY_TEMPLATE: `/MenuRestaurant`,

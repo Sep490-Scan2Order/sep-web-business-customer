@@ -106,6 +106,15 @@ interface TemplateLayoutConfig {
   menuStructure?: MenuSection[];
 }
 
+interface AiHolidayResponse {
+  templateName: string;
+  themeColor: string;
+  fontFamily: string;
+  backgroundColor: string;
+  backgroundImageUrl: string;
+  layoutConfigJson: string;
+}
+
 type BackgroundMode = "color" | "image";
 
 const FIXED_SLOTS: FixedLayoutSlot[] = [
@@ -239,6 +248,63 @@ const getMenuTemplateById = async (
   return response.data;
 };
 
+const generateHolidayTemplateAi = async (
+  holidayName: string
+): Promise<ApiResponse<AiHolidayResponse>> => {
+  const response = await apiClient.post<ApiResponse<AiHolidayResponse>>(
+    API.MENU_TEMPLATE.GENERATE_HOLIDAY_AI,
+    { holidayName }
+  );
+  return response.data;
+};
+
+const mergeLayoutConfig = (
+  currentLayout: TemplateLayoutConfig,
+  layoutPatch: Partial<TemplateLayoutConfig> | null
+): TemplateLayoutConfig => {
+  if (!layoutPatch) return currentLayout;
+  return {
+    ...currentLayout,
+    ...layoutPatch,
+    canvas: {
+      ...currentLayout.canvas,
+      ...layoutPatch.canvas,
+    },
+    header: {
+      ...currentLayout.header,
+      ...layoutPatch.header,
+    },
+    chips: {
+      ...currentLayout.chips,
+      ...layoutPatch.chips,
+    },
+    card: {
+      ...currentLayout.card,
+      ...layoutPatch.card,
+      addToCartButton: {
+        ...currentLayout.card?.addToCartButton,
+        ...layoutPatch.card?.addToCartButton,
+      },
+    },
+    dataMapping: {
+      ...currentLayout.dataMapping,
+      ...layoutPatch.dataMapping,
+      menu: {
+        ...currentLayout.dataMapping?.menu,
+        ...layoutPatch.dataMapping?.menu,
+      },
+      categories: {
+        ...currentLayout.dataMapping?.categories,
+        ...layoutPatch.dataMapping?.categories,
+      },
+      dishes: {
+        ...currentLayout.dataMapping?.dishes,
+        ...layoutPatch.dataMapping?.dishes,
+      },
+    },
+  };
+};
+
 export default function TemplateManagementPage() {
   const [step, setStep] = useState<"list" | "create">("list");
 
@@ -276,6 +342,10 @@ export default function TemplateManagementPage() {
   const [backgroundImagePreviewUrl, setBackgroundImagePreviewUrl] =
     useState("");
   const [sections, setSections] = useState<MenuSection[]>(initialSections);
+  const [holidayName, setHolidayName] = useState("");
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
+  const [aiLayoutPatch, setAiLayoutPatch] =
+    useState<Partial<TemplateLayoutConfig> | null>(null);
 
   useEffect(() => {
     void loadTemplates();
@@ -473,6 +543,57 @@ export default function TemplateManagementPage() {
     setBackgroundImageUrl("");
     setBackgroundImageFile(null);
     setSections(initialSections);
+    setHolidayName("");
+    setAiLayoutPatch(null);
+  };
+
+  const handleGenerateTemplateByAi = async () => {
+    if (!holidayName.trim()) {
+      toast.error("Vui lòng chọn hoặc nhập tên ngày lễ");
+      return;
+    }
+    try {
+      setIsGeneratingAi(true);
+      const aiRes = await generateHolidayTemplateAi(holidayName.trim());
+      if (!aiRes.isSuccess || !aiRes.data) {
+        toast.error(aiRes.message || "AI không thể tạo giao diện lúc này");
+        return;
+      }
+
+      const aiData = aiRes.data;
+      let parsedPatch: Partial<TemplateLayoutConfig> | null = null;
+      if (aiData.layoutConfigJson?.trim()) {
+        try {
+          parsedPatch = JSON.parse(
+            aiData.layoutConfigJson
+          ) as Partial<TemplateLayoutConfig>;
+        } catch {
+          toast.error("layoutConfigJson từ AI không hợp lệ");
+        }
+      }
+
+      setAiLayoutPatch(parsedPatch);
+      setTemplateName(aiData.templateName || holidayName.trim());
+      setThemeColor(aiData.themeColor || "#3B82F6");
+      setFontFamily(aiData.fontFamily || "Arial");
+
+      if (aiData.backgroundImageUrl?.trim()) {
+        setBackgroundMode("image");
+        setBackgroundImageUrl(aiData.backgroundImageUrl.trim());
+        setBackgroundColor(aiData.backgroundColor || "#FFFFFF");
+      } else {
+        setBackgroundMode("color");
+        setBackgroundColor(aiData.backgroundColor || "#FFFFFF");
+        setBackgroundImageUrl("");
+      }
+
+      toast.success("AI đã tạo giao diện mẫu");
+    } catch (error) {
+      console.error("Error generating AI template:", error);
+      toast.error("Có lỗi xảy ra khi tạo template AI");
+    } finally {
+      setIsGeneratingAi(false);
+    }
   };
 
   const addCategory = () => {
@@ -562,7 +683,7 @@ export default function TemplateManagementPage() {
     try {
       setSubmitting(true);
 
-      const layoutConfigJson = JSON.stringify({
+      const baseLayoutConfig: TemplateLayoutConfig = {
         version: 1,
         canvas: {
           width: 1000,
@@ -598,7 +719,9 @@ export default function TemplateManagementPage() {
             ],
           },
         },
-      });
+      };
+      const mergedLayoutConfig = mergeLayoutConfig(baseLayoutConfig, aiLayoutPatch);
+      const layoutConfigJson = JSON.stringify(mergedLayoutConfig);
 
       const formData = new FormData();
       formData.append("TemplateName", templateName);
@@ -680,6 +803,50 @@ export default function TemplateManagementPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="rounded-xl border border-slate-200 bg-white p-6">
+            <h2 className="mb-3 text-lg font-semibold text-slate-900">
+              Tạo template bằng AI
+            </h2>
+            <p className="mb-3 text-sm text-slate-600">
+              Chọn mẫu nhanh hoặc nhập ngày lễ hoặc nội dung mong muốn, AI sẽ tạo ra layout cho template.
+            </p>
+            <div className="mb-3 flex flex-wrap gap-2">
+              {["Giáng Sinh", "8/3", "Khai trương", "Tết", "Halloween"].map(
+                (preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => setHolidayName(preset)}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                      holidayName === preset
+                        ? "border-blue-500 bg-blue-50 text-blue-700"
+                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                    }`}
+                  >
+                    {preset}
+                  </button>
+                )
+              )}
+            </div>
+            <div className="flex flex-col gap-2 md:flex-row">
+              <input
+                type="text"
+                value={holidayName}
+                onChange={(e) => setHolidayName(e.target.value)}
+                placeholder="Ví dụ: Giáng Sinh"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                type="button"
+                onClick={handleGenerateTemplateByAi}
+                disabled={isGeneratingAi}
+                className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isGeneratingAi ? "AI đang thiết kế..." : "Tạo template AI"}
+              </button>
+            </div>
+          </div>
+
           {/* Template Settings */}
           <div className="rounded-xl border border-slate-200 bg-white p-6">
             <h2 className="mb-4 text-lg font-semibold text-slate-900">
@@ -818,14 +985,7 @@ export default function TemplateManagementPage() {
               <p className="font-semibold">
                 ℹ️ Phần này CHỈ dùng để preview UI
               </p>
-              <p className="mt-1 text-xs text-blue-700">
-                Category/Dish nhập ở đây <strong>KHÔNG</strong> được lưu vào
-                database. Tenant sẽ dùng data thật từ API{" "}
-                <code className="rounded bg-blue-100 px-1">
-                  /Restaurant/{"{restaurantId}"}/menu
-                </code>
-                .
-              </p>
+              
             </div>
 
             <div className="mb-4 flex items-center justify-between">
