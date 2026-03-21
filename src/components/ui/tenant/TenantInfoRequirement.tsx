@@ -33,6 +33,16 @@ const defaultFormData: TenantInfo = {
   address: '',
 }
 
+function parseCoordinateInput(value: string): number | undefined {
+  const trimmed = value.trim()
+  if (!trimmed) return undefined
+
+  // Accept both "10.123" and "10,123" styles.
+  const normalized = trimmed.replace(',', '.')
+  const parsed = Number.parseFloat(normalized)
+  return Number.isFinite(parsed) ? parsed : undefined
+}
+
 export default function TenantInfoRequirement({
   isOpen,
   onClose,
@@ -181,6 +191,26 @@ export default function TenantInfoRequirement({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+
+    const hasLatitude = formData.latitude !== undefined
+    const hasLongitude = formData.longitude !== undefined
+
+    if (hasLatitude !== hasLongitude) {
+      toast.error('Vui lòng nhập đầy đủ cả vĩ độ và kinh độ')
+      return
+    }
+
+    if (
+      hasLatitude &&
+      hasLongitude &&
+      ((formData.latitude as number) < -90 ||
+        (formData.latitude as number) > 90 ||
+        (formData.longitude as number) < -180 ||
+        (formData.longitude as number) > 180)
+    ) {
+      toast.error('Tọa độ không hợp lệ. Vĩ độ: -90 đến 90, kinh độ: -180 đến 180')
+      return
+    }
     
     // Build address from province and district if using location service
     let fullAddress = ''
@@ -358,14 +388,19 @@ export default function TenantInfoRequirement({
                 Vĩ độ (Latitude)
               </label>
               <input
-                type="number"
+                type="text"
                 id="latitude"
                 name="latitude"
-                step="any"
-                value={formData.latitude || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, latitude: e.target.value ? parseFloat(e.target.value) : undefined }))}
+                inputMode="decimal"
+                value={formData.latitude ?? ''}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    latitude: parseCoordinateInput(e.target.value),
+                  }))
+                }
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-slate-300 focus:bg-white"
-                placeholder="VD: 21.0285"
+                placeholder="VD: 10.715178 hoặc 10,715178"
               />
             </div>
 
@@ -374,14 +409,19 @@ export default function TenantInfoRequirement({
                 Kinh độ (Longitude)
               </label>
               <input
-                type="number"
+                type="text"
                 id="longitude"
                 name="longitude"
-                step="any"
-                value={formData.longitude || ''}
-                onChange={(e) => setFormData(prev => ({ ...prev, longitude: e.target.value ? parseFloat(e.target.value) : undefined }))}
+                inputMode="decimal"
+                value={formData.longitude ?? ''}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    longitude: parseCoordinateInput(e.target.value),
+                  }))
+                }
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-slate-300 focus:bg-white"
-                placeholder="VD: 105.8542"
+                placeholder="VD: 107.333179 hoặc 107,333179"
               />
             </div>
           </div>
