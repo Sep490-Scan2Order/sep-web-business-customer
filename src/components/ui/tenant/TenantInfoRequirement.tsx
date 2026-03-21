@@ -1,9 +1,11 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { X, MapPin, Upload, Loader2, Plus, Save } from 'lucide-react'
 import { toast } from 'react-toastify'
 import { ProvinceSummary, DistrictSummary } from '@/src/types/type'
+import type { RestaurantLocationMapProps } from '@/src/components/ui/tenant/RestaurantLocationMap'
 
 export interface TenantInfo {
   restaurantName: string
@@ -33,15 +35,17 @@ const defaultFormData: TenantInfo = {
   address: '',
 }
 
-function parseCoordinateInput(value: string): number | undefined {
-  const trimmed = value.trim()
-  if (!trimmed) return undefined
-
-  // Accept both "10.123" and "10,123" styles.
-  const normalized = trimmed.replace(',', '.')
-  const parsed = Number.parseFloat(normalized)
-  return Number.isFinite(parsed) ? parsed : undefined
+const RestaurantLocationMap = dynamic<RestaurantLocationMapProps>(
+  () => import('@/src/components/ui/tenant/RestaurantLocationMap'),
+  {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-72 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-500">
+      Đang tải bản đồ...
+    </div>
+  ),
 }
+)
 
 export default function TenantInfoRequirement({
   isOpen,
@@ -187,6 +191,39 @@ export default function TenantInfoRequirement({
 
   const handleDistrictChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedDistrictCode(e.target.value)
+  }
+
+  const handleMapLocationChange = React.useCallback((latitude: number, longitude: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      latitude,
+      longitude,
+    }))
+  }, [])
+
+  const handleGetCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error('Trình duyệt không hỗ trợ định vị hiện tại')
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        handleMapLocationChange(position.coords.latitude, position.coords.longitude)
+      },
+      () => {
+        toast.error('Không thể lấy vị trí hiện tại. Vui lòng kiểm tra quyền truy cập vị trí.')
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    )
+  }
+
+  const handleClearCoordinates = () => {
+    setFormData((prev) => ({
+      ...prev,
+      latitude: undefined,
+      longitude: undefined,
+    }))
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -381,48 +418,50 @@ export default function TenantInfoRequirement({
             </div>
           )}
 
-          {/* Latitude & Longitude */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label htmlFor="latitude" className="mb-2 block text-sm font-medium text-slate-700">
-                Vĩ độ (Latitude)
-              </label>
-              <input
-                type="text"
-                id="latitude"
-                name="latitude"
-                inputMode="decimal"
-                value={formData.latitude ?? ''}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    latitude: parseCoordinateInput(e.target.value),
-                  }))
-                }
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-slate-300 focus:bg-white"
-                placeholder="VD: 10.715178 hoặc 10,715178"
-              />
+          {/* Location picker */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <label className="text-sm font-medium text-slate-700">Vị trí nhà hàng trên bản đồ</label>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleGetCurrentLocation}
+                  className="cursor-pointer rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  Dùng vị trí hiện tại
+                </button>
+                <button
+                  type="button"
+                  onClick={handleClearCoordinates}
+                  disabled={formData.latitude === undefined && formData.longitude === undefined}
+                  className="cursor-pointer rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Xóa tọa độ
+                </button>
+              </div>
             </div>
 
-            <div>
-              <label htmlFor="longitude" className="mb-2 block text-sm font-medium text-slate-700">
-                Kinh độ (Longitude)
-              </label>
-              <input
-                type="text"
-                id="longitude"
-                name="longitude"
-                inputMode="decimal"
-                value={formData.longitude ?? ''}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    longitude: parseCoordinateInput(e.target.value),
-                  }))
-                }
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-slate-300 focus:bg-white"
-                placeholder="VD: 107.333179 hoặc 107,333179"
-              />
+            <p className="text-xs text-slate-500">Nhấn vào bản đồ để chọn vị trí. Tọa độ sẽ tự động cập nhật.</p>
+
+            <RestaurantLocationMap
+              latitude={formData.latitude}
+              longitude={formData.longitude}
+              onChange={handleMapLocationChange}
+            />
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <p className="mb-1 text-xs font-medium text-slate-500">Vĩ độ (Latitude)</p>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900">
+                  {formData.latitude !== undefined ? formData.latitude.toFixed(6) : 'Chưa chọn'}
+                </div>
+              </div>
+              <div>
+                <p className="mb-1 text-xs font-medium text-slate-500">Kinh độ (Longitude)</p>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900">
+                  {formData.longitude !== undefined ? formData.longitude.toFixed(6) : 'Chưa chọn'}
+                </div>
+              </div>
             </div>
           </div>
 
