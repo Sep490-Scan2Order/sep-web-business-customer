@@ -263,44 +263,145 @@ const mergeLayoutConfig = (
   layoutPatch: Partial<TemplateLayoutConfig> | null
 ): TemplateLayoutConfig => {
   if (!layoutPatch) return currentLayout;
+  const currentCanvas = currentLayout.canvas ?? {};
+  const patchCanvas = layoutPatch.canvas ?? {};
+  const currentHeader = currentLayout.header ?? {};
+  const patchHeader = layoutPatch.header ?? {};
+  const currentChips = currentLayout.chips ?? {};
+  const patchChips = layoutPatch.chips ?? {};
+  const currentCard = currentLayout.card ?? {};
+  const patchCard = layoutPatch.card ?? {};
+  const currentAddToCart = currentLayout.card?.addToCartButton ?? {};
+  const patchAddToCart = layoutPatch.card?.addToCartButton ?? {};
+  const currentDataMapping = currentLayout.dataMapping ?? {};
+  const patchDataMapping = layoutPatch.dataMapping ?? {};
+  const currentMenuMapping = currentLayout.dataMapping?.menu ?? {};
+  const patchMenuMapping = layoutPatch.dataMapping?.menu ?? {};
+  const currentCategoriesMapping = currentLayout.dataMapping?.categories ?? {};
+  const patchCategoriesMapping = layoutPatch.dataMapping?.categories ?? {};
+  const currentDishesMapping = currentLayout.dataMapping?.dishes ?? {};
+  const patchDishesMapping = layoutPatch.dataMapping?.dishes ?? {};
+
   return {
     ...currentLayout,
     ...layoutPatch,
-    canvas: {
-      ...currentLayout.canvas,
-      ...layoutPatch.canvas,
-    },
-    header: {
-      ...currentLayout.header,
-      ...layoutPatch.header,
-    },
-    chips: {
-      ...currentLayout.chips,
-      ...layoutPatch.chips,
-    },
-    card: {
-      ...currentLayout.card,
-      ...layoutPatch.card,
-      addToCartButton: {
-        ...currentLayout.card?.addToCartButton,
-        ...layoutPatch.card?.addToCartButton,
-      },
-    },
+    canvas:
+      currentLayout.canvas || layoutPatch.canvas
+        ? {
+            width:
+              layoutPatch.canvas?.width ?? currentLayout.canvas?.width ?? 1000,
+            height:
+              layoutPatch.canvas?.height ?? currentLayout.canvas?.height ?? 800,
+            ...currentCanvas,
+            ...patchCanvas,
+          }
+        : undefined,
+    header:
+      currentLayout.header || layoutPatch.header
+        ? {
+            showBackButton: true,
+            showSearch: true,
+            searchPlaceholder: "Tìm món ăn, đồ uống...",
+            showCart: true,
+            ...currentHeader,
+            ...patchHeader,
+          }
+        : undefined,
+    chips:
+      currentLayout.chips || layoutPatch.chips
+        ? {
+            showAllChip: true,
+            allChipLabel: "Tất cả",
+            categoryChipStyle: "pill",
+            ...currentChips,
+            ...patchChips,
+          }
+        : undefined,
+    card:
+      currentLayout.card || layoutPatch.card
+        ? {
+            imageSize: "md",
+            borderRadius: 12,
+            showPromotionBadge: true,
+            showOriginalPriceStrikethrough: true,
+            priceColorMode: "theme",
+            showStockLine: true,
+            ...currentCard,
+            ...patchCard,
+            addToCartButton: {
+              show: true,
+              label: "+ Thêm vào giỏ",
+              shape: "pill",
+              ...currentAddToCart,
+              ...patchAddToCart,
+            },
+          }
+        : undefined,
     dataMapping: {
-      ...currentLayout.dataMapping,
-      ...layoutPatch.dataMapping,
-      menu: {
-        ...currentLayout.dataMapping?.menu,
-        ...layoutPatch.dataMapping?.menu,
-      },
-      categories: {
-        ...currentLayout.dataMapping?.categories,
-        ...layoutPatch.dataMapping?.categories,
-      },
-      dishes: {
-        ...currentLayout.dataMapping?.dishes,
-        ...layoutPatch.dataMapping?.dishes,
-      },
+      ...currentDataMapping,
+      ...patchDataMapping,
+      menu:
+        currentLayout.dataMapping?.menu || layoutPatch.dataMapping?.menu
+          ? {
+              source:
+                layoutPatch.dataMapping?.menu?.source ??
+                currentLayout.dataMapping?.menu?.source ??
+                "API.RESTAURANT.GET_MENU(restaurantId)",
+              categoryField:
+                layoutPatch.dataMapping?.menu?.categoryField ??
+                currentLayout.dataMapping?.menu?.categoryField ??
+                "categoryName",
+              dishesField:
+                layoutPatch.dataMapping?.menu?.dishesField ??
+                currentLayout.dataMapping?.menu?.dishesField ??
+                "dishes",
+              dishDisplayFields:
+                layoutPatch.dataMapping?.menu?.dishDisplayFields ??
+                currentLayout.dataMapping?.menu?.dishDisplayFields ??
+                [],
+              promotionFields:
+                layoutPatch.dataMapping?.menu?.promotionFields ??
+                currentLayout.dataMapping?.menu?.promotionFields ??
+                [],
+              ...currentMenuMapping,
+              ...patchMenuMapping,
+            }
+          : undefined,
+      categories:
+        currentLayout.dataMapping?.categories ||
+        layoutPatch.dataMapping?.categories
+          ? {
+              source:
+                layoutPatch.dataMapping?.categories?.source ??
+                currentLayout.dataMapping?.categories?.source ??
+                "",
+              displayField:
+                layoutPatch.dataMapping?.categories?.displayField ??
+                currentLayout.dataMapping?.categories?.displayField ??
+                "categoryName",
+              ...currentCategoriesMapping,
+              ...patchCategoriesMapping,
+            }
+          : undefined,
+      dishes:
+        currentLayout.dataMapping?.dishes || layoutPatch.dataMapping?.dishes
+          ? {
+              source:
+                layoutPatch.dataMapping?.dishes?.source ??
+                currentLayout.dataMapping?.dishes?.source ??
+                "",
+              groupBy:
+                layoutPatch.dataMapping?.dishes?.groupBy ??
+                currentLayout.dataMapping?.dishes?.groupBy ??
+                "categoryName",
+              displayFields:
+                layoutPatch.dataMapping?.dishes?.displayFields ??
+                currentLayout.dataMapping?.dishes?.displayFields ??
+                ["dishName", "price"],
+              ...currentDishesMapping,
+              ...patchDishesMapping,
+            }
+          : undefined,
     },
   };
 };
