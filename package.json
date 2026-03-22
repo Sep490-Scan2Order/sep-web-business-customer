@@ -6,7 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "codeceptjs run --steps",
+    "test:e2e:prod": "cross-env E2E_BASE_URL=https://scan2order.id.vn codeceptjs run --steps",
+    "test:e2e:tenant-login": "codeceptjs run tests/e2e/tenant_login_test.js --steps",
+    "allure:generate": "allure generate ./output/allure-results --clean -o ./output/allure-report",
+    "allure:open": "allure open ./output/allure-report",
+    "test:e2e:report": "npm run test:e2e && npm run allure:generate"
   },
   "dependencies": {
     "@microsoft/signalr": "^10.0.0",
@@ -26,16 +35,30 @@
     "zustand": "^5.0.11"
   },
   "devDependencies": {
+    "@codeceptjs/allure-legacy": "^1.0.2",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/jwt-decode": "^2.2.1",
     "@types/leaflet": "^1.9.21",
-    "@types/node": "^20",
+    "@types/node": "^20.19.37",
     "@types/nprogress": "^0.2.3",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.1.0",
+    "allure-commandline": "^2.38.1",
+    "codeceptjs": "^3.7.7",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.3.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "jsdom": "^29.0.1",
+    "msw": "^2.12.14",
+    "playwright": "^1.58.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
   }
 }
