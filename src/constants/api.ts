@@ -22,7 +22,7 @@ export const API = {
     },
 
     STAFF:{
-        CREATE: "/Staff",
+        CREATE: "/Staff/create-staff",
         GET_ALL: "/Staff/get-all",
     },
     AUTH: {
