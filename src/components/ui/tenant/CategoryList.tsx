@@ -1,17 +1,19 @@
 import React, { useState } from "react";
 import { CategoryDto } from "@/src/types/type";
-import { Search, Plus, Edit2, Layers } from "lucide-react";
+import { Search, Plus, Edit2, Layers, Trash2 } from "lucide-react";
 
 interface CategoryListProps {
   categories: CategoryDto[];
   onCreateClick: () => void;
   onEditClick: (category: CategoryDto) => void;
+  onDeleteClick: (category: CategoryDto) => void;
 }
 
 export default function CategoryList({
   categories,
   onCreateClick,
   onEditClick,
+  onDeleteClick,
 }: CategoryListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const filteredCategories = categories.filter((category) =>
@@ -70,15 +72,28 @@ export default function CategoryList({
                     <p className="text-xs text-slate-500">ID: #{category.id}</p>
                   </div>
                 </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEditClick(category);
-                  }}
-                  className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-                >
-                  <Edit2 className="h-4 w-4" />
-                </button>
+                <div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditClick(category);
+                    }}
+                    className="cursor-pointer rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                    title="Chỉnh sửa danh mục"
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteClick(category);
+                    }}
+                    className="cursor-pointer rounded-lg p-1.5 text-rose-500 hover:bg-rose-50 hover:text-rose-600"
+                    title="Xóa danh mục"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}

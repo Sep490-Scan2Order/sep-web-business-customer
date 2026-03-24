@@ -1,7 +1,9 @@
 "use client";
 import DishList from "@/src/components/ui/tenant/DishList";
 import ComboDetailPopUp from "@/src/components/ui/tenant/ComboDetailPopUp";
+import ConfirmActionPopup from "@/src/components/ui/common/ConfirmActionPopup";
 import ComboPopUp from "@/src/components/ui/tenant/ComboPopUp";
+import DishImportPopUp from "@/src/components/ui/tenant/DishImportPopUp";
 import DishPopUp from "@/src/components/ui/tenant/DishPopUp";
 import { API } from "@/src/constants/api";
 import { useAuth } from "@/src/hooks/useAuth";
@@ -18,11 +20,15 @@ export default function DishPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [showDishModal, setShowDishModal] = useState(false);
   const [showComboModal, setShowComboModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [showComboDetailModal, setShowComboDetailModal] = useState(false);
   const [comboDetailLoading, setComboDetailLoading] = useState(false);
+  const [importLoading, setImportLoading] = useState(false);
+  const [deleteDishLoading, setDeleteDishLoading] = useState(false);
   const [selectedCombo, setSelectedCombo] = useState<ComboDto | null>(null);
   const [comboItems, setComboItems] = useState<ComboDto[]>([]);
   const [selectedDish, setSelectedDish] = useState<DishesDto | null>(null);
+  const [pendingDeleteDish, setPendingDeleteDish] = useState<DishesDto | null>(null);
   const hasSelectableDish = dishes.some((dish) => dish.type !== 1);
 
   useEffect(() => {
@@ -141,6 +147,50 @@ export default function DishPage() {
     handleUpdateClick(dish);
   };
 
+  const handleDeleteDishClick = (dish: DishesDto) => {
+    setPendingDeleteDish(dish);
+  };
+
+  const handleConfirmDeleteDish = async () => {
+    if (!pendingDeleteDish) {
+      return;
+    }
+
+    if (typeof pendingDeleteDish.categoryId !== "number") {
+      toast.error("Không xác định được danh mục của món ăn để xóa");
+      return;
+    }
+
+    setDeleteDishLoading(true);
+
+    try {
+      const response = await apiClient.delete(
+        API.DISHES.DELETE_DISH(pendingDeleteDish.categoryId, pendingDeleteDish.id),
+      );
+
+      if (!response.data?.isSuccess) {
+        toast.error(response.data?.message || "Không thể xóa món ăn");
+        return;
+      }
+
+      setDishes((prev) => prev.filter((dish) => dish.id !== pendingDeleteDish.id));
+      setPendingDeleteDish(null);
+      setShowDishModal(false);
+      toast.success(response.data?.message || "Xóa món ăn thành công");
+    } catch (error: unknown) {
+      const backendMessage = (
+        error as { response?: { data?: { message?: string } } }
+      ).response?.data?.message;
+      toast.error(
+        backendMessage ||
+          (error as { message?: string }).message ||
+          "Có lỗi xảy ra khi xóa món ăn",
+      );
+    } finally {
+      setDeleteDishLoading(false);
+    }
+  };
+
   const handleCreateDish = async (categoryId: number,formData: FormData) => {
     setLoading(true);
     console.log("Dữ liệu gửi đi:", Object.fromEntries(formData.entries()));
@@ -248,6 +298,57 @@ export default function DishPage() {
     }
   };
 
+  const handleImportDishesClick = () => {
+    setShowDishModal(false);
+    setShowComboModal(false);
+    setShowComboDetailModal(false);
+    setShowImportModal(true);
+  };
+
+  const handleImportDishes = async (file: File) => {
+    if (!user?.id) {
+      toast.error("Không tìm thấy tenantId để import món ăn");
+      return;
+    }
+
+    setImportLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const importResponse = await apiClient.post(API.DISHES.IMPORT_DISHES, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (!importResponse.data?.isSuccess) {
+        toast.error(importResponse.data?.message || "Không thể import món ăn");
+        return;
+      }
+
+      const dishesResponse = await apiClient.get(API.DISHES.GET_ALL_BY_TENANT_ID(user.id));
+      if (dishesResponse.data?.isSuccess && dishesResponse.data?.data) {
+        setDishes(dishesResponse.data.data);
+      }
+
+      toast.success(importResponse.data.message || "Import món ăn thành công");
+      setShowImportModal(false);
+    } catch (error: unknown) {
+      const backendMessage = (
+        error as { response?: { data?: { message?: string } } }
+      ).response?.data?.message;
+      toast.error(
+        backendMessage ||
+          (error as { message?: string }).message ||
+          "Có lỗi xảy ra khi import món ăn",
+      );
+    } finally {
+      setImportLoading(false);
+    }
+  };
+
   return (
     <div>
       {dishes.length === 0 ? (
@@ -283,6 +384,12 @@ export default function DishPage() {
                 >
                   Tạo combo
                 </button>
+                <button
+                  onClick={handleImportDishesClick}
+                  className="rounded-lg border border-slate-200 bg-slate-900 px-6 py-3 font-medium text-white hover:bg-slate-800"
+                >
+                  Nhập món ăn hàng loạt bằng file Excel
+                </button>
               </div>
             )}
           </div>
@@ -292,8 +399,10 @@ export default function DishPage() {
           dishes={dishes}
           onCreateClick={handleCreateClick}
           onCreateComboClick={handleCreateComboClick}
+          onImportClick={handleImportDishesClick}
           onDishClick={handleDishCardClick}
           onEditClick={handleUpdateClick}
+          onDeleteClick={handleDeleteDishClick}
         />
       )}
 
@@ -321,6 +430,14 @@ export default function DishPage() {
         />
       )}
 
+      {showImportModal && (
+        <DishImportPopUp
+          onClose={() => setShowImportModal(false)}
+          onSubmit={handleImportDishes}
+          isLoading={importLoading}
+        />
+      )}
+
       {showComboDetailModal && selectedCombo && (
         <ComboDetailPopUp
           combo={selectedCombo}
@@ -333,6 +450,22 @@ export default function DishPage() {
           }}
         />
       )}
+
+      <ConfirmActionPopup
+        isOpen={Boolean(pendingDeleteDish)}
+        title="Xác nhận xóa món ăn"
+        message={
+          pendingDeleteDish
+            ? `Bạn có chắc muốn xóa ${pendingDeleteDish.type === 1 ? "combo" : "món"} ${pendingDeleteDish.dishName}?`
+            : "Bạn có chắc muốn xóa món ăn này?"
+        }
+        confirmText="Xóa"
+        cancelText="Hủy"
+        confirmVariant="danger"
+        isLoading={deleteDishLoading}
+        onClose={() => setPendingDeleteDish(null)}
+        onConfirm={handleConfirmDeleteDish}
+      />
     </div>
   );
 }
