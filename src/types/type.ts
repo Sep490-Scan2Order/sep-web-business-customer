@@ -638,3 +638,50 @@ export interface ExpiringSubscription {
   daysRemaining: number;
   expirationDate: string;
 }
+// ===== Revenue Summary Types =====
+
+export interface RevenuePeriod {
+  startDate: string;
+  endDate: string;
+}
+
+export interface RevenueSummaryMetrics {
+  grossRevenue: number;
+  netRevenue: number;
+  totalDiscount: number;
+  totalRefund: number;
+  totalOrders: number;
+  averageOrderValue: number;
+}
+
+export interface PaymentMethodStats {
+  cash: number;
+  transfer: number;
+}
+
+export interface OrderTypeDetail {
+  revenue: number;
+  count: number;
+}
+
+export interface OrderTypeStats {
+  regular: OrderTypeDetail;
+  refund: OrderTypeDetail;
+}
+
+export interface TopSellingDish {
+  dishId: number;
+  dishName: string;
+  quantitySold: number;
+  revenue: number;
+}
+
+export interface RevenueSummaryData {
+  period: RevenuePeriod;
+  summary: RevenueSummaryMetrics;
+  paymentMethods: PaymentMethodStats;
+  orderTypes: OrderTypeStats;
+  topSellingDishes: TopSellingDish[];
+}
+
+export interface RevenueSummaryResponse extends ApiResponse<RevenueSummaryData> {}
