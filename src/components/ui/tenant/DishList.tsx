@@ -1,21 +1,25 @@
 import React, { useState } from "react";
 import { DishesDto } from "@/src/types/type";
-import { Search, Plus, Edit2, Eye, UtensilsCrossed } from "lucide-react";
+import { Search, Plus, Edit2, Eye, Trash2, UtensilsCrossed } from "lucide-react";
 
 interface DishListProps {
   dishes: DishesDto[];
   onCreateClick: () => void;
   onCreateComboClick: () => void;
+  onImportClick: () => void;
   onDishClick: (dish: DishesDto) => void;
   onEditClick: (dish: DishesDto) => void;
+  onDeleteClick: (dish: DishesDto) => void;
 }
 
 export default function DishList({
   dishes,
   onCreateClick,
   onCreateComboClick,
+  onImportClick,
   onDishClick,
   onEditClick,
+  onDeleteClick,
 }: DishListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   
@@ -64,6 +68,14 @@ export default function DishList({
           >
             <Plus className="h-4 w-4" />
             Tạo combo
+          </button>
+
+          <button
+            onClick={onImportClick}
+            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            <Plus className="h-4 w-4" />
+            Nhập món ăn bằng file Excel
           </button>
         </div>
       </div>
@@ -172,18 +184,6 @@ export default function DishList({
                           >
                             <Eye className="h-4 w-4" />
                           </button>
-                           <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onEditClick(dish);
-                            }}
-                            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
-                            title="Chinh sua mon an"
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </button>
-                          </div>
-                        ) : (
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -194,6 +194,40 @@ export default function DishList({
                           >
                             <Edit2 className="h-4 w-4" />
                           </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDeleteClick(dish);
+                            }}
+                            className=" cursor-pointer rounded-lg p-1.5 text-rose-500 hover:bg-rose-50 hover:text-rose-600"
+                            title="Xóa món ăn"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                          </div>
+                        ) : (
+                          <div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onEditClick(dish);
+                              }}
+                              className=" cursor-pointer rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                              title="Chỉnh sửa món ăn"
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onDeleteClick(dish);
+                              }}
+                              className=" cursor-pointer rounded-lg p-1.5 text-rose-500 hover:bg-rose-50 hover:text-rose-600"
+                              title="Xóa món ăn"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </div>
                         )}
                       </div>
                     </div>

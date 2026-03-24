@@ -56,6 +56,7 @@ export const API = {
         GET_ALL: "/Category/get-category-by-tenant",
         UPDATE_CATEGORY: (id: number) => `/Category/update-category/${id}`,
         GET_ALL_BY_TENANT_ID: (tenantId: string) => `/Category/get-category-by-tenantId/${tenantId}`,
+        DELETE_CATEGORY: (id: number) => `/Category/delete-category/${id}`,
     },
     DISHES:{
         CREATE: (categoryId: number) => `/Dish/create-dish/${categoryId}`,
@@ -65,6 +66,8 @@ export const API = {
         GET_ALL_BY_TENANT_ID: (tenantId: string) => `/Dish/get-dish-by-tenantId/${tenantId}`,
         CREATE_COMBO: (categoryId: number) => `/Dish/create-combo/${categoryId}`,
         GET_DETAIL_COMBO: (dishID: number) => `/Dish/get-combo-by-id/${dishID}`,
+        IMPORT_DISHES: "/Dish/import-dishes",
+        DELETE_DISH: (categoryId: number, dishId: number) => `/Dish/delete-dish/${categoryId}/${dishId}`,
     },
     MENU_TEMPLATE: {
         CREATE: "/MenuTemplate",

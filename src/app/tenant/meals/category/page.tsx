@@ -1,4 +1,5 @@
 "use client";
+import ConfirmActionPopup from "@/src/components/ui/common/ConfirmActionPopup";
 import CategoryList from "@/src/components/ui/tenant/CategoryList";
 import CategoryPopUp from "@/src/components/ui/tenant/CategoryPopUp";
 import { API } from "@/src/constants/api";
@@ -13,8 +14,10 @@ export default function CategoryPage() {
   const { user } = useAuth();
   const [categories, setCategories] = useState<CategoryDto[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<CategoryDto | null>(null);
+  const [pendingDeleteCategory, setPendingDeleteCategory] = useState<CategoryDto | null>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -111,6 +114,46 @@ export default function CategoryPage() {
     }
   };
 
+  const handleDeleteCategoryClick = (category: CategoryDto) => {
+    setPendingDeleteCategory(category);
+  };
+
+  const handleConfirmDeleteCategory = async () => {
+    if (!pendingDeleteCategory) {
+      return;
+    }
+
+    setDeleteLoading(true);
+
+    try {
+      const response = await apiClient.delete(
+        API.CATEGORY.DELETE_CATEGORY(pendingDeleteCategory.id),
+      );
+
+      if (!response.data?.isSuccess) {
+        toast.error(response.data?.message || "Không thể xóa danh mục");
+        return;
+      }
+
+      setCategories((prev) =>
+        prev.filter((category) => category.id !== pendingDeleteCategory.id),
+      );
+      setPendingDeleteCategory(null);
+      toast.success(response.data?.message || "Xóa danh mục thành công");
+    } catch (error: unknown) {
+      const backendMessage = (
+        error as { response?: { data?: { message?: string } } }
+      ).response?.data?.message;
+      toast.error(
+        backendMessage ||
+          (error as { message?: string }).message ||
+          "Có lỗi xảy ra khi xóa danh mục",
+      );
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   return (
   <div>
     {" "}
@@ -141,6 +184,7 @@ export default function CategoryPage() {
         categories={categories}
         onCreateClick={handleCreateClick}
         onEditClick={handleUpdateClick}
+        onDeleteClick={handleDeleteCategoryClick}
       />
     )}
 
@@ -156,6 +200,22 @@ export default function CategoryPage() {
           categoryData={selectedCategory} 
         />
       )}
+
+      <ConfirmActionPopup
+        isOpen={Boolean(pendingDeleteCategory)}
+        title="Xác nhận xóa danh mục"
+        message={
+          pendingDeleteCategory
+            ? `Bạn có chắc muốn xóa danh mục ${pendingDeleteCategory.categoryName}?`
+            : "Bạn có chắc muốn xóa danh mục này?"
+        }
+        confirmText="Xóa"
+        cancelText="Hủy"
+        confirmVariant="danger"
+        isLoading={deleteLoading}
+        onClose={() => setPendingDeleteCategory(null)}
+        onConfirm={handleConfirmDeleteCategory}
+      />
   </div>
   )
 }
