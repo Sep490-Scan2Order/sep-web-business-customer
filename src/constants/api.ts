@@ -19,6 +19,7 @@ export const API = {
         SEARCH_BANK_NAME_BY_CARD_NUMBER: "/Tenant/bank-lookup",
         UPDATE_BANK_INFO: "/Tenant/update-bank-info?bankId=",
         GET_TENANT_BY_ID: (id: string) => `/Tenant/${id}`,
+        DASHBOARD_REVENUE: "/Tenant/dashboard/revenue",
     },
 
     STAFF:{

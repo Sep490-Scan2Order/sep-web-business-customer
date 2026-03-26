@@ -638,3 +638,35 @@ export interface ExpiringSubscription {
   daysRemaining: number;
   expirationDate: string;
 }
+
+// ===== Tenant Dashboard Types =====
+
+export interface TenantRestaurantRevenue {
+  restaurantId: number;
+  restaurantName: string;
+  image?: string | null;
+  address?: string | null;
+  currentPlan?: string | null;
+  isActive: boolean;
+  totalOrders: number;
+  grossRevenue: number;
+  netRevenue: number;
+  totalDiscount: number;
+  averageOrderValue: number;
+}
+
+export interface TenantDashboardRevenue {
+  tenantId: string;
+  tenantName: string;
+  isAllTime: boolean;
+  filterPreset: string;
+  startDate?: string | null;
+  endDate?: string | null;
+  totalRestaurants: number;
+  totalOrders: number;
+  grossRevenue: number;
+  netRevenue: number;
+  totalDiscount: number;
+  averageOrderValue: number;
+  restaurants: TenantRestaurantRevenue[];
+}

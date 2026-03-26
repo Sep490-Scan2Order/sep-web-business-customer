@@ -206,8 +206,8 @@ export default function CategoryPage() {
         title="Xác nhận xóa danh mục"
         message={
           pendingDeleteCategory
-            ? `Bạn có chắc muốn xóa danh mục ${pendingDeleteCategory.categoryName}?`
-            : "Bạn có chắc muốn xóa danh mục này?"
+            ? `Bạn có chắc muốn xóa danh mục ${pendingDeleteCategory.categoryName}? Tất cả món ăn thuộc danh mục này cũng sẽ bị xóa.`
+            : "Bạn có chắc muốn xóa danh mục này? Tất cả món ăn thuộc danh mục cũng sẽ bị xóa."
         }
         confirmText="Xóa"
         cancelText="Hủy"
