@@ -22,6 +22,7 @@ export const isTokenExpired = (token: string): boolean => {
 interface AuthStateWithHydration extends AuthState {
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
+  isLoggingOut: boolean;
 }
 
 export const useAuthStore = create<AuthStateWithHydration>()(
@@ -31,6 +32,7 @@ export const useAuthStore = create<AuthStateWithHydration>()(
       token: null,
       isAuthenticated: false,
       _hasHydrated: false,
+      isLoggingOut: false,
 
       setUser: (user: User | null) =>
         set({
@@ -76,7 +78,13 @@ export const useAuthStore = create<AuthStateWithHydration>()(
           user: null,
           token: null,
           isAuthenticated: false,
+          isLoggingOut: true,
         });
+        
+        // Reset cờ sau 1 giây báo hiệu đã chuyển trang xong
+        setTimeout(() => {
+          set({ isLoggingOut: false });
+        }, 1000);
       },
 
       setHasHydrated: (state: boolean) => {

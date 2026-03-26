@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/src/hooks/useAuth';
-import { useHasHydrated, isTokenExpired } from '@/src/store/authStore';
+import { useHasHydrated, isTokenExpired, useAuthStore } from '@/src/store/authStore';
 import { toast } from 'react-toastify';
 
 interface AuthProviderProps {
@@ -67,10 +67,13 @@ export function AuthProvider({
 
       // Kiểm tra authentication
       if (!isAuthenticated || !user) {
-        toast.error(loginMessage, {
-          position: 'top-right',
-          autoClose: 3000,
-        });
+        const isLoggingOut = useAuthStore.getState().isLoggingOut;
+        if (!isLoggingOut) {
+          toast.error(loginMessage, {
+            position: 'top-right',
+            autoClose: 3000,
+          });
+        }
         router.replace(redirectTo);
         return;
       }

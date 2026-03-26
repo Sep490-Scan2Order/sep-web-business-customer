@@ -49,27 +49,27 @@ export default function AdminLoginPage() {
 
       if (response.data?.isSuccess && response.data.data) {
         const { accessToken, refreshToken, userInfo } = response.data.data;
-        
+
         // Luu full userInfo de dong bo voi store
         const user = {
           ...userInfo,
           email: userInfo.email || formData.email,
           avatar: userInfo.avatar || undefined,
         };
-        
+
         // Lưu token và user vào store (sẽ tự động lưu accessToken vào localStorage)
         setAuth(user, accessToken);
-        
+
         // Lưu refreshToken riêng vào localStorage
         if (typeof window !== 'undefined') {
           localStorage.setItem('refreshToken', refreshToken);
         }
-        
+
         console.log("Admin login successful:", user);
         toast.success("Đăng nhập thành công");
-        
+
         // Redirect đến trang admin
-        router.push("/admin");
+        router.push("/admin/overview");
       } else {
         toast.error(response.data?.message || "Đăng nhập thất bại");
       }
@@ -133,7 +133,7 @@ export default function AdminLoginPage() {
                   </span>
                 </h1>
                 <p className="mt-4 max-w-lg text-base text-white/80 leading-relaxed">
-                  Truy cập hệ thống quản trị toàn bộ nền tảng Scan To Order. 
+                  Truy cập hệ thống quản trị toàn bộ nền tảng Scan To Order.
                   Quản lý người dùng, nhà hàng, và cấu hình hệ thống.
                 </p>
               </div>
