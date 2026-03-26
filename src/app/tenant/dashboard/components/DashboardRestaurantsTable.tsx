@@ -1,5 +1,9 @@
+"use client";
+
+import Link from "next/link";
 import { TenantDashboardRevenue } from "@/src/types/type";
 import { formatVnd } from "./dashboardUtils";
+import { Eye } from "lucide-react";
 
 type DashboardRestaurantsTableProps = {
   restaurants: TenantDashboardRevenue["restaurants"];
@@ -25,11 +29,12 @@ export default function DashboardRestaurantsTable({
               <th className="px-2 py-3 text-right">Discount</th>
               <th className="px-2 py-3 text-right">Net</th>
               <th className="px-2 py-3 text-right">AOV</th>
+              <th className="px-2 py-3 text-center">Chi tiết</th>
             </tr>
           </thead>
           <tbody>
             {restaurants.length === 0 ? (
-              <tr>
+              <tr>9
                 <td colSpan={8} className="px-2 py-8 text-center text-slate-500">
                   Chưa có nhà hàng hoặc chưa có đơn hàng trong bộ lọc hiện tại.
                 </td>
@@ -84,6 +89,15 @@ export default function DashboardRestaurantsTable({
                   </td>
                   <td className="px-2 py-3 text-right text-slate-700">
                     {formatVnd(restaurant.averageOrderValue)}
+                  </td>
+                  <td className="px-2 py-3 text-center">
+                    <Link
+                      href={`/tenant/dashboard/restaurant/${restaurant.restaurantId}?name=${encodeURIComponent(restaurant.restaurantName)}`}
+                      className="inline-flex items-center justify-center gap-1 rounded-lg bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
+                    >
+                      <Eye className="h-4 w-4" />
+                      Xem chi tiết
+                    </Link>
                   </td>
                 </tr>
               ))

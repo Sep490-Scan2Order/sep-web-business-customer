@@ -5,7 +5,6 @@ import { API } from "@/src/constants/api";
 import { useAuth } from "@/src/hooks/useAuth";
 import apiClient from "@/src/services/apiClient";
 import { Restaurant, StaffDto } from "@/src/types/type";
-import { randomBytes } from "crypto";
 import { Plus, ArrowLeft, Store } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -104,14 +103,6 @@ export default function UsersPage() {
       return;
     }
 
-    const array = new Uint32Array(2);
-    window.crypto.getRandomValues(array);
-    const generatedPassword = Array.from(array, (dec) =>
-      dec.toString(16).padStart(8, "0"),
-    )
-      .join("")
-      .substring(0, 8);
-
     setLoading(true);
     try {
       const response = await apiClient.post(API.STAFF.CREATE, {
@@ -119,78 +110,11 @@ export default function UsersPage() {
         email: formData.get("email") as string,
         name: formData.get("name") as string,
         phone: formData.get("phone") as string,
-        password: generatedPassword,
       });
 
       if (response.data.isSuccess) {
         setStaffs((prev) => [...prev, response.data.data]);
         toast.success("Tạo nhân viên thành công");
-
-        const emailHtmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px;">
-  <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-    
-    <div style="background-color: #ea580c; padding: 25px; text-align: center;">
-      <h2 style="margin: 0; color: #ffffff; font-size: 24px;">Chào mừng bạn gia nhập!</h2>
-      <p style="margin: 5px 0 0 0; color: #fff3e0; font-size: 16px;">${selectedRestaurant.restaurantName}</p>
-    </div>
-
-    <div style="padding: 30px; color: #333333;">
-      <p style="font-size: 16px; line-height: 1.6; margin-top: 0;">Xin chào <strong>${formData.get("name")}</strong>,</p>
-      <p style="font-size: 16px; line-height: 1.6;">Tài khoản nhân viên của bạn đã được quản trị viên tạo thành công trên hệ thống quản lý nhà hàng. Dưới đây là thông tin đăng nhập của bạn:</p>
-      
-      <div style="background-color: #fff7ed; border-left: 4px solid #ea580c; padding: 15px 20px; margin: 25px 0; border-radius: 4px;">
-        <p style="margin: 0 0 10px 0; font-size: 15px; color: #555555;">
-          <span style="display: inline-block; width: 100px;">Email:</span> 
-          <strong>${formData.get("email")}</strong>
-        </p>
-        <p style="margin: 0; font-size: 15px; color: #555555;">
-          <span style="display: inline-block; width: 100px;">Mật khẩu:</span> 
-          <strong style="font-family: monospace; font-size: 18px; color: #ea580c; letter-spacing: 1px;">${generatedPassword}</strong>
-        </p>
-      </div>
-
-      <p style="font-size: 14px; color: #dc2626; line-height: 1.5; font-style: italic;">
-        * Lưu ý quan trọng: Vui lòng đăng nhập và đổi mật khẩu ngay trong lần đầu tiên truy cập để đảm bảo an toàn cho tài khoản.
-      </p>
-      
-      <div style="text-align: center; margin-top: 35px; margin-bottom: 10px;">
-        <a href="https://your-domain.com/login" style="background-color: #ea580c; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block;">Đăng nhập hệ thống</a>
-      </div>
-    </div>
-
-    <div style="background-color: #f9fafb; border-top: 1px solid #eeeeee; padding: 15px; text-align: center;">
-      <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-        Email này được gửi tự động từ hệ thống quản lý <strong>S2O - Scan2Order</strong>. Vui lòng không trả lời email này.
-      </p>
-    </div>
-
-  </div>
-</body>
-</html>
-`;
-
-        // Gửi email với biến cục bộ
-        const emailResponse = await apiClient.post(API.EMAIL.SEND, {
-          to: formData.get("email") as string,
-          subject: "Thông tin tài khoản nhân viên",
-          htmlContent: emailHtmlContent,
-        });
-
-        if (emailResponse.data.isSuccess) {
-          toast.success("Gửi email thông tin tài khoản thành công");
-        } else {
-          toast.error(
-            emailResponse.data.message ||
-              "Không thể gửi email thông tin tài khoản",
-          );
-        }
 
         setShowStaffModal(false);
       } else {
