@@ -718,3 +718,37 @@ export interface RevenueSummaryData {
 }
 
 export interface RevenueSummaryResponse extends ApiResponse<RevenueSummaryData> {}
+
+// ===== Admin Drill-Down Dashboard Types =====
+
+/** Cấp 1 – Top Tenants */
+export interface TopTenantItem {
+  tenantId: string;
+  tenantName: string;
+  totalRestaurants: number;
+  totalOrders: number;
+  totalRevenue: number;
+}
+
+/** Cấp 2 – Tenant Detail: một nhà hàng */
+export interface TenantDetailRestaurant {
+  restaurantId: number;
+  restaurantName: string;
+  image?: string | null;
+  address?: string | null;
+  currentPlan?: string | null;
+  isActive: boolean;
+  totalOrders: number;
+  grossRevenue: number;
+  netRevenue: number;
+  totalDiscount: number;
+}
+
+/** Cấp 2 – Tenant Detail: toàn bộ response */
+export interface TenantDetailData {
+  tenantId: string;
+  tenantName: string;
+  isSuspended: boolean;
+  period: { startDate: string; endDate: string };
+  restaurants: TenantDetailRestaurant[];
+}

@@ -123,6 +123,15 @@ export const API = {
         PLAN_DISTRIBUTION: "/Admin/plan-distribution",
         TOP_PERFORMING_RESTAURANTS: (top: number = 5) => `/Admin/top-performing-restaurants?top=${top}`,
         EXPIRING_SUBSCRIPTIONS: (daysThreshold: number = 30) => `/Admin/expiring-subscriptions?daysThreshold=${daysThreshold}`,
+        TOP_TENANTS: (top: number = 10) => `/Admin/top-tenants?top=${top}`,
+        TENANT_DETAIL: (tenantId: string, startDate?: string, endDate?: string) => {
+            let url = `/Admin/tenants/${tenantId}/detail`;
+            const params: string[] = [];
+            if (startDate) params.push(`startDate=${startDate}`);
+            if (endDate) params.push(`endDate=${endDate}`);
+            if (params.length) url += `?${params.join("&")}`;
+            return url;
+        },
     },
     BRANCH_DISH_CONFIG: {
         UPDATE_IS_SELLING: (restaurantId: number, dishId: number, isSelling: boolean) => `/BranchDishConfig/update-is-selling/${restaurantId}/${dishId}?isSelling=${isSelling}`,

@@ -7,6 +7,9 @@ import {
   PlanDistributionItem,
   TopPerformingRestaurant,
   ExpiringSubscription,
+  TopTenantItem,
+  TenantDetailData,
+  RevenueSummaryData,
 } from "@/src/types/type";
 
 export const getSummaryMetrics = async (): Promise<AdminSummaryMetrics> => {
@@ -72,6 +75,51 @@ export const getExpiringSubscriptions = async (
     throw new Error(
       payload.message || "Failed to fetch expiring subscriptions",
     );
+  }
+  return payload.data;
+};
+
+// ===== Drill-Down Dashboard =====
+
+export const getTopTenants = async (
+  top: number = 10,
+): Promise<TopTenantItem[]> => {
+  const response = await apiClient.get<ApiResponse<TopTenantItem[]>>(
+    API.ADMIN.TOP_TENANTS(top),
+  );
+  const payload = response.data;
+  if (!payload.isSuccess || !payload.data) {
+    throw new Error(payload.message || "Failed to fetch top tenants");
+  }
+  return payload.data;
+};
+
+export const getTenantDetail = async (
+  tenantId: string,
+  startDate?: string,
+  endDate?: string,
+): Promise<TenantDetailData> => {
+  const response = await apiClient.get<ApiResponse<TenantDetailData>>(
+    API.ADMIN.TENANT_DETAIL(tenantId, startDate, endDate),
+  );
+  const payload = response.data;
+  if (!payload.isSuccess || !payload.data) {
+    throw new Error(payload.message || "Failed to fetch tenant detail");
+  }
+  return payload.data;
+};
+
+export const getRestaurantRevenueSummary = async (
+  restaurantId: number,
+  startDate?: string,
+  endDate?: string,
+): Promise<RevenueSummaryData> => {
+  const response = await apiClient.get<ApiResponse<RevenueSummaryData>>(
+    API.RESTAURANT.REVENUE_SUMMARY(restaurantId, startDate, endDate),
+  );
+  const payload = response.data;
+  if (!payload.isSuccess || !payload.data) {
+    throw new Error(payload.message || "Failed to fetch revenue summary");
   }
   return payload.data;
 };
