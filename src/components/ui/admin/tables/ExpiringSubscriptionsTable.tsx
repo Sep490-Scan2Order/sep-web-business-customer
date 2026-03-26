@@ -33,49 +33,52 @@ export default function ExpiringSubscriptionsTable() {
   };
 
   return (
-    <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border shadow-sm">
-      <h3 className="font-semibold mb-4">Expiring Subscriptions</h3>
+    <div className="bg-white p-6 rounded-2xl border shadow-sm">
+      <h3 className="text-base font-semibold text-slate-900 mb-1">
+        Gói đăng ký sắp hết hạn
+      </h3>
+      <p className="text-xs text-slate-500 mb-4">Các gói sẽ hết hạn trong 30 ngày tới</p>
 
       {loading ? (
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="h-10 bg-gray-100 dark:bg-zinc-800 rounded animate-pulse"
+              className="h-10 bg-gray-100 rounded animate-pulse"
             />
           ))}
         </div>
       ) : subs.length === 0 ? (
         <div className="py-8 text-center text-gray-400">
-          No expiring subscriptions
+          Không có gói đăng ký sắp hết hạn
         </div>
       ) : (
         <table className="w-full text-sm">
-          <thead className="text-gray-500">
+          <thead className="text-xs font-medium uppercase tracking-wide text-slate-500">
             <tr>
-              <th className="text-left pb-3">Restaurant</th>
-              <th className="pb-3">Plan</th>
-              <th className="pb-3">Days Left</th>
-              <th className="text-right pb-3">Expires</th>
+              <th className="text-left pb-3">Nhà hàng</th>
+              <th className="pb-3">Gói</th>
+              <th className="pb-3">Còn lại</th>
+              <th className="text-right pb-3">Hết hạn</th>
             </tr>
           </thead>
 
           <tbody>
             {subs.map((s) => (
-              <tr key={s.restaurantId} className="border-t">
-                <td className="py-3 font-medium">{s.restaurantName}</td>
+              <tr key={s.restaurantId} className="border-t border-slate-100 hover:bg-slate-50 transition-colors">
+                <td className="py-3 font-medium text-slate-800">{s.restaurantName}</td>
 
-                <td className="text-center">
+                <td className="text-center py-3">
                   <span className="px-2 py-1 bg-indigo-100 text-indigo-600 rounded text-xs">
                     {s.planName}
                   </span>
                 </td>
 
-                <td className={`text-center ${getDaysColor(s.daysRemaining)}`}>
-                  {s.daysRemaining} days
+                <td className={`text-center py-3 ${getDaysColor(s.daysRemaining)}`}>
+                  {s.daysRemaining} ngày
                 </td>
 
-                <td className="text-right text-gray-500">
+                <td className="text-right py-3 text-gray-500">
                   {formatDate(s.expirationDate)}
                 </td>
               </tr>

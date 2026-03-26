@@ -28,8 +28,11 @@ export default function RevenueChart() {
     value.toLocaleString("vi-VN") + " ₫";
 
   return (
-    <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border shadow-sm">
-      <h3 className="font-semibold mb-4">Subscription Revenue Trends</h3>
+    <div className="bg-white p-6 rounded-2xl border shadow-sm">
+      <h3 className="text-base font-semibold text-slate-900 mb-1">
+        Xu hướng doanh thu gói đăng ký
+      </h3>
+      <p className="text-xs text-slate-500 mb-4">Trong 6 tháng gần nhất</p>
 
       {loading ? (
         <div className="h-[300px] flex items-center justify-center">
@@ -37,7 +40,7 @@ export default function RevenueChart() {
         </div>
       ) : data.length === 0 ? (
         <div className="h-[300px] flex items-center justify-center text-gray-400">
-          No revenue data available
+          Chưa có dữ liệu doanh thu
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={300}>
@@ -52,7 +55,7 @@ export default function RevenueChart() {
             <XAxis dataKey="month" />
             <YAxis tickFormatter={(v) => v.toLocaleString("vi-VN")} />
             <Tooltip
-              formatter={(value) => [formatVND(Number(value)), "Revenue"]}
+              formatter={(value) => [formatVND(Number(value)), "Doanh thu"]}
             />
             <Area
               type="monotone"

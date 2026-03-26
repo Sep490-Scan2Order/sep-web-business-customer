@@ -27,8 +27,11 @@ export default function PlanDistributionChart() {
   }));
 
   return (
-    <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border shadow-sm">
-      <h3 className="font-semibold mb-4">Subscription Plan Distribution</h3>
+    <div className="bg-white p-6 rounded-2xl border shadow-sm">
+      <h3 className="text-base font-semibold text-slate-900 mb-1">
+        Phân bổ gói đăng ký
+      </h3>
+      <p className="text-xs text-slate-500 mb-4">Tỷ lệ gói đang hoạt động hiện tại</p>
 
       {loading ? (
         <div className="h-[250px] flex items-center justify-center">
@@ -36,7 +39,7 @@ export default function PlanDistributionChart() {
         </div>
       ) : chartData.length === 0 ? (
         <div className="h-[250px] flex items-center justify-center text-gray-400">
-          No plan data available
+          Chưa có dữ liệu gói đăng ký
         </div>
       ) : (
         <>
@@ -76,7 +79,7 @@ export default function PlanDistributionChart() {
                     backgroundColor: COLORS[index % COLORS.length],
                   }}
                 />
-                <span className="text-gray-600 dark:text-gray-300">
+                <span className="text-gray-600">
                   {item.name} ({item.count})
                 </span>
               </div>

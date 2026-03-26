@@ -11,12 +11,12 @@ export default function TopDishesTable({ dishes }: Props) {
 
   if (dishes.length === 0) {
     return (
-      <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border shadow-sm">
-        <h4 className="font-semibold text-slate-800 dark:text-slate-100 mb-4">
+      <div className="bg-white p-6 rounded-2xl border shadow-sm">
+        <h3 className="text-base font-semibold text-slate-900 mb-1">
           Món bán chạy nhất
-        </h4>
+        </h3>
+        <p className="text-xs text-slate-500 mb-4">Xếp hạng theo số lượng bán và doanh thu</p>
         <div className="py-10 text-center text-gray-400">
-          <div className="text-3xl mb-2">🍽️</div>
           <p className="text-sm">Chưa có dữ liệu món ăn</p>
         </div>
       </div>
@@ -24,28 +24,31 @@ export default function TopDishesTable({ dishes }: Props) {
   }
 
   return (
-    <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border shadow-sm">
+    <div className="bg-white p-6 rounded-2xl border shadow-sm">
       <div className="flex items-center justify-between mb-4">
-        <h4 className="font-semibold text-slate-800 dark:text-slate-100">
-          Món bán chạy nhất
-        </h4>
-        <span className="text-xs text-slate-400">
+        <div>
+          <h3 className="text-base font-semibold text-slate-900 mb-1">
+            Món bán chạy nhất
+          </h3>
+          <p className="text-xs text-slate-500">Xếp hạng theo số lượng bán và doanh thu</p>
+        </div>
+        <span className="text-xs text-slate-500">
           {dishes.length} món
         </span>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-slate-100 dark:border-zinc-700">
-              <th className="text-left pb-3 text-slate-500 font-medium">#</th>
-              <th className="text-left pb-3 text-slate-500 font-medium">
+          <thead className="text-xs font-medium uppercase tracking-wide text-slate-500">
+            <tr>
+              <th className="text-left pb-3">#</th>
+              <th className="text-left pb-3">
                 Tên món
               </th>
-              <th className="text-center pb-3 text-slate-500 font-medium">
+              <th className="text-center pb-3">
                 Qty
               </th>
-              <th className="text-right pb-3 text-slate-500 font-medium">
+              <th className="text-right pb-3">
                 Doanh thu
               </th>
             </tr>
@@ -54,7 +57,7 @@ export default function TopDishesTable({ dishes }: Props) {
             {dishes.map((dish, idx) => (
               <tr
                 key={dish.dishId}
-                className="border-b border-slate-50 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-800/40 transition-colors"
+                className="border-t border-slate-100 hover:bg-slate-50 transition-colors"
               >
                 <td className="py-3 pr-2">
                   <span
@@ -65,19 +68,19 @@ export default function TopDishesTable({ dishes }: Props) {
                           ? "bg-slate-300 text-white"
                           : idx === 2
                             ? "bg-amber-700 text-white"
-                            : "bg-slate-100 text-slate-500 dark:bg-zinc-700 dark:text-slate-400"
+                            : "bg-slate-100 text-slate-500"
                     }`}
                   >
                     {idx + 1}
                   </span>
                 </td>
                 <td className="py-3">
-                  <span className="font-medium text-slate-700 dark:text-slate-200">
+                  <span className="font-medium text-slate-700">
                     {dish.dishName}
                   </span>
                 </td>
                 <td className="py-3 text-center">
-                  <span className="inline-flex items-center gap-1 text-slate-600 dark:text-slate-300">
+                  <span className="inline-flex items-center gap-1 text-slate-600">
                     <span className="tabular-nums">
                       {dish.quantitySold.toLocaleString()}
                     </span>

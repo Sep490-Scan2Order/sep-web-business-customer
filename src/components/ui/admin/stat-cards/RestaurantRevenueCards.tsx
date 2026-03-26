@@ -1,6 +1,14 @@
 "use client";
 
 import { RevenueSummaryMetrics } from "@/src/types/type";
+import {
+  BadgeDollarSign,
+  HandCoins,
+  TicketPercent,
+  RotateCcw,
+  ClipboardList,
+  ChartLine,
+} from "lucide-react";
 
 interface Props {
   data: RevenueSummaryMetrics;
@@ -14,50 +22,38 @@ export default function RestaurantRevenueCards({ data }: Props) {
     {
       label: "Doanh thu gốc",
       value: formatVND(data.grossRevenue),
-      icon: "💰",
-      color: "from-emerald-400 to-teal-500",
-      bg: "bg-emerald-50 dark:bg-emerald-900/20",
-      text: "text-emerald-700 dark:text-emerald-300",
+      icon: <BadgeDollarSign className="w-4 h-4 text-emerald-600" />,
+      text: "text-emerald-600",
     },
     {
       label: "Doanh thu thực nhận",
       value: formatVND(data.netRevenue),
-      icon: "✅",
-      color: "from-indigo-400 to-purple-500",
-      bg: "bg-indigo-50 dark:bg-indigo-900/20",
-      text: "text-indigo-700 dark:text-indigo-300",
+      icon: <HandCoins className="w-4 h-4 text-indigo-600" />,
+      text: "text-indigo-600",
     },
     {
       label: "Tổng giảm giá",
       value: formatVND(data.totalDiscount),
-      icon: "🏷️",
-      color: "from-amber-400 to-orange-500",
-      bg: "bg-amber-50 dark:bg-amber-900/20",
-      text: "text-amber-700 dark:text-amber-300",
+      icon: <TicketPercent className="w-4 h-4 text-amber-600" />,
+      text: "text-amber-600",
     },
     {
       label: "Tổng hoàn tiền",
       value: formatVND(data.totalRefund),
-      icon: "↩️",
-      color: "from-rose-400 to-red-500",
-      bg: "bg-rose-50 dark:bg-rose-900/20",
-      text: "text-rose-700 dark:text-rose-300",
+      icon: <RotateCcw className="w-4 h-4 text-rose-600" />,
+      text: "text-rose-600",
     },
     {
       label: "Tổng đơn hàng",
       value: formatNum(data.totalOrders),
-      icon: "📋",
-      color: "from-sky-400 to-blue-500",
-      bg: "bg-sky-50 dark:bg-sky-900/20",
-      text: "text-sky-700 dark:text-sky-300",
+      icon: <ClipboardList className="w-4 h-4 text-sky-600" />,
+      text: "text-sky-600",
     },
     {
       label: "Giá trị TB / đơn",
       value: formatVND(data.averageOrderValue),
-      icon: "📈",
-      color: "from-violet-400 to-purple-600",
-      bg: "bg-violet-50 dark:bg-violet-900/20",
-      text: "text-violet-700 dark:text-violet-300",
+      icon: <ChartLine className="w-4 h-4 text-violet-600" />,
+      text: "text-violet-600",
     },
   ];
 
@@ -66,11 +62,13 @@ export default function RestaurantRevenueCards({ data }: Props) {
       {cards.map((card) => (
         <div
           key={card.label}
-          className={`${card.bg} rounded-2xl p-5 border border-white/60 dark:border-white/10 shadow-sm`}
+          className="rounded-2xl p-5 border bg-white shadow-sm"
         >
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-xl">{card.icon}</span>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <span className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center">
+              {card.icon}
+            </span>
+            <span className="text-xs font-medium text-slate-500">
               {card.label}
             </span>
           </div>

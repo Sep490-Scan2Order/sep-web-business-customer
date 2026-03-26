@@ -32,18 +32,18 @@ export default function TopTenantsTable() {
       .toUpperCase();
 
   return (
-    <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border shadow-sm">
+    <div className="bg-white p-6 rounded-2xl border shadow-sm">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="font-semibold text-slate-800 dark:text-slate-100 text-lg">
-            Top 10 Tenants
+          <h3 className="text-base font-semibold text-slate-900 mb-1">
+            Top 10 Tenant
           </h3>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Doanh thu cộng dồn toàn bộ nhà hàng • Click để xem chi tiết
+          <p className="text-xs text-slate-500">
+            Tổng doanh thu theo tenant trong hệ thống
           </p>
         </div>
-        <span className="text-xs bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full font-medium border border-indigo-100">
-          All-time revenue
+        <span className="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium border border-slate-200">
+          Xếp hạng doanh thu
         </span>
       </div>
 
@@ -52,34 +52,33 @@ export default function TopTenantsTable() {
           {[...Array(5)].map((_, i) => (
             <div
               key={i}
-              className="h-14 bg-gray-100 dark:bg-zinc-800 rounded-xl animate-pulse"
+              className="h-10 bg-gray-100 rounded animate-pulse"
             />
           ))}
         </div>
       ) : tenants.length === 0 ? (
-        <div className="py-16 text-center text-gray-400">
-          <div className="text-4xl mb-3">📊</div>
-          <p>Chưa có dữ liệu tenant</p>
+        <div className="py-8 text-center text-gray-400">
+          Chưa có dữ liệu tenant
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 dark:border-zinc-700">
-                <th className="text-left pb-3 text-slate-500 font-medium">#</th>
-                <th className="text-left pb-3 text-slate-500 font-medium">
+            <thead className="text-xs font-medium uppercase tracking-wide text-slate-500">
+              <tr>
+                <th className="text-left pb-3">#</th>
+                <th className="text-left pb-3">
                   Tenant
                 </th>
-                <th className="text-center pb-3 text-slate-500 font-medium">
+                <th className="text-center pb-3">
                   Nhà hàng
                 </th>
-                <th className="text-center pb-3 text-slate-500 font-medium">
+                <th className="text-center pb-3">
                   Đơn hàng
                 </th>
-                <th className="text-right pb-3 text-slate-500 font-medium">
+                <th className="text-right pb-3">
                   Tổng doanh thu
                 </th>
-                <th className="text-right pb-3 text-slate-500 font-medium"></th>
+                <th className="text-right pb-3"></th>
               </tr>
             </thead>
             <tbody>
@@ -87,7 +86,7 @@ export default function TopTenantsTable() {
                 <tr
                   key={t.tenantId}
                   onClick={() => handleRowClick(t.tenantId)}
-                  className="border-b border-slate-50 dark:border-zinc-800 hover:bg-indigo-50/50 dark:hover:bg-zinc-800/60 cursor-pointer transition-colors group"
+                  className="border-t hover:bg-slate-50 cursor-pointer transition-colors"
                 >
                   <td className="py-4 pr-3">
                     <span className="text-slate-400 font-mono text-xs">
@@ -96,34 +95,25 @@ export default function TopTenantsTable() {
                   </td>
                   <td className="py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold text-xs flex-shrink-0 shadow-sm">
+                      <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-xs flex-shrink-0">
                         {getInitials(t.tenantName)}
                       </div>
-                      <span className="font-medium text-slate-800 dark:text-slate-100 truncate max-w-[200px]">
+                      <span className="font-medium text-slate-800 truncate max-w-[200px]">
                         {t.tenantName}
                       </span>
                     </div>
                   </td>
+                  <td className="py-4 text-center text-slate-600">{t.totalRestaurants}</td>
                   <td className="py-4 text-center">
-                    <span className="inline-flex items-center gap-1 text-slate-600 dark:text-slate-300">
-                      <span className="text-xs">🏪</span>
-                      {t.totalRestaurants}
-                    </span>
-                  </td>
-                  <td className="py-4 text-center">
-                    <span className="text-slate-600 dark:text-slate-300">
-                      {t.totalOrders.toLocaleString()}
-                    </span>
+                    <span className="text-slate-600">{t.totalOrders.toLocaleString()}</span>
                   </td>
                   <td className="py-4 text-right">
                     <span className="font-semibold text-emerald-600">
                       {formatVND(t.totalRevenue)}
                     </span>
                   </td>
-                  <td className="py-4 pl-4 text-right">
-                    <span className="text-slate-300 group-hover:text-indigo-500 transition-colors text-lg">
-                      →
-                    </span>
+                  <td className="py-4 pl-4 text-right text-xs text-indigo-600 font-medium">
+                    Xem chi tiết
                   </td>
                 </tr>
               ))}
