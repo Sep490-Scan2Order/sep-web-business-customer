@@ -10,6 +10,8 @@
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run tests/integration",
+    "test:integration:report": "vitest run tests/integration --coverage && start \"\" coverage\\index.html",
     "test:e2e": "codeceptjs run --steps",
     "test:e2e:prod": "cross-env E2E_BASE_URL=https://scan2order.id.vn codeceptjs run --steps",
     "test:e2e:tenant-login": "codeceptjs run tests/e2e/tenant_login_test.js --steps",
