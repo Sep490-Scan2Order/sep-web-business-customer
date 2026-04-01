@@ -17,6 +17,7 @@ import {
   SquareMenu,
   NotepadText,
   TicketPercent,
+  Receipt,
 } from "lucide-react";
 import { ROUTES, TENANT_ROUTES } from "@/src/constants/routes";
 import { useAuth } from "@/src/hooks/useAuth";
@@ -76,6 +77,13 @@ const sections: { label: string; items: NavItem[] }[] = [
         label: "Restaurant",
         href: TENANT_ROUTES.RESTAURANT,
         icon: Store,
+        hasChildren: true,
+        match: "prefix",
+      },
+      {
+        label: "Order Management",
+        href: TENANT_ROUTES.ORDERS,
+        icon: Receipt,
         hasChildren: true,
         match: "prefix",
       },

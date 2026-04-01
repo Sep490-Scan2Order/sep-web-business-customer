@@ -146,6 +146,16 @@ export const API = {
         },
         GET_REPORT_BY_ID: (shiftId: number) => `/Shift/${shiftId}/report`,
     },
+    ORDER: {
+        GET_TENANT_ORDERS: (restaurantId: number, pageIndex: number = 1, pageSize: number = 10, keyword?: string, status?: number, fromDate?: string, toDate?: string) => {
+            let url = `/Order/tenant/restaurant/${restaurantId}?pageIndex=${pageIndex}&pageSize=${pageSize}`;
+            if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
+            if (status !== undefined && status !== null) url += `&status=${status}`;
+            if (fromDate) url += `&fromDate=${fromDate}`;
+            if (toDate) url += `&toDate=${toDate}`;
+            return url;
+        }
+    }
 };
 
 export const BANK_API = {

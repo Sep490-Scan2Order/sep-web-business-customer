@@ -54,4 +54,5 @@ export const TENANT_ROUTES = {
   PROMOTION: "/tenant/promotion",
   BRANCH_DISH_MANAGEMENT: "/tenant/branch-dish-management",
   SHIFT_REPORTS: "/tenant/shift-reports",
+  ORDERS: "/tenant/orders",
 };

@@ -774,3 +774,39 @@ export interface ShiftReportPagedResponse {
   page: number;
   pageSize: number;
 }
+
+export interface TenantOrderDetailDto {
+  dishId: number;
+  dishName: string;
+  quantity: number;
+  subTotal: number;
+  originalPrice: number;
+  discountedPrice: number;
+  promotionAmount: number;
+}
+
+export interface TenantOrderResponseDto {
+  id: string;
+  orderCode: number;
+  numberPhone: string;
+  totalAmount: number;
+  promotionDiscount: number;
+  finalAmount: number;
+  status: number; // OrderStatus
+  isPreOrder: boolean;
+  requestedPickupAt?: string;
+  confirmedPickupAt?: string;
+  note?: string;
+  type: string;
+  paymentProofUrl?: string;
+  typeOrder: number; // TypeOrder
+  createdAt: string;
+  orderDetails: TenantOrderDetailDto[];
+}
+
+export interface PagedTenantOrderResponseDto {
+  items: TenantOrderResponseDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
