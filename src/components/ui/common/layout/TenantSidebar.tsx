@@ -60,6 +60,13 @@ const sections: { label: string; items: NavItem[] }[] = [
         hasChildren: true,
         match: "prefix",
       },
+      {
+        label: "Shift Management",
+        href: TENANT_ROUTES.SHIFT_REPORTS,
+        icon: NotepadText,
+        hasChildren: true,
+        match: "prefix",
+      },
     ],
   },
   {

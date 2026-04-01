@@ -137,6 +137,15 @@ export const API = {
         UPDATE_IS_SELLING: (restaurantId: number, dishId: number, isSelling: boolean) => `/BranchDishConfig/update-is-selling/${restaurantId}/${dishId}?isSelling=${isSelling}`,
         SYNC_DISHES_TO_BRANCH: "/BranchDishConfig/sync-dishes-to-branches",
     },
+    SHIFT: {
+        GET_REPORTS: (restaurantId: number, pageIndex: number = 1, pageSize: number = 10, from?: string, to?: string) => {
+            let url = `/Shift/reports?restaurantId=${restaurantId}&pageIndex=${pageIndex}&pageSize=${pageSize}`;
+            if (from) url += `&from=${from}`;
+            if (to) url += `&to=${to}`;
+            return url;
+        },
+        GET_REPORT_BY_ID: (shiftId: number) => `/Shift/${shiftId}/report`,
+    },
 };
 
 export const BANK_API = {
