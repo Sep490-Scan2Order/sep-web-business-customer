@@ -10,6 +10,7 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "html"],
       reportsDirectory: "./coverage",
+      exclude: ["tests/**", "**/*.png", "coverage/**", "output/**"],
     },
   },
   resolve: {
