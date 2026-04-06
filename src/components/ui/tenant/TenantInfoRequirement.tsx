@@ -11,6 +11,8 @@ export interface TenantInfo {
   restaurantName: string
   phone: string
   description?: string
+  openTime?: string
+  closeTime?: string
   image?: File
   address?: string
   provinceCode?: string
@@ -33,6 +35,8 @@ const defaultFormData: TenantInfo = {
   phone: '',
   description: '',
   address: '',
+  openTime: '',
+  closeTime: '',
 }
 
 const RestaurantLocationMap = dynamic<RestaurantLocationMapProps>(
@@ -74,6 +78,8 @@ export default function TenantInfoRequirement({
       phone: initialData?.phone ?? '',
       description: initialData?.description ?? '',
       address: initialData?.address ?? '',
+      openTime: initialData?.openTime ?? '',
+      closeTime: initialData?.closeTime ?? '',
       latitude: initialData?.latitude,
       longitude: initialData?.longitude,
       image: undefined,
@@ -343,6 +349,36 @@ export default function TenantInfoRequirement({
               className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-slate-300 focus:bg-white"
               placeholder="Nhập số điện thoại"
             />
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div>
+              <label htmlFor="openTime" className="mb-2 block text-sm font-medium text-slate-700">
+                Giờ mở cửa
+              </label>
+              <input
+                type="time"
+                id="openTime"
+                name="openTime"
+                value={formData.openTime ?? ''}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-300 focus:bg-white"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="closeTime" className="mb-2 block text-sm font-medium text-slate-700">
+                Giờ đóng cửa
+              </label>
+              <input
+                type="time"
+                id="closeTime"
+                name="closeTime"
+                value={formData.closeTime ?? ''}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-300 focus:bg-white"
+              />
+            </div>
           </div>
 
           {/* Địa chỉ - Province & District */}

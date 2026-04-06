@@ -143,6 +143,8 @@ export interface CreateRestaurantRequest {
   image?: File;
   phone?: string;
   description?: string;
+  openTime?: string;
+  closeTime?: string;
 }
 
 export interface UpdateRestaurantLocationRequest {
@@ -165,6 +167,8 @@ export interface Restaurant {
   image: string;
   phone: string;
   description: string;
+  openTime?: string | null;
+  closeTime?: string | null;
   profileUrl: string;
   slug: string;
   qrMenu: string;

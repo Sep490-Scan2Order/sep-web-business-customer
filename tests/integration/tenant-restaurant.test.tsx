@@ -30,6 +30,8 @@ const createRestaurant = (overrides: Partial<Record<string, unknown>> = {}) =>
     image: "",
     phone: "0900000001",
     description: "Mô tả A",
+    openTime: "08:00",
+    closeTime: "22:00",
     profileUrl: "",
     slug: "nha-hang-a",
     qrMenu: "",
@@ -78,6 +80,8 @@ describe("Integration: Tenant Restaurant Management Flow", () => {
       expect(screen.getByText("Tạo nhà hàng mới")).toBeInTheDocument();
       expect(screen.getByLabelText("Tên nhà hàng *")).toBeInTheDocument();
       expect(screen.getByLabelText("Số điện thoại *")).toBeInTheDocument();
+      expect(screen.getByLabelText("Giờ mở cửa")).toBeInTheDocument();
+      expect(screen.getByLabelText("Giờ đóng cửa")).toBeInTheDocument();
       expect(screen.getByLabelText("Địa chỉ")).toBeInTheDocument();
     });
   });
@@ -99,6 +103,8 @@ describe("Integration: Tenant Restaurant Management Flow", () => {
           restaurantName: "Nhà hàng Mới",
           address: "456 Đường B",
           slug: "nha-hang-moi",
+          openTime: "08:30",
+          closeTime: "21:30",
         }),
       },
     } as never);
@@ -118,6 +124,8 @@ describe("Integration: Tenant Restaurant Management Flow", () => {
 
     await user.type(screen.getByLabelText("Tên nhà hàng *"), "Nhà hàng Mới");
     await user.type(screen.getByLabelText("Số điện thoại *"), "0988777666");
+    await user.type(screen.getByLabelText("Giờ mở cửa"), "08:30");
+    await user.type(screen.getByLabelText("Giờ đóng cửa"), "21:30");
     await user.type(screen.getByLabelText("Địa chỉ"), "456 Đường B");
     await user.type(screen.getByLabelText("Mô tả"), "Nhà hàng thử nghiệm");
 
@@ -125,6 +133,11 @@ describe("Integration: Tenant Restaurant Management Flow", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Nhà hàng Mới")).toBeInTheDocument();
+      expect(
+        screen.getByText((content, element) => {
+          return element?.tagName === "P" && content.includes("Giờ mở cửa:") && content.includes("08:30") && content.includes("21:30")
+        }),
+      ).toBeInTheDocument();
     });
 
     expect(apiClient.post).toHaveBeenCalledWith(
@@ -144,6 +157,8 @@ describe("Integration: Tenant Restaurant Management Flow", () => {
     ];
     expect(submittedFormData.get("RestaurantName")).toBe("Nhà hàng Mới");
     expect(submittedFormData.get("Phone")).toBe("0988777666");
+    expect(submittedFormData.get("OpenTime")).toBe("08:30");
+    expect(submittedFormData.get("CloseTime")).toBe("21:30");
     expect(submittedFormData.get("Address")).toBe("456 Đường B");
     expect(submittedFormData.get("Description")).toBe("Nhà hàng thử nghiệm");
   });
@@ -172,6 +187,11 @@ describe("Integration: Tenant Restaurant Management Flow", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Nhà hàng A")).toBeInTheDocument();
+      expect(
+        screen.getByText((content, element) => {
+          return element?.tagName === "P" && content.includes("Giờ mở cửa:") && content.includes("08:00") && content.includes("22:00")
+        }),
+      ).toBeInTheDocument();
     });
 
     await user.type(screen.getByPlaceholderText("Tìm kiếm nhà hàng..."), "A");
@@ -182,15 +202,23 @@ describe("Integration: Tenant Restaurant Management Flow", () => {
     await waitFor(() => {
       expect(screen.getByText("Cập nhật nhà hàng")).toBeInTheDocument();
       expect(screen.getByDisplayValue("Nhà hàng A")).toBeInTheDocument();
+      expect(screen.getByDisplayValue("08:00")).toBeInTheDocument();
+      expect(screen.getByDisplayValue("22:00")).toBeInTheDocument();
     });
 
     const nameInput = screen.getByLabelText("Tên nhà hàng *");
     const addressInput = screen.getByLabelText("Địa chỉ");
+    const openTimeInput = screen.getByLabelText("Giờ mở cửa");
+    const closeTimeInput = screen.getByLabelText("Giờ đóng cửa");
 
     await user.clear(nameInput);
     await user.type(nameInput, "Nhà hàng A - Updated");
     await user.clear(addressInput);
     await user.type(addressInput, "789 Đường C");
+    await user.clear(openTimeInput);
+    await user.type(openTimeInput, "09:00");
+    await user.clear(closeTimeInput);
+    await user.type(closeTimeInput, "23:00");
 
     await user.click(screen.getByRole("button", { name: "Cập nhật" }));
 
@@ -215,5 +243,7 @@ describe("Integration: Tenant Restaurant Management Flow", () => {
     ];
     expect(submittedFormData.get("RestaurantName")).toBe("Nhà hàng A - Updated");
     expect(submittedFormData.get("Address")).toBe("789 Đường C");
+    expect(submittedFormData.get("OpenTime")).toBe("09:00");
+    expect(submittedFormData.get("CloseTime")).toBe("23:00");
   });
 });
