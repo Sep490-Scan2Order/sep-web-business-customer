@@ -23,6 +23,7 @@ type TenantApiItem = {
     id: string;
     accountId: string;
     name: string;
+    email: string | null;
     phone: string;
     taxNumber: string;
     bankName: string;

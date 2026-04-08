@@ -1,16 +1,19 @@
 "use client";
 
-<<<<<<< HEAD
 import { useEffect, useMemo, useState } from "react";
+import { Loader2, PlayCircle } from "lucide-react";
 import { toast } from "react-toastify";
 import { configurationService } from "@/src/services/configurationService";
 import { ConfigurationResponse } from "@/src/types/type";
+import { API } from "@/src/constants/api";
+import apiClient from "@/src/services/apiClient";
 
 export default function GlobalSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [configs, setConfigs] = useState<ConfigurationResponse[]>([]);
   const [commissionRateInput, setCommissionRateInput] = useState<string>("");
+  const [isRunningCronTest, setIsRunningCronTest] = useState(false);
 
   const activeConfig = useMemo(() => configs[0] ?? null, [configs]);
 
@@ -36,6 +39,28 @@ export default function GlobalSettingsPage() {
     };
     void load();
   }, []);
+
+  const handleRunCronJobTest = async () => {
+    try {
+      setIsRunningCronTest(true);
+      const response = await apiClient.post(API.ADMIN.TEST_CRONJOBS);
+      if (response.data?.isSuccess) {
+        toast.success(
+          response.data?.message || "Đã chạy test cronjob thành công."
+        );
+        return;
+      }
+
+      toast.error(response.data?.message || "Không thể chạy test cronjob.");
+    } catch (error) {
+      const backendMessage = (
+        error as { response?: { data?: { message?: string } } }
+      ).response?.data?.message;
+      toast.error(backendMessage || "Có lỗi xảy ra khi chạy test cronjob.");
+    } finally {
+      setIsRunningCronTest(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!activeConfig) {
@@ -68,48 +93,16 @@ export default function GlobalSettingsPage() {
       toast.error("Có lỗi xảy ra khi cập nhật cấu hình");
     } finally {
       setSaving(false);
-=======
-import { API } from "@/src/constants/api";
-import apiClient from "@/src/services/apiClient";
-import { Loader2, PlayCircle } from "lucide-react";
-import { useState } from "react";
-import { toast } from "react-toastify";
-
-export default function GlobalSettingsPage() {
-  const [isRunningCronTest, setIsRunningCronTest] = useState(false);
-
-  const handleRunCronJobTest = async () => {
-    try {
-      setIsRunningCronTest(true);
-      const response = await apiClient.post(API.ADMIN.TEST_CRONJOBS);
-      if (response.data?.isSuccess) {
-        toast.success(response.data?.message || "Đã chạy test cronjob thành công.");
-        return;
-      }
-
-      toast.error(response.data?.message || "Không thể chạy test cronjob.");
-    } catch (error) {
-      const backendMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message;
-      toast.error(backendMessage || "Có lỗi xảy ra khi chạy test cronjob.");
-    } finally {
-      setIsRunningCronTest(false);
->>>>>>> ed911c43f4380cc356b914e92df3a3150070a095
     }
   };
 
   return (
-<<<<<<< HEAD
-    <div className="p-6">
-      <div className="mb-6">
-=======
     <div className="space-y-6 p-6">
       <div>
->>>>>>> ed911c43f4380cc356b914e92df3a3150070a095
         <h1 className="text-2xl font-bold text-slate-900">Global Settings</h1>
         <p className="mt-2 text-slate-600">Configure system-wide settings</p>
       </div>
 
-<<<<<<< HEAD
       {loading ? (
         <div className="rounded-xl border border-slate-200 bg-white p-6 text-slate-500">
           Đang tải...
@@ -161,11 +154,12 @@ export default function GlobalSettingsPage() {
           </div>
         </div>
       )}
-=======
+
       <div className="max-w-2xl rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 className="text-lg font-semibold text-slate-900">Cronjob Testing</h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          Chạy test thủ công cho luồng cronjob tính phí hoa hồng và giám sát công nợ tenant.
+          Chạy test thủ công cho luồng cronjob tính phí hoa hồng và giám sát công
+          nợ tenant.
         </p>
 
         <button
@@ -187,7 +181,6 @@ export default function GlobalSettingsPage() {
           )}
         </button>
       </div>
->>>>>>> ed911c43f4380cc356b914e92df3a3150070a095
     </div>
   );
 }
