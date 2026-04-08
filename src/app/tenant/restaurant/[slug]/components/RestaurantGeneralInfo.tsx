@@ -16,6 +16,8 @@ const RestaurantGeneralInfo = React.memo(function RestaurantGeneralInfo({
 }: Props) {
   const [isMapPickerOpen, setIsMapPickerOpen] = React.useState(false)
   const hasMinCash = restaurant.minCashAmount !== null && restaurant.minCashAmount !== undefined
+  const hasOpenTime = Boolean(restaurant.openTime)
+  const hasCloseTime = Boolean(restaurant.closeTime)
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-5">
@@ -39,6 +41,15 @@ const RestaurantGeneralInfo = React.memo(function RestaurantGeneralInfo({
             Số điện thoại
           </p>
           <p className="mt-2 text-sm text-slate-900">{restaurant.phone || 'Chưa cập nhật'}</p>
+        </div>
+
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Giờ hoạt động</p>
+          <p className="mt-2 text-sm text-slate-900">
+            {hasOpenTime || hasCloseTime
+              ? `${restaurant.openTime || '--:--'} - ${restaurant.closeTime || '--:--'}`
+              : 'Chưa cập nhật'}
+          </p>
         </div>
 
         <div className="sm:col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-4">

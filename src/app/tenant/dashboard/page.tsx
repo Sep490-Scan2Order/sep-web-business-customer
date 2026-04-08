@@ -21,6 +21,8 @@ import DashboardLoadingSkeleton from "./components/DashboardLoadingSkeleton";
 import DashboardRestaurantsTable from "./components/DashboardRestaurantsTable";
 import DashboardStatsGrid from "./components/DashboardStatsGrid";
 import DashboardSummaryBar from "./components/DashboardSummaryBar";
+import DebtReminderPopup from "@/src/components/ui/tenant/DebtReminderPopup";
+import { useRouter } from "next/navigation";
 import {
   getDashboardFilterSummary,
   getDateInputValue,
@@ -37,8 +39,10 @@ const presetOptions: Array<{ label: string; value: TenantDashboardPreset }> = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showBankModal, setShowBankModal] = useState(false);
+  const [showDebtPopup, setShowDebtPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isDashboardLoading, setIsDashboardLoading] = useState(false);
   const [dashboardError, setDashboardError] = useState<string | null>(null);
@@ -114,6 +118,8 @@ export default function DashboardPage() {
       return;
     }
 
+    setShowDebtPopup((tenantInfo.totalDebtAmount ?? 0) > 0);
+
     if (!tenantInfo.taxNumber) {
       setShowInfoModal(true);
       setShowBankModal(false);
@@ -178,6 +184,16 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      <DebtReminderPopup
+        isOpen={showDebtPopup && (tenantInfo?.totalDebtAmount ?? 0) > 0}
+        onClose={() => setShowDebtPopup(false)}
+        onPayNow={() => router.push('/tenant/debt-payment')}
+        debtAmount={tenantInfo?.totalDebtAmount ?? 0}
+        debtStartedAt={tenantInfo?.debtStartedAt ?? null}
+        lastWarningSentAt={tenantInfo?.lastWarningSentAt ?? null}
+        isSuspended={Boolean(tenantInfo?.isSuspended)}
+      />
+
       <VerifyTaxModelPopUp
         isOpen={showInfoModal}
         onClose={() => setShowInfoModal(false)}
@@ -206,6 +222,31 @@ export default function DashboardPage() {
         onEndDateChange={setEndDate}
         onApplyCustomRange={handleApplyCustomRange}
       />
+
+      {(tenantInfo?.totalDebtAmount ?? 0) > 0 ? (
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">Cảnh báo công nợ</p>
+              <h3 className="mt-2 text-xl font-semibold text-slate-900">Bạn đang có khoản nợ hoa hồng cần thanh toán</h3>
+              <p className="mt-2 text-sm text-slate-600">
+                Số tiền hiện tại: <span className="font-semibold text-slate-900">{(tenantInfo?.totalDebtAmount ?? 0).toLocaleString('vi-VN')} VND</span>
+                {tenantInfo?.debtStartedAt ? (
+                  <span className="ml-2">- Từ {new Date(tenantInfo.debtStartedAt).toLocaleString('vi-VN')}</span>
+                ) : null}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => router.push('/tenant/debt-payment')}
+              className="inline-flex items-center justify-center rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
+            >
+              Thanh toán nợ ngay
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       {dashboardError ? (
         <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">

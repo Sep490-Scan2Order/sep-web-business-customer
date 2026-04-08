@@ -12,6 +12,8 @@ export interface Restaurant {
   image?: string
   slug?: string
   imageVersion?: number
+  openTime?: string | null
+  closeTime?: string | null
 }
 
 interface RestaurantListProps {
@@ -141,6 +143,12 @@ export default function RestaurantList({ restaurants, onCreateClick, onEditClick
                     {restaurant.status === 'active' ? 'Hoạt động' : 'Tạm dừng'}
                   </span>
                 </div>
+
+                {(restaurant.openTime || restaurant.closeTime) && (
+                  <p className="mt-3 text-xs text-slate-500">
+                    Giờ mở cửa: {restaurant.openTime || '--:--'} - {restaurant.closeTime || '--:--'}
+                  </p>
+                )}
               </div>
             </div>
             )

@@ -18,6 +18,7 @@ import {
   NotepadText,
   TicketPercent,
   Receipt,
+  CreditCard,
 } from "lucide-react";
 import { ROUTES, TENANT_ROUTES } from "@/src/constants/routes";
 import { useAuth } from "@/src/hooks/useAuth";
@@ -130,6 +131,12 @@ const sections: { label: string; items: NavItem[] }[] = [
         label: "Plans",
         href: TENANT_ROUTES.PLAN,
         icon: NotepadText,
+        match: "prefix",
+      },
+      {
+        label: "Thanh toán nợ",
+        href: TENANT_ROUTES.DEBT_PAYMENT,
+        icon: CreditCard,
         match: "prefix",
       },
     ],

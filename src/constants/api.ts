@@ -94,6 +94,7 @@ export const API = {
         GET_SUBSCRIPTION_BY_TENANT: "/subscription/get-by-tenant",
         GET_SUBSCRIPTION_PAYMENT_STATUS: (orderCode: number) => `/subscription/payment-status/${orderCode}`,
         CANCEL_PAYMENT: (orderCode: number) => `/subscription/cancel-payment/${orderCode}`,
+        CREATE_COMMISSION_FEE_PAYMENT: "/subscription/create-commission-fee-payment",
     },
     EMAIL:{
         SEND: "/Email/send",
@@ -128,6 +129,7 @@ export const API = {
         TOP_PERFORMING_RESTAURANTS: (top: number = 5) => `/Admin/top-performing-restaurants?top=${top}`,
         EXPIRING_SUBSCRIPTIONS: (daysThreshold: number = 30) => `/Admin/expiring-subscriptions?daysThreshold=${daysThreshold}`,
         TOP_TENANTS: (top: number = 10) => `/Admin/top-tenants?top=${top}`,
+        TEST_CRONJOBS: "/Admin/test-cronjobs",
         TENANT_DETAIL: (tenantId: string, startDate?: string, endDate?: string) => {
             let url = `/Admin/tenants/${tenantId}/detail`;
             const params: string[] = [];

@@ -61,6 +61,8 @@ function buildRestaurantFormData(data: CreateRestaurantRequest): FormData {
   if (data.image !== undefined) formData.append('Image', data.image)
   if (data.phone !== undefined) formData.append('Phone', data.phone)
   if (data.description !== undefined) formData.append('Description', data.description)
+  if (data.openTime !== undefined && data.openTime !== '') formData.append('OpenTime', data.openTime)
+  if (data.closeTime !== undefined && data.closeTime !== '') formData.append('CloseTime', data.closeTime)
 
   return formData
 }
@@ -169,6 +171,8 @@ export default function RestaurantPage() {
         phone: info.phone,
         address: info.address,
         description: info.description,
+        openTime: info.openTime,
+        closeTime: info.closeTime,
         latitude: info.latitude,
         longitude: info.longitude,
         image: info.image,
@@ -240,6 +244,8 @@ export default function RestaurantPage() {
             status: restaurant.isActive ? 'active' : 'inactive',
             image: restaurant.image,
             slug: restaurant.slug,
+            openTime: restaurant.openTime,
+            closeTime: restaurant.closeTime,
             imageVersion: restaurantImageVersions[restaurant.id],
           }))}
           onCreateClick={handleCreateClick}
@@ -262,6 +268,8 @@ export default function RestaurantPage() {
                 address: editingRestaurant.address,
                 latitude: editingRestaurant.latitude,
                 longitude: editingRestaurant.longitude,
+                openTime: editingRestaurant.openTime ?? undefined,
+                closeTime: editingRestaurant.closeTime ?? undefined,
                 imageUrl: editingRestaurant.image,
               }
             : undefined
