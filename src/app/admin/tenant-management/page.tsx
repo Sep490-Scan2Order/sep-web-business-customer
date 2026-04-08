@@ -32,6 +32,9 @@ type TenantApiItem = {
     totalRestaurants: number;
     totalDishes: number;
     totalCategories: number;
+    debtStartedAt: string | null;
+    totalDebtAmount: number;
+    isSuspended: boolean;
     checked?: boolean;
 };
 
@@ -155,8 +158,8 @@ export default function TenantManagementPage() {
   // Check if some (but not all) items are selected
   const isSomeSelected = paginatedTenants.some(tenant => selectedIds.has(tenant.id)) && !isAllSelected;
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Just now';
+  const formatDate = (dateString?: string | null) => {
+    if (!dateString) return "—";
     const date = new Date(dateString);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
@@ -164,11 +167,22 @@ export default function TenantManagementPage() {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    if (diffDays === 1) return 'Yesterday';
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60)
+      return `${diffMins} minute${diffMins > 1 ? "s" : ""} ago`;
+    if (diffHours < 24)
+      return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+    if (diffDays === 1) return "Yesterday";
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const formatMoney = (value?: number | null) => {
+    if (value === null || value === undefined) return "—";
+    return value.toLocaleString("vi-VN") + " ₫";
   };
 
   return (
@@ -227,21 +241,23 @@ export default function TenantManagementPage() {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone Number</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Debt started</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total debt</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Suspended</th>
                 <th className="w-12 px-4 py-3"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {isLoading ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={10} className="px-4 py-8 text-center text-gray-500">
                     Loading...
                   </td>
                 </tr>
               ) : paginatedTenants.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={10} className="px-4 py-8 text-center text-gray-500">
                     No tenants found
                   </td>
                 </tr>
@@ -268,23 +284,18 @@ export default function TenantManagementPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">
-                      user{index + 1}@gmail.com
+                      {tenant.email || "—"}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-900">{tenant.phone}</span>
+                        <span className="text-sm text-gray-900">{tenant.phone || "—"}</span>
                         <button 
-                          onClick={() => copyToClipboard(tenant.phone)}
+                          onClick={() => copyToClipboard(tenant.phone || "")}
+                          disabled={!tenant.phone}
                           className="p-1 hover:bg-gray-100 rounded transition-colors"
                         >
                           <Copy className="w-3.5 h-3.5 text-gray-400" />
                         </button>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Calendar className="w-4 h-4 text-gray-400" />
-                        <span>{formatDate()}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
@@ -303,6 +314,25 @@ export default function TenantManagementPage() {
                           </span>
                         );
                       })()}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-700">
+                      {formatDate(tenant.debtStartedAt)}
+                    </td>
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                      {formatMoney(tenant.totalDebtAmount)}
+                    </td>
+                    <td className="px-4 py-3">
+                      {tenant.isSuspended ? (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-amber-700 bg-amber-50">
+                          <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
+                          Suspended
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-slate-600 bg-slate-50">
+                          <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
+                          No
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <div className="relative" ref={openDropdownId === tenant.id ? dropdownRef : null}>

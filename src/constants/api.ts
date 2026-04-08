@@ -110,6 +110,10 @@ export const API = {
         UPDATE_READ_BY_TENANT_ID: `/NotifyTenant/update-read-by-tenant`,
         DETAILS: (pageIndex: number = 1, pageSize: number = 5) => `/NotifyTenant/details?pageIndex=${pageIndex}&pageSize=${pageSize}`,
     },
+    CONFIGURATION: {
+        GET_ALL: "/Configuration",
+        UPDATE: (id: number) => `/Configuration/${id}`,
+    },
     PROMOTION:{
         GET_BY_TENANT: (pageNumber: number = 1, pageSize: number = 10) =>
             `/Promotion/tenant-logged-in?pageNumber=${pageNumber}&pageSize=${pageSize}`,
