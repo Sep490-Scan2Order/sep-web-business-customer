@@ -94,10 +94,10 @@ function PaymentStatusContent() {
         <h2 className="text-2xl font-bold text-slate-800 mb-2">Tra cứu thất bại</h2>
         <p className="text-slate-600 mb-8 max-w-md">{error}</p>
         <button 
-          onClick={() => router.push('/tenant/plan')}
+          onClick={() => router.push('/tenant/debt-payment')}
           className="flex items-center gap-2 bg-slate-900 text-white px-6 py-2.5 rounded-xl hover:bg-slate-800 transition"
         >
-          <ArrowLeft className="w-4 h-4" /> Quay lại trang Dịch vụ
+          <ArrowLeft className="w-4 h-4" /> Quay lại thanh toán
         </button>
       </div>
     );
@@ -123,7 +123,7 @@ function PaymentStatusContent() {
       
       <p className="text-slate-600 mb-8 max-w-md">
         {isPaid 
-          ? "Cảm ơn bạn đã tin tưởng. Gói dịch vụ của các nhà hàng đã được cập nhật thành công."
+          ? "Cảm ơn bạn đã đóng tiền đúng hạn!"
           : "Giao dịch của bạn đang được ghi nhận. Vui lòng chờ trong giây lát."}
       </p>
 
@@ -163,10 +163,10 @@ function PaymentStatusContent() {
       </div>
 
       <button 
-        onClick={() => router.push('/tenant/plan')} 
+        onClick={() => router.push('/tenant/debt-payment')} 
         className="flex items-center gap-2 bg-emerald-600 text-white px-8 py-3 rounded-xl hover:bg-emerald-700 transition shadow-lg shadow-emerald-200 font-medium"
       >
-        <ArrowLeft className="w-5 h-5" /> Trở về Quản lý Gói dịch vụ
+        <ArrowLeft className="w-5 h-5" /> Trở về trang thanh toán nợ
       </button>
     </div>
   );

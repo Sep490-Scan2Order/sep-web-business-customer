@@ -94,6 +94,7 @@ export const API = {
         GET_SUBSCRIPTION_BY_TENANT: "/subscription/get-by-tenant",
         GET_SUBSCRIPTION_PAYMENT_STATUS: (orderCode: number) => `/subscription/payment-status/${orderCode}`,
         CANCEL_PAYMENT: (orderCode: number) => `/subscription/cancel-payment/${orderCode}`,
+        CREATE_COMMISSION_FEE_PAYMENT: "/subscription/create-commission-fee-payment",
     },
     EMAIL:{
         SEND: "/Email/send",

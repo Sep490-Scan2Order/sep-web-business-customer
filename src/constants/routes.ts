@@ -51,6 +51,7 @@ export const TENANT_ROUTES = {
   CATEGORY: "/tenant/meals/category",
   DISH: "/tenant/meals/dish",
   PLAN: "/tenant/plan",
+  DEBT_PAYMENT: "/tenant/debt-payment",
   PROMOTION: "/tenant/promotion",
   BRANCH_DISH_MANAGEMENT: "/tenant/branch-dish-management",
   SHIFT_REPORTS: "/tenant/shift-reports",

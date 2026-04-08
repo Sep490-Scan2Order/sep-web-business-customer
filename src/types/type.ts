@@ -51,6 +51,7 @@ export interface User {
   // Status
   isActive?: boolean;
   verified?: boolean;
+  isSuspended?: boolean;
 
   // Bank info
   bankId?: string;
@@ -196,6 +197,7 @@ export interface UserInfo {
   avatar: string | null;
   isActive: boolean;
   verified: boolean;
+  isSuspended: boolean;
   taxNumber: string | null;
   bankId: string;
   cardNumber: string;
