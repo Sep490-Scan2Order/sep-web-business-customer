@@ -12,6 +12,7 @@ import {
   CartesianGrid,
   Cell,
 } from "recharts";
+import { Package } from "lucide-react";
 import { getRestaurantRevenueSummary } from "@/src/services/adminService";
 import { RevenueSummaryData } from "@/src/types/type";
 import RestaurantRevenueCards from "@/src/components/ui/admin/stat-cards/RestaurantRevenueCards";
@@ -67,17 +68,21 @@ export default function RestaurantRevenuePage() {
   const orderTypeChartData = data
     ? [
         {
-          name: "Đơn thường",
+          name: "Đơn hàng thường",
           revenue: data.orderTypes.regular.revenue,
           count: data.orderTypes.regular.count,
-          fill: "#6366f1",
+          fill: "#10b981",
         },
-        {
-          name: "Hoàn tiền",
-          revenue: data.orderTypes.refund.revenue,
-          count: data.orderTypes.refund.count,
-          fill: "#f43f5e",
-        },
+        ...(data.summary.totalRefund > 0 || data.orderTypes.refund.count > 0
+          ? [
+              {
+                name: "Hoàn tiền",
+                revenue: data.summary.totalRefund,
+                count: data.orderTypes.refund.count,
+                fill: "#f43f5e",
+              },
+            ]
+          : []),
       ]
     : [];
 
@@ -166,56 +171,52 @@ export default function RestaurantRevenuePage() {
             </div>
 
             <div className="lg:col-span-2 bg-white p-6 rounded-2xl border shadow-sm">
-              <h3 className="text-base font-semibold text-slate-900 mb-1">
-                Phân loại đơn hàng
+              <h3 className="text-lg font-semibold text-slate-800 mb-6 flex items-center gap-2">
+                <Package className="w-5 h-5 text-emerald-500" />
+                Phân tích loại đơn hàng
               </h3>
-              <p className="text-xs text-slate-500 mb-4">
-                Đơn thường vs Hoàn tiền
-              </p>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart
-                  data={orderTypeChartData}
-                  margin={{ top: 4, right: 20, left: 0, bottom: 4 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                  <YAxis
-                    tickFormatter={(v) => (v / 1_000_000).toFixed(1) + "M"}
-                    tick={{ fontSize: 11 }}
-                  />
-                  <Tooltip
-                    formatter={(value, name) => {
-                      if (name === "revenue")
-                        return [formatVND(Number(value)), "Doanh thu"];
-                      return [value, name];
-                    }}
-                  />
-                  <Bar dataKey="revenue" radius={[6, 6, 0, 0]} name="revenue">
-                    {orderTypeChartData.map((entry, i) => (
-                      <Cell key={i} fill={entry.fill} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-
-              <div className="mt-4 grid grid-cols-2 gap-4">
-                {orderTypeChartData.map((d) => (
-                  <div
-                    key={d.name}
-                    className="flex items-center gap-3 p-3 rounded-xl bg-slate-50"
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={orderTypeChartData}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                   >
-                    <div
-                      className="w-3 h-3 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: d.fill }}
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis
+                      dataKey="name"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: "#64748b", fontSize: 12 }}
                     />
-                    <div>
-                      <p className="text-xs text-slate-500">{d.name}</p>
-                      <p className="font-semibold text-slate-700 text-sm">
-                        {d.count.toLocaleString()} đơn
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: "#64748b", fontSize: 12 }}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        borderRadius: "12px",
+                        border: "none",
+                        boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+                      }}
+                      cursor={{ fill: "#f8fafc" }}
+                      formatter={(value, name) => {
+                        if (name === "Doanh thu") return [formatVND(Number(value)), "Doanh thu"];
+                        return [value, name];
+                      }}
+                    />
+                    <Bar
+                      dataKey="revenue"
+                      name="Doanh thu"
+                      radius={[6, 6, 0, 0]}
+                      barSize={40}
+                    >
+                      {orderTypeChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>
