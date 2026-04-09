@@ -355,6 +355,15 @@ export interface ApplyMenuTemplateRequest {
   templateId: number;
 }
 
+export interface ConfigurationResponse {
+  id: number;
+  commissionRate: number;
+}
+
+export interface UpdateConfigurationRequest {
+  commissionRate: number;
+}
+
 export interface StaffDto {
   id: string,
   accountId: string,

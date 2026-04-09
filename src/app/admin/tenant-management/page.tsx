@@ -157,6 +157,7 @@ export default function TenantManagementPage() {
   // Filter tenants based on search
   const filteredTenants = tenants.filter(tenant => 
     tenant.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    tenant.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     tenant.accountId.toLowerCase().includes(searchQuery.toLowerCase()) ||
     tenant.phone.includes(searchQuery)
   );
@@ -200,20 +201,12 @@ export default function TenantManagementPage() {
   // Check if some (but not all) items are selected
   const isSomeSelected = paginatedTenants.some(tenant => selectedIds.has(tenant.id)) && !isAllSelected;
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Vừa xong';
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 1) return 'Vừa xong';
-    if (diffMins < 60) return `${diffMins} phút trước`;
-    if (diffHours < 24) return `${diffHours} giờ trước`;
-    if (diffDays === 1) return 'Hôm qua';
-    return date.toLocaleDateString('vi-VN');
+  const formatMoney = (amount: number) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      maximumFractionDigits: 0,
+    }).format(amount || 0);
   };
 
   return (
@@ -291,7 +284,7 @@ export default function TenantManagementPage() {
                   </td>
                 </tr>
               ) : (
-                paginatedTenants.map((tenant, index) => (
+                paginatedTenants.map((tenant) => (
                   <tr key={tenant.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">
                       <input 
@@ -313,13 +306,14 @@ export default function TenantManagementPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">
-                      user{index + 1}@gmail.com
+                      {tenant.email || "—"}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-900">{tenant.phone}</span>
+                        <span className="text-sm text-gray-900">{tenant.phone || "—"}</span>
                         <button 
-                          onClick={() => copyToClipboard(tenant.phone)}
+                          onClick={() => copyToClipboard(tenant.phone || "")}
+                          disabled={!tenant.phone}
                           className="p-1 hover:bg-gray-100 rounded transition-colors"
                         >
                           <Copy className="w-3.5 h-3.5 text-gray-400" />
@@ -329,23 +323,21 @@ export default function TenantManagementPage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
                         <HandCoins className="w-4 h-4 text-gray-400" />
-                        <span>{tenant.totalDebtAmount?.toLocaleString()} VND</span>
+                        <span>{formatMoney(tenant.totalDebtAmount)}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      {(() => {
-                        return tenant.isSuspended === false ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-green-600 bg-green-50">
-                            <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
-                            Hoạt động
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-red-600 bg-red-50">
-                            <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
-                            Bị đình chỉ
-                          </span>
-                        );
-                      })()}
+                      {tenant.isSuspended ? (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-red-600 bg-red-50">
+                          <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
+                          Bị đình chỉ
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-green-600 bg-green-50">
+                          <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
+                          Hoạt động
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <div className="relative" ref={openDropdownId === tenant.id ? dropdownRef : null}>
@@ -382,7 +374,11 @@ export default function TenantManagementPage() {
                             <div className="border-t border-gray-100 my-1"></div>
                             <button
                               onClick={() => openConfirmSuspendPopup(tenant)}
-                              className="cursor-pointer w-full px-4 py-2 text-left text-sm {tenant.isSuspended ? 'text-green-600' : 'text-red-600'} hover:bg-red-50 flex items-center gap-2"
+                              className={`cursor-pointer w-full px-4 py-2 text-left text-sm flex items-center gap-2 ${
+                                tenant.isSuspended
+                                  ? "text-green-600 hover:bg-green-50"
+                                  : "text-red-600 hover:bg-red-50"
+                              }`}
                             >
                               {tenant.isSuspended ? <LockOpen className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
                               {tenant.isSuspended ? "Kích hoạt lại bên thuê" : "Đình chỉ bên thuê"}
