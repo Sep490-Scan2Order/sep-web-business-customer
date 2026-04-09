@@ -11,7 +11,7 @@ const FEATURE_GROUPS = [
       "Thanh toán đa phương thức (Chuyển khoản, Ví điện tử) trước khi dùng",
       "Theo dõi tiến độ chế biến món ăn theo thời gian thực",
       "Hệ thống tích điểm tự động và áp dụng mã giảm giá thông minh",
-      "Gợi ý món ăn cá nhân hóa dựa trên sở thích (AI Powered)",
+      "Gợi ý món ăn cá nhân hóa dựa trên sở thích (AI hỗ trợ)",
     ],
   },
   {
@@ -22,18 +22,18 @@ const FEATURE_GROUPS = [
       "Hệ thống hiển thị bếp (KDS) ngay trên thiết bị di động",
       "Nhận thông báo đơn hàng mới tức thì qua SignalR/Socket",
       "Quản lý trạng thái món (Chờ cung ứng, Đang nấu, Đã xong)",
-      "Kiểm soát tồn kho Real-time, tự động ẩn món khi hết hàng",
+      "Kiểm soát tồn kho thời gian thực, tự động ẩn món khi hết hàng",
       "Bàn giao ca và đối soát dòng tiền mặt nhanh chóng",
     ],
   },
   {
-    title: "Quản trị Nhà hàng (Dashboard)",
+    title: "Quản trị nhà hàng (Bảng điều khiển)",
     description:
       "Kiểm soát toàn diện mọi hoạt động kinh doanh thông qua số liệu trực quan.",
     items: [
       "Thiết lập Menu số linh hoạt, thay đổi giá trong 30 giây",
-      "Công cụ Marketing: Tạo chiến dịch Flash sale, Giờ vàng",
-      "Báo cáo chuyên sâu doanh thu, món bán chạy (Heatmap)",
+      "Công cụ tiếp thị: Tạo chiến dịch giảm giá nhanh, Giờ vàng",
+      "Báo cáo chuyên sâu doanh thu, món bán chạy (bản đồ nhiệt)",
       "Quản lý phân quyền nhân sự chặt chẽ theo vai trò",
       "Tích hợp ví điện tử và quản lý dòng tiền rút về",
     ],
@@ -43,8 +43,8 @@ const FEATURE_GROUPS = [
     description:
       "Giải pháp quản lý đa điểm dành cho đơn vị vận hành nền tảng hoặc chuỗi lớn.",
     items: [
-      "Phê duyệt và Onboarding nhà hàng mới chỉ với vài click",
-      "Quản lý các gói đăng ký dịch vụ (Subscription Control)",
+      "Phê duyệt và khởi tạo nhà hàng mới chỉ với vài thao tác",
+      "Quản lý các gói đăng ký dịch vụ (kiểm soát gói)",
       "Hệ thống CMS quản trị nội dung và thông báo toàn trang",
       "Giám sát giao dịch tài chính và đối soát phí nền tảng",
       "Hệ thống cảnh báo tự động khi phát hiện trễ phí hoặc sự cố",
@@ -54,30 +54,30 @@ const FEATURE_GROUPS = [
 
 const HIGHLIGHTS = [
   {
-    title: "Pre-paid Model",
+    title: "Mô hình thanh toán trước",
     content: "Mô hình thanh toán trước giúp tối ưu dòng vốn và giảm rủi ro hủy đơn.",
   },
   {
-    title: "Multi-tenant Architecture",
+    title: "Kiến trúc đa bên thuê",
     content: "Dữ liệu tách biệt tuyệt đối giữa các nhà hàng, đảm bảo tính bảo mật và riêng tư.",
   },
   {
-    title: "High Scalability",
+    title: "Khả năng mở rộng cao",
     content: "Dễ dàng mở rộng từ 1 cửa hàng lên chuỗi 100 cửa hàng mà không thay đổi cấu trúc.",
   },
   {
-    title: "Real-time Sync",
+    title: "Đồng bộ thời gian thực",
     content: "Đồng bộ hóa dữ liệu tức thời giữa khách hàng - bếp - quản lý.",
   },
 ];
 
 const MODULES = [
-  "Gọi món không chạm (Contactless Ordering)",
+  "Gọi món không chạm",
   "Thanh toán trực tuyến tích hợp QR Pay",
   "Hệ thống điều phối bếp thông minh",
   "Quản lý thực đơn, trạng thái món",
-  "Phân tích dữ liệu kinh doanh (Analytics)",
-  "Hệ thống Loyalty & Membership",
+  "Phân tích dữ liệu kinh doanh",
+  "Hệ thống khách hàng thân thiết",
 ];
 
 export default function FeaturesPage() {
@@ -173,11 +173,11 @@ export default function FeaturesPage() {
               </li>
               <li className="flex gap-3">
                 <span className="font-bold text-[rgb(var(--color-primary))]">03.</span>
-                <span>Chống thất thoát tuyệt đối nhờ hệ thống thanh toán trước và báo cáo real-time.</span>
+                <span>Chống thất thoát tuyệt đối nhờ hệ thống thanh toán trước và báo cáo thời gian thực.</span>
               </li>
               <li className="flex gap-3">
                 <span className="font-bold text-[rgb(var(--color-primary))]">04.</span>
-                <span>Xây dựng lòng trung thành khách hàng qua hệ thống Voucher và Point tự động.</span>
+                <span>Xây dựng lòng trung thành khách hàng qua hệ thống phiếu ưu đãi và điểm thưởng tự động.</span>
               </li>
             </ul>
           </div>
@@ -219,18 +219,18 @@ export default function FeaturesPage() {
       <section className="max-w-6xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 items-center">
           <div>
-            <h2 className="text-3xl font-bold">Nền tảng Cloud tin cậy</h2>
+            <h2 className="text-3xl font-bold">Nền tảng đám mây tin cậy</h2>
             <p className="mt-4 text-sm md:text-base text-gray-600 leading-relaxed">
               Chúng tôi sử dụng công nghệ tiên tiến nhất để đảm bảo hệ thống của bạn 
               luôn hoạt động 24/7 với độ bảo mật tối đa.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               {[
-                "JWT & RBAC Security",
-                "Dockerized Infrastructure",
-                "Realtime WebSockets",
-                "Data Isolation",
-                "Automated Backup",
+                "Bảo mật JWT & RBAC",
+                "Hạ tầng đóng gói bằng Docker",
+                "Kết nối thời gian thực qua WebSockets",
+                "Cô lập dữ liệu",
+                "Sao lưu tự động",
               ].map((tech) => (
                 <span key={tech} className="rounded-full bg-gray-50 border border-gray-200 px-5 py-2 text-sm font-medium text-gray-700">
                   {tech}
@@ -243,15 +243,15 @@ export default function FeaturesPage() {
               Cam kết vận hành
             </h3>
             <div className="space-y-4 text-sm text-gray-600">
-              <p>✔ <strong>Uptime 99.9%:</strong> Hệ thống luôn sẵn sàng phục vụ khách hàng.</p>
+              <p>✔ <strong>Tỷ lệ sẵn sàng 99.9%:</strong> Hệ thống luôn sẵn sàng phục vụ khách hàng.</p>
               <p>✔ <strong>Cập nhật liên tục:</strong> Nhận các tính năng mới mà không tốn phí bảo trì.</p>
-              <p>✔ <strong>Hỗ trợ kỹ thuật:</strong> Đội ngũ hỗ trợ triển khai tận nơi và online.</p>
+              <p>✔ <strong>Hỗ trợ kỹ thuật:</strong> Đội ngũ hỗ trợ triển khai tận nơi và trực tuyến.</p>
             </div>
             <Link
               href={ROUTES.PAGES.PUBLIC.REGISTER}
               className="mt-8 inline-flex w-full items-center justify-center rounded-xl bg-[rgb(var(--color-primary))] px-6 py-4 text-white font-bold hover:opacity-90 transition-opacity"
             >
-              Yêu cầu Demo ngay
+              Yêu cầu tư vấn ngay
             </Link>
           </div>
         </div>

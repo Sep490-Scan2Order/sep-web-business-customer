@@ -36,7 +36,7 @@ export default function BlogDetailModal({
       <div className="mx-auto my-8 w-full max-w-4xl rounded-lg bg-white shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-          <h2 className="text-2xl font-bold text-gray-900">Blog Chi Tiết</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Chi tiết blog</h2>
           <button
             type="button"
             onClick={onClose}
@@ -90,7 +90,7 @@ export default function BlogDetailModal({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={thumbnailUrl}
-                    alt={`${blog.title} thumbnail`}
+                    alt={`Ảnh thu nhỏ của ${blog.title}`}
                     className="h-56 w-full object-cover"
                   />
                 </div>

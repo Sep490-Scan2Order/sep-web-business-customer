@@ -227,7 +227,7 @@ export default function ShiftReportsPage() {
               <table className="w-full text-left text-sm text-slate-600">
                 <thead className="bg-slate-50 text-xs font-semibold uppercase text-slate-500 border-b border-slate-200">
                   <tr>
-                    <th className="whitespace-nowrap px-6 py-4">Mã Ca (Shift ID)</th>
+                    <th className="whitespace-nowrap px-6 py-4">Mã ca</th>
                     <th className="whitespace-nowrap px-6 py-4">Ngày giờ báo cáo</th>
                     <th className="whitespace-nowrap px-6 py-4">Nhân viên</th>
                     <th className="whitespace-nowrap px-6 py-4">Dự kiến</th>
@@ -256,7 +256,7 @@ export default function ShiftReportsPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4 font-medium text-slate-700">
-                          {report.cashierName || "N/A"}
+                          {report.cashierName || "Không có"}
                         </td>
                         <td className="px-6 py-4 font-medium text-slate-700">
                           {formatCurrency(report.expectedTotalAmount)}
@@ -372,8 +372,8 @@ export default function ShiftReportsPage() {
               </div>
 
               <div className="flex justify-between items-center pb-3 border-b border-slate-100">
-                <span className="text-sm text-slate-500">Người lập báo cáo (Cashier)</span>
-                <span className="text-sm font-medium text-slate-900">{selectedReport.cashierName || "N/A"}</span>
+                <span className="text-sm text-slate-500">Người lập báo cáo</span>
+                <span className="text-sm font-medium text-slate-900">{selectedReport.cashierName || "Không có"}</span>
               </div>
               
               <div className="flex justify-between items-center pb-3 border-b border-slate-100">
@@ -387,7 +387,7 @@ export default function ShiftReportsPage() {
               </div>
               
               <div className="flex justify-between items-center pb-3 border-b border-slate-100">
-                <span className="text-sm text-slate-500">Tổng tiền hoàn trả (Refund)</span>
+                <span className="text-sm text-slate-500">Tổng tiền hoàn trả</span>
                 <span className="text-sm font-medium text-rose-600">-{formatCurrency(selectedReport.totalRefundAmount)}</span>
               </div>
 

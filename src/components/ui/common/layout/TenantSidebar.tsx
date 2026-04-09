@@ -42,10 +42,10 @@ type NavItem = {
 
 const sections: { label: string; items: NavItem[] }[] = [
   {
-    label: "Dashboards",
+    label: "Bảng điều khiển",
     items: [
       {
-        label: "Overview",
+        label: "Tổng quan",
         href: TENANT_ROUTES.DASHBOARD,
         icon: LayoutDashboard,
         match: "prefix",
@@ -53,17 +53,17 @@ const sections: { label: string; items: NavItem[] }[] = [
     ],
   },
   {
-    label: "User Management",
+    label: "Quản lý người dùng",
     items: [
       {
-        label: "Staff Management",
+        label: "Quản lý nhân viên",
         href: TENANT_ROUTES.USERS,
         icon: Users,
         hasChildren: true,
         match: "prefix",
       },
       {
-        label: "Shift Management",
+        label: "Quản lý ca làm",
         href: TENANT_ROUTES.SHIFT_REPORTS,
         icon: NotepadText,
         hasChildren: true,
@@ -72,51 +72,51 @@ const sections: { label: string; items: NavItem[] }[] = [
     ],
   },
   {
-    label: "Management",
+    label: "Quản lý",
     items: [
       {
-        label: "Restaurant",
+        label: "Nhà hàng",
         href: TENANT_ROUTES.RESTAURANT,
         icon: Store,
         hasChildren: true,
         match: "prefix",
       },
       {
-        label: "Order Management",
+        label: "Quản lý đơn hàng",
         href: TENANT_ROUTES.ORDERS,
         icon: Receipt,
         hasChildren: true,
         match: "prefix",
       },
       {
-        label: "Meals Management",
+        label: "Quản lý thực đơn",
         icon: UtensilsCrossed,
         hasChildren: true,
         children: [
           {
-            label: "Category",
+            label: "Danh mục",
             href: TENANT_ROUTES.CATEGORY,
           },
           {
-            label: "Dish",
+            label: "Món ăn",
             href: TENANT_ROUTES.DISH,
           },
           {
-            label: "Branch Dish Management",
+            label: "Quản lý món theo chi nhánh",
             href: TENANT_ROUTES.BRANCH_DISH_MANAGEMENT,
           }
         ],
         match: "prefix",
       },
       {
-        label: "Menu Template",
+        label: "Mẫu thực đơn",
         href: TENANT_ROUTES.MENU_TEMPLATE,
         icon: SquareMenu,
         hasChildren: true,
         match: "prefix",
       },
       {
-        label: "Promotion",
+        label: "Khuyến mãi",
         href: TENANT_ROUTES.PROMOTION,
         icon: TicketPercent,
         hasChildren: true,
@@ -125,10 +125,10 @@ const sections: { label: string; items: NavItem[] }[] = [
     ],
   },
   {
-    label: "Subscription",
+    label: "Gói dịch vụ",
     items: [
       {
-        label: "Plans",
+        label: "Gói đăng ký",
         href: TENANT_ROUTES.PLAN,
         icon: NotepadText,
         match: "prefix",
@@ -148,7 +148,7 @@ export default function TenantSidebar() {
   const pathname = usePathname() || "";
   const [collapsed, setCollapsed] = React.useState(false);
   const [openDropdowns, setOpenDropdowns] = React.useState<Set<string>>(new Set());
-  const sidebarWidth = collapsed ? "w-20" : "w-72";
+  const sidebarWidth = collapsed ? "w-20" : "w-60";
   const { user, logout } = useAuth();
   const router = useRouter();
 
@@ -183,7 +183,7 @@ export default function TenantSidebar() {
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={tenantInfo.avatar}
-                alt="Tenant avatar"
+                alt="Ảnh đại diện bên thuê"
                 className="h-full w-full object-cover"
               />
             ) : (
@@ -199,13 +199,13 @@ export default function TenantSidebar() {
               <div className="text-sm font-semibold text-slate-800">
                 {tenantInfo.name}
               </div>
-              <div className="text-xs text-slate-400">Tenant Portal</div>
+              <div className="text-xs text-slate-400">Cổng bên thuê</div>
             </div>
             <button
               type="button"
               className="cursor-pointer flex items-center justify-center rounded-lg border border-slate-200 p-1 text-slate-600 hover:bg-slate-50"
               onClick={() => setCollapsed(true)}
-              aria-label="Collapse sidebar"
+              aria-label="Thu gọn thanh bên"
             >
               <ChevronsLeft className="h-4 w-4" />
             </button>
@@ -215,7 +215,7 @@ export default function TenantSidebar() {
             type="button"
             className="cursor-pointer flex items-center justify-center rounded-lg border border-slate-200 p-1 text-slate-600 hover:bg-slate-50"
             onClick={() => setCollapsed(false)}
-            aria-label="Expand sidebar"
+            aria-label="Mở rộng thanh bên"
           >
             <ChevronsRight className="h-4 w-4" />
           </button>
@@ -327,7 +327,7 @@ export default function TenantSidebar() {
         <button className="cursor-pointer flex items-center gap-2">
           <Settings className="h-4 w-4" />
           {!collapsed ? (
-            <span className="text-sm font-medium">Setting</span>
+            <span className="text-sm font-medium">Cài đặt</span>
           ) : null}
         </button>
       </div>
@@ -338,7 +338,7 @@ export default function TenantSidebar() {
         <button className="cursor-pointer flex items-center gap-2">
           <LogOut className="h-4 w-4" />
           {!collapsed ? (
-            <span className="text-sm font-medium">Logout</span>
+            <span className="text-sm font-medium">Đăng xuất</span>
           ) : null}
         </button>
       </div>

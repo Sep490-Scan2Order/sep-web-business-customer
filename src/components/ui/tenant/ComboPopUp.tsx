@@ -264,7 +264,7 @@ export default function ComboPopUp({
                 {imagePreview && (
                   <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-slate-200">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={imagePreview} alt="Combo preview" className="h-full w-full object-cover" />
+                    <img src={imagePreview} alt="Xem trước combo" className="h-full w-full object-cover" />
                   </div>
                 )}
               </div>

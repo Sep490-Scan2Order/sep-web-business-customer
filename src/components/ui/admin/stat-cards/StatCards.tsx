@@ -40,7 +40,7 @@ export default function StatCards() {
     <div className="flex gap-6">
       <div className="flex-1">
         <StatCard
-          title="Total Tenants"
+          title="Tổng tenant"
           value={data?.totalTenants?.toLocaleString() ?? "0"}
           icon={<Building2 size={20} />}
         />
@@ -48,7 +48,7 @@ export default function StatCards() {
 
       <div className="flex-1">
         <StatCard
-          title="Total Restaurants"
+          title="Tổng nhà hàng"
           value={data?.totalRestaurants?.toLocaleString() ?? "0"}
           icon={<Store size={20} />}
         />
@@ -56,7 +56,7 @@ export default function StatCards() {
 
       <div className="flex-1">
         <StatCard
-          title="Platform Revenue"
+          title="Doanh thu nền tảng"
           value={data ? formatVND(data.platformRevenue) : "0 ₫"}
           icon={<Wallet size={20} />}
         />
@@ -64,7 +64,7 @@ export default function StatCards() {
 
       <div className="flex-1">
         <StatCard
-          title="Active Accounts"
+          title="Tài khoản hoạt động"
           value={data?.activeAccounts?.toLocaleString() ?? "0"}
           icon={<Users size={20} />}
         />

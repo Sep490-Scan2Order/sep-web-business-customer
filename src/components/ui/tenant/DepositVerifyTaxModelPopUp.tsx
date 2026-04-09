@@ -20,13 +20,13 @@ export default function DepositVerifyTaxModelPopUp({ isOpen, onClose, onSubmit, 
     return (
    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
-        {/* Header với close button */}
+        {/* Phần đầu với nút đóng */}
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-slate-900">Thông báo</h2>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close dialog"
+            aria-label="Đóng hộp thoại"
             className="flex items-center justify-center rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
           >
             <X className="h-5 w-5" />

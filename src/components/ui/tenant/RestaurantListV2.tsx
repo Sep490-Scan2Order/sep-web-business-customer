@@ -33,7 +33,7 @@ export default function RestaurantListV2({ restaurants, onRestaurantClick }: Res
       {/* Header Section */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Branch Dish Management</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Quản lý món theo chi nhánh</div>
           <div className="text-lg font-semibold text-slate-900">Quản lý Chuỗi Món Ăn</div>
         </div>
       </div>

@@ -84,7 +84,7 @@ export default function AdminLoginPage() {
     <div className="relative min-h-screen">
       <Image
         src={bgImage}
-        alt="Admin Login background"
+        alt="Nền đăng nhập quản trị"
         fill
         className="object-cover"
         priority
@@ -105,7 +105,7 @@ export default function AdminLoginPage() {
               />
               <div className="text-white">
                 <p className="text-lg font-bold">Scan To Order</p>
-                <p className="text-xs text-white/70">Administrator Portal</p>
+                <p className="text-xs text-white/70">Cổng quản trị viên</p>
               </div>
             </Link>
 
@@ -124,7 +124,7 @@ export default function AdminLoginPage() {
             <div className="text-white space-y-6">
               <div>
                 <p className="inline-block rounded-full bg-red-500/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider backdrop-blur-sm border border-red-500/30">
-                  Administrator Access
+                  Truy cập quản trị
                 </p>
                 <h1 className="mt-6 text-4xl font-bold leading-tight lg:text-5xl">
                   Đăng nhập<br />
@@ -143,7 +143,7 @@ export default function AdminLoginPage() {
                 {[
                   { label: "Nhà hàng", value: "300+" },
                   { label: "Người dùng", value: "5K+" },
-                  { label: "Uptime", value: "99.9%" }
+                  { label: "Thời gian hoạt động", value: "99.9%" }
                 ].map((stat, index) => (
                   <div key={index} className="space-y-1">
                     <p className="text-3xl font-bold text-red-500">{stat.value}</p>
@@ -157,7 +157,7 @@ export default function AdminLoginPage() {
                 {[
                   { icon: ShieldCheck, text: "Bảo mật cấp cao với xác thực 2FA" },
                   { icon: CheckCircle2, text: "Quản lý toàn bộ hệ thống" },
-                  { icon: CheckCircle2, text: "Giám sát và phân tích real-time" }
+                  { icon: CheckCircle2, text: "Giám sát và phân tích thời gian thực" }
                 ].map((feature, index) => (
                   <div key={index} className="flex items-center gap-3 text-white/80">
                     <feature.icon className="h-5 w-5 text-red-500 flex-shrink-0" />
@@ -174,7 +174,7 @@ export default function AdminLoginPage() {
                   <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10 border border-red-500/20">
                     <ShieldCheck className="h-8 w-8 text-red-500" />
                   </div>
-                  <h2 className="text-2xl font-bold text-white sm:text-3xl">Đăng nhập Admin</h2>
+                  <h2 className="text-2xl font-bold text-white sm:text-3xl">Đăng nhập quản trị</h2>
                   <p className="mt-2 text-sm text-white/70">
                     Nhập thông tin đăng nhập quản trị viên
                   </p>
@@ -185,7 +185,7 @@ export default function AdminLoginPage() {
                   <div className="group">
                     <label className="mb-2 flex items-center gap-2 text-sm font-medium text-white/90">
                       <Mail className="h-4 w-4 text-red-500" />
-                      Email
+                      Email quản trị
                     </label>
                     <input
                       type="email"

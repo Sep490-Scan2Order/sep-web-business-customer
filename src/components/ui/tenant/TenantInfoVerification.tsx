@@ -30,10 +30,10 @@ export default function TenantInfoVerification({
             </div>
             <div>
               <p className="text-sm font-semibold text-slate-900">
-                Bank verification
+                Xác thực ngân hàng
               </p>
               <p className="text-xs text-slate-500">
-                Status: {formatBoolean(userInfo.isVerifyBank)}
+                Trạng thái: {formatBoolean(userInfo.isVerifyBank)}
               </p>
             </div>
           </div>
@@ -43,26 +43,26 @@ export default function TenantInfoVerification({
         {userInfo.isVerifyBank ? (
           <div className="mt-6 space-y-3 text-sm text-slate-700">
             <div className="flex items-center justify-between">
-              <span className="text-slate-500">Bank name</span>
+              <span className="text-slate-500">Tên ngân hàng</span>
               <span className="font-medium text-slate-900">
                 {formatOptional(userInfo.bankName)}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-500">Card number</span>
+              <span className="text-slate-500">Số tài khoản/thẻ</span>
               <span className="font-medium text-slate-900">
                 {formatOptional(userInfo.cardNumber)}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-slate-500">Bank ID</span>
+              <span className="text-slate-500">Mã ngân hàng</span>
               <span className="font-medium text-slate-900">
                 {maskId(userInfo.bankId)}
               </span>
             </div>
             {userInfo.bankLogo && (
               <div className="pt-2">
-                <p className="text-xs uppercase text-slate-400">Bank logo</p>
+                <p className="text-xs uppercase text-slate-400">Logo ngân hàng</p>
                 <div className="mt-2 h-12 w-32 overflow-hidden rounded-xl border border-slate-200 bg-white">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -77,14 +77,14 @@ export default function TenantInfoVerification({
         ) : (
           <div className="mt-6 space-y-3 text-sm text-slate-700">
             <p className="text-slate-500">
-              Bank information is not verified. Please complete the bank
-              verification process to enable payment features.
+              Thông tin ngân hàng chưa được xác thực. Vui lòng hoàn tất quy trình
+              xác thực để sử dụng đầy đủ tính năng thanh toán.
             </p>
             <button
               className="rounded-lg bg-emerald-600 px-4 py-2 font-medium text-white hover:bg-emerald-700"
               onClick={() => setBankPopupOpen(true)}
             >
-              Verify bank information
+              Xác thực thông tin ngân hàng
             </button>
           </div>
         )}
@@ -98,10 +98,10 @@ export default function TenantInfoVerification({
             </div>
             <div>
               <p className="text-sm font-semibold text-slate-900">
-                Tax verification
+                Xác thực thuế
               </p>
               <p className="text-xs text-slate-500">
-                Status: {formatBoolean(userInfo.isVerifyTax)}
+                Trạng thái: {formatBoolean(userInfo.isVerifyTax)}
               </p>
             </div>
           </div>
@@ -110,20 +110,20 @@ export default function TenantInfoVerification({
 
         <div className="mt-6 space-y-3 text-sm text-slate-700">
           <div className="flex items-center justify-between">
-            <span className="text-slate-500">Tax number</span>
+            <span className="text-slate-500">Mã số thuế</span>
             <span className="font-medium text-slate-900">
               {formatOptional(userInfo.taxNumber)}
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-slate-500">Tax verified</span>
+            <span className="text-slate-500">Tình trạng xác thực thuế</span>
             <span className="font-medium text-slate-900">
               {formatBoolean(userInfo.isVerifyTax)}
             </span>
           </div>
           {userInfo.isVerifyTax && (
             <div className="flex items-center justify-between">
-              <span className="text-slate-500">Tax verified</span>
+              <span className="text-slate-500">Chủ thể xác thực</span>
               <span className="font-medium text-slate-900">
                 {userInfo.name}
               </span>
@@ -132,7 +132,7 @@ export default function TenantInfoVerification({
         </div>
       </div>
 
-      {/* Bank verification modal */}
+      {/* Hộp thoại xác thực ngân hàng */}
       <TenantVerifyBankModelPopup
         isOpen={bankPopupOpen}
         onClose={() => setBankPopupOpen(false)}

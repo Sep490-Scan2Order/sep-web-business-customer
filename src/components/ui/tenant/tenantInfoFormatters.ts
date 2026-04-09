@@ -9,14 +9,14 @@ export const formatNumber = (value: number | null | undefined, fallback = '—')
   if (value === null || value === undefined || Number.isNaN(value)) {
     return fallback
   }
-  return new Intl.NumberFormat('en-US').format(value)
+  return new Intl.NumberFormat('vi-VN').format(value)
 }
 
 export const formatMoney = (value: number | null | undefined, fallback = '—') => {
   if (value === null || value === undefined || Number.isNaN(value)) {
     return fallback
   }
-  return `${new Intl.NumberFormat('en-US').format(value)} VND`
+  return `${new Intl.NumberFormat('vi-VN').format(value)} VND`
 }
 
 export const formatDate = (value: string | null | undefined, fallback = '—') => {
@@ -27,9 +27,9 @@ export const formatDate = (value: string | null | undefined, fallback = '—') =
   if (Number.isNaN(date.getTime())) {
     return fallback
   }
-  return date.toLocaleDateString('en-GB', {
+  return date.toLocaleDateString('vi-VN', {
     day: '2-digit',
-    month: 'short',
+    month: '2-digit',
     year: 'numeric',
   })
 }
@@ -38,7 +38,7 @@ export const formatBoolean = (value: boolean | null | undefined, fallback = '—
   if (value === null || value === undefined) {
     return fallback
   }
-  return value ? 'Yes' : 'No'
+  return value ? 'Có' : 'Không'
 }
 
 export const maskId = (value: string | null | undefined, fallback = '—') => {

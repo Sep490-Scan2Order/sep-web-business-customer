@@ -17,7 +17,7 @@ export default function StaffList({ staffs, onEditClick }: StaffListProps) {
 
     // Group staff by restaurant
     const groupedStaffs = filteredStaffs.reduce((acc, staff) => {
-      const restaurant = staff.restaurantName || "Unknown Restaurant"; 
+      const restaurant = staff.restaurantName || "Nhà hàng chưa xác định"; 
       if (!acc[restaurant]) {
         acc[restaurant] = [];
       }
@@ -31,7 +31,7 @@ export default function StaffList({ staffs, onEditClick }: StaffListProps) {
       {/* Header Section */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Staff Management</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Quản lý nhân viên</div>
           <div className="text-lg font-semibold text-slate-900">Nhân viên</div>
         </div>
       </div>
@@ -42,7 +42,7 @@ export default function StaffList({ staffs, onEditClick }: StaffListProps) {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Tìm kiếm..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 pl-9 text-sm text-slate-600 outline-none placeholder:text-slate-400 focus:border-slate-300 focus:bg-white"

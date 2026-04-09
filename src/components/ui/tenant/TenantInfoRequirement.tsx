@@ -308,7 +308,7 @@ export default function TenantInfoRequirement({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close dialog"
+            aria-label="Đóng hộp thoại"
             className="cursor-pointer rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
           >
             <X className="h-5 w-5" />
@@ -528,7 +528,7 @@ export default function TenantInfoRequirement({
                 <div className="relative h-24 w-24 rounded-lg overflow-hidden border-2 border-slate-200">
                   <img 
                     src={imagePreview} 
-                    alt="Preview" 
+                    alt="Xem trước ảnh" 
                     className="h-full w-full object-cover"
                   />
                   <button

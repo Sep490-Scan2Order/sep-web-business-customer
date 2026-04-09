@@ -3,6 +3,9 @@ export const API = {
         process.env.NEXT_PUBLIC_API_BASE_URL,
     PLAN: {
         GETALL: "/plan",
+        GET_BY_ID: (id: number) => `/plan/${id}`,
+        CREATE: "/plan",
+        UPDATE: (id: number) => `/plan/${id}`,
     },
     
     OTP: {
@@ -20,6 +23,7 @@ export const API = {
         UPDATE_BANK_INFO: "/Tenant/update-bank-info?bankId=",
         GET_TENANT_BY_ID: (id: string) => `/Tenant/${id}`,
         DASHBOARD_REVENUE: "/Tenant/dashboard/revenue",
+        IS_SUSPENDED: (tenantId: string, isSuspended: boolean) => `/Tenant/IsSuspened?tenantId=${tenantId}&isSuspended=${isSuspended}`,
     },
 
     STAFF:{

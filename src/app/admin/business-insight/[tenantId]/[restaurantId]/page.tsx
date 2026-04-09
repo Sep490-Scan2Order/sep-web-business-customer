@@ -89,14 +89,14 @@ export default function RestaurantRevenuePage() {
             onClick={() => router.push("/admin/business-insight")}
             className="cursor-pointer hover:text-indigo-600 transition-colors"
           >
-            Business Insight
+            Phân tích kinh doanh
           </button>
           <span>›</span>
           <button
             onClick={() => router.back()}
             className="cursor-pointer hover:text-indigo-600 transition-colors"
           >
-            Tenant
+            Chi tiết tenant
           </button>
           <span>›</span>
           <span className="text-slate-800 font-medium">Nhà hàng #{restaurantId}</span>

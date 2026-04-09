@@ -107,7 +107,7 @@ export default function BranchDishMenuList({
 
         <div className="text-right">
           <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-            Branch Dish Management
+            Quản lý món theo chi nhánh
           </div>
           <h1 className="text-lg font-semibold text-slate-900">
             {restaurant?.restaurantName ?? 'Nhà hàng'}
@@ -193,7 +193,7 @@ export default function BranchDishMenuList({
                           />
                         ) : (
                           <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-slate-100 text-xs text-slate-500">
-                            No image
+                            Không có ảnh
                           </div>
                         )}
 

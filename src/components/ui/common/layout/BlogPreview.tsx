@@ -73,7 +73,7 @@ export default function BlogPreview({
                 <div key={block.id} className="my-6 text-center">
                   <Image
                     src={block.imagePreview}
-                    alt="Blog image"
+                    alt="Hình ảnh blog"
                     width={800}
                     height={500}
                     className="inline-block rounded-lg"

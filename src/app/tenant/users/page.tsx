@@ -178,7 +178,7 @@ export default function UsersPage() {
           {/* Header */}
           <div className="mb-6">
             <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-              Staff Management
+              Quản lý nhân viên
             </div>
             <div className="text-lg font-semibold text-slate-900">
               Chọn nhà hàng để quản lý nhân viên

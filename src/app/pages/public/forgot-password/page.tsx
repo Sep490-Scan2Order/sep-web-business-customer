@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
     });
   };
 
-  // Step 1: Send email to get OTP
+  // Bước 1: Gửi email để nhận OTP
   const handleSendEmail = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
     }
   };
 
-  // Step 2: Verify OTP
+  // Bước 2: Xác thực OTP
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -99,14 +99,14 @@ export default function ForgotPasswordPage() {
       );
 
       if (response.data?.isSuccess) {
-        // Extract reset token from response data
+        // Lấy mã đặt lại mật khẩu từ dữ liệu trả về
         const token = response.data?.data;
         if (token) {
           setResetToken(token);
           toast.success("Xác thực OTP thành công");
           setCurrentStep("password");
         } else {
-          toast.error("Không thể lấy reset token");
+          toast.error("Không thể lấy mã đặt lại mật khẩu");
         }
       } else {
         toast.error(response.data?.message || "Xác thực OTP thất bại");
@@ -122,7 +122,7 @@ export default function ForgotPasswordPage() {
     }
   };
 
-  // Step 3: Reset password
+  // Bước 3: Đặt lại mật khẩu
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -155,7 +155,7 @@ export default function ForgotPasswordPage() {
 
       if (response.data?.isSuccess) {
         toast.success("Đặt lại mật khẩu thành công");
-        // Redirect to login page
+        // Chuyển hướng về trang đăng nhập
         setTimeout(() => {
           router.push(ROUTES.PAGES.PUBLIC.LOGIN);
         }, 1500);
@@ -177,7 +177,7 @@ export default function ForgotPasswordPage() {
     <div className="relative min-h-screen">
       <Image
         src={bgImage}
-        alt="Login background"
+        alt="Nền quên mật khẩu"
         fill
         className="object-cover"
         priority
@@ -186,7 +186,7 @@ export default function ForgotPasswordPage() {
 
       <div className="relative z-10 min-h-screen">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          {/* Header */}
+          {/* Phần đầu trang */}
           <div className="flex items-center justify-between">
             <Link
               href={ROUTES.HOME}
@@ -201,7 +201,7 @@ export default function ForgotPasswordPage() {
               />
               <div className="text-white">
                 <p className="text-lg font-bold">Scan To Order</p>
-                <p className="text-xs text-white/70">Smart Restaurant Solution</p>
+                <p className="text-xs text-white/70">Giải pháp nhà hàng thông minh</p>
               </div>
             </Link>
 
@@ -214,9 +214,9 @@ export default function ForgotPasswordPage() {
             </Link>
           </div>
 
-          {/* Main Content */}
+          {/* Nội dung chính */}
           <div className="mt-8 lg:mt-16 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12 lg:items-center">
-            {/* Left Side - Info */}
+            {/* Cột trái - Thông tin */}
             <div className="text-white space-y-6">
               <div>
                 <p className="inline-block rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">
@@ -233,7 +233,7 @@ export default function ForgotPasswordPage() {
                 </p>
               </div>
 
-              {/* Stats */}
+              {/* Thống kê */}
               <div className="hidden lg:grid grid-cols-3 gap-6 pt-6">
                 {[
                   { label: "Nhà hàng", value: "300+" },
@@ -249,7 +249,7 @@ export default function ForgotPasswordPage() {
                 ))}
               </div>
 
-              {/* Features */}
+              {/* Điểm nổi bật */}
               <div className="hidden lg:block space-y-3 pt-4">
                 {[
                   { icon: ShieldCheck, text: "Bảo mật dữ liệu tuyệt đối" },
@@ -264,7 +264,7 @@ export default function ForgotPasswordPage() {
               </div>
             </div>
 
-            {/* Right Side - Form */}
+            {/* Cột phải - Biểu mẫu */}
             <div className="w-full max-w-md lg:justify-self-end">
               <div className="rounded-2xl border border-white/10 bg-black/40 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
                 <div className="text-center">
@@ -283,7 +283,7 @@ export default function ForgotPasswordPage() {
                   </p>
                 </div>
 
-                {/* Progress Steps */}
+                {/* Các bước tiến trình */}
                 <div className="mt-6 flex items-center justify-between">
                   {["email", "otp", "password"].map((step, index) => (
                     <React.Fragment key={step}>
@@ -313,7 +313,7 @@ export default function ForgotPasswordPage() {
                   ))}
                 </div>
 
-                {/* Step 1: Email */}
+                {/* Bước 1: Email */}
                 {currentStep === "email" && (
                   <form className="mt-8 space-y-5" onSubmit={handleSendEmail}>
                     <div className="group">
@@ -326,7 +326,7 @@ export default function ForgotPasswordPage() {
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        placeholder="email@example.com"
+                        placeholder="ten@nhahang.vn"
                         className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/40 backdrop-blur-sm transition-all focus:border-[rgb(var(--color-accent))] focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))]/20"
                       />
                     </div>
@@ -381,7 +381,7 @@ export default function ForgotPasswordPage() {
                   </form>
                 )}
 
-                {/* Step 2: OTP */}
+                {/* Bước 2: OTP */}
                 {currentStep === "otp" && (
                   <form className="mt-8 space-y-5" onSubmit={handleVerifyOtp}>
                     <div className="group">
@@ -455,7 +455,7 @@ export default function ForgotPasswordPage() {
                   </form>
                 )}
 
-                {/* Step 3: Password */}
+                {/* Bước 3: Mật khẩu */}
                 {currentStep === "password" && (
                   <form
                     className="mt-8 space-y-5"
@@ -567,7 +567,7 @@ export default function ForgotPasswordPage() {
                   </form>
                 )}
 
-                {/* Footer */}
+                {/* Chân trang */}
                 <p className="mt-6 text-center text-xs text-white/50">
                   Cần trợ giúp?{" "}
                   <Link href="#" className="text-[rgb(var(--color-accent))] hover:underline">

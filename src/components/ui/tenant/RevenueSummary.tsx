@@ -38,7 +38,7 @@ const RevenueSummary: React.FC<RevenueSummaryProps> = ({ restaurantId }) => {
         toast.error(response.data.message || "Không thể tải dữ liệu doanh thu");
       }
     } catch (error) {
-      console.error("Error fetching revenue summary:", error);
+      console.error("Lỗi khi tải tổng quan doanh thu:", error);
       toast.error("Có lỗi xảy ra khi tải dữ liệu doanh thu");
     } finally {
       setLoading(false);
@@ -107,14 +107,14 @@ const RevenueSummary: React.FC<RevenueSummaryProps> = ({ restaurantId }) => {
       {/* Metric Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard 
-          title="Tổng doanh thu (Gross)" 
+          title="Tổng doanh thu (gộp)" 
           value={formatMoney(data.summary.grossRevenue)} 
           icon={<TrendingUp className="w-5 h-5 text-emerald-600" />} 
           trend="+12.5%" 
           color="bg-emerald-50 text-emerald-600"
         />
         <MetricCard 
-          title="Doanh thu thuần (Net)" 
+          title="Doanh thu thuần" 
           value={formatMoney(data.summary.netRevenue)} 
           icon={<Banknote className="w-5 h-5 text-blue-600" />} 
           trend="+8.2%" 

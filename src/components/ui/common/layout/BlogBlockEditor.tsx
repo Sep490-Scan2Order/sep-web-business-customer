@@ -227,7 +227,7 @@ export default function BlogBlockEditor({
                     <div className="relative">
                       <Image
                         src={block.imagePreview}
-                        alt="Preview"
+                        alt="Xem trước"
                         width={600}
                         height={400}
                         className="rounded-lg object-cover"

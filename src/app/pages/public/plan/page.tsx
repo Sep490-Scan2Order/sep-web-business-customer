@@ -33,7 +33,7 @@ export default function PlanPage() {
           setActivePlans([]);
         }
       } catch (error) {
-        console.error("Failed to load plans", error);
+        console.error("Khong the tai danh sach goi", error);
         setActivePlans([]);
       } finally {
         setIsLoading(false);

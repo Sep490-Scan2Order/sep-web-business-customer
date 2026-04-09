@@ -116,7 +116,7 @@ export default function MenuTemplatePage() {
       if (templatesRes.isSuccess && templatesRes.data) {
         setTemplates(templatesRes.data);
       } else {
-        toast.error(templatesRes.message || "Failed to load templates");
+        toast.error(templatesRes.message || "Không thể tải danh sách mẫu thực đơn");
       }
 
       if (restaurantsRes.isSuccess && restaurantsRes.data) {
@@ -126,11 +126,11 @@ export default function MenuTemplatePage() {
           setSelectedRestaurant(restaurantsRes.data[0]);
         }
       } else {
-        toast.error(restaurantsRes.message || "Failed to load restaurants");
+        toast.error(restaurantsRes.message || "Không thể tải danh sách nhà hàng");
       }
     } catch (error) {
       console.error("Error loading data:", error);
-      toast.error("Error loading data");
+      toast.error("Lỗi khi tải dữ liệu");
     } finally {
       setLoading(false);
     }
@@ -184,12 +184,12 @@ export default function MenuTemplatePage() {
       // Fallback khi không lấy được detail: vẫn cho xem preview từ dữ liệu list
       setSelectedTemplate(template);
       setSelectedLayout(parseLayoutConfig(template.layoutConfigJson));
-      toast.error(detailRes.message || "Không tải được chi tiết template");
+      toast.error(detailRes.message || "Không tải được chi tiết mẫu thực đơn");
     } catch (error) {
       console.error("Error loading template detail:", error);
       setSelectedTemplate(template);
       setSelectedLayout(parseLayoutConfig(template.layoutConfigJson));
-      toast.error("Không tải được chi tiết template");
+      toast.error("Không tải được chi tiết mẫu thực đơn");
     }
   };
 
@@ -221,7 +221,7 @@ export default function MenuTemplatePage() {
 
   const handleApplyTemplate = async () => {
     if (!selectedTemplate || !selectedRestaurant) {
-      toast.error("Vui lòng chọn template và restaurant");
+      toast.error("Vui lòng chọn mẫu thực đơn và nhà hàng");
       return;
     }
 
@@ -235,13 +235,13 @@ export default function MenuTemplatePage() {
       const response = await applyTemplateToRestaurant(request);
       
       if (response.isSuccess) {
-        toast.success("Bạn đã áp dụng template vào menu thành công");
+        toast.success("Bạn đã áp dụng mẫu vào thực đơn thành công");
       } else {
-        toast.error(response.message || "Không thể áp dụng template");
+        toast.error(response.message || "Không thể áp dụng mẫu thực đơn");
       }
     } catch (error) {
       console.error("Error applying template:", error);
-      toast.error("Có lỗi xảy ra khi áp dụng template");
+      toast.error("Có lỗi xảy ra khi áp dụng mẫu thực đơn");
     } finally {
       setApplying(false);
     }
@@ -250,7 +250,7 @@ export default function MenuTemplatePage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-slate-500">Loading...</div>
+        <div className="text-slate-500">Đang tải...</div>
       </div>
     );
   }
@@ -258,24 +258,24 @@ export default function MenuTemplatePage() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">Menu Templates</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Mẫu thực đơn</h1>
         <p className="mt-2 text-slate-600">
-          Chọn template và xem menu của bạn với dữ liệu thật
+          Chọn mẫu và xem thực đơn của bạn với dữ liệu thật
         </p>
       </div>
 
       {/* Data Summary */}
       <div className="mb-6 grid gap-4 md:grid-cols-3">
         <div className="rounded-lg border border-slate-200 bg-white p-4">
-          <p className="text-sm text-slate-500">Available Templates</p>
+          <p className="text-sm text-slate-500">Số mẫu hiện có</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{templates.length}</p>
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-4">
-          <p className="text-sm text-slate-500">Your Restaurants</p>
+          <p className="text-sm text-slate-500">Nhà hàng của bạn</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">{restaurants.length}</p>
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-4">
-          <p className="text-sm text-slate-500">Menu Categories</p>
+          <p className="text-sm text-slate-500">Danh mục thực đơn</p>
           <p className="mt-1 text-2xl font-bold text-slate-900">
             {menuLoading ? "..." : restaurantMenu.length}
           </p>
@@ -299,7 +299,7 @@ export default function MenuTemplatePage() {
         <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4">
           <p className="text-sm font-semibold text-amber-900">⚠️ Chưa có dữ liệu menu</p>
           <p className="mt-1 text-xs text-amber-700">
-            Nhà hàng này chưa có dữ liệu menu. Hãy thêm categories và dishes trước khi xem preview.
+            Nhà hàng này chưa có dữ liệu thực đơn. Hãy thêm danh mục và món ăn trước khi xem trước.
           </p>
         </div>
       )}
@@ -352,11 +352,11 @@ export default function MenuTemplatePage() {
       {/* Templates List */}
       <div className="mb-6">
         <h2 className="mb-4 text-lg font-semibold text-slate-900">
-          Chọn Template
+          Chọn mẫu thực đơn
         </h2>
         {templates.length === 0 ? (
           <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 py-8 text-center">
-            <p className="text-slate-600">Chưa có template nào</p>
+            <p className="text-slate-600">Chưa có mẫu thực đơn nào</p>
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -379,7 +379,7 @@ export default function MenuTemplatePage() {
                 </h3>
                 <div className="mt-2 space-y-1 text-sm text-slate-600">
                   <p>Font: {template.fontFamily}</p>
-                  <p>Color: {template.themeColor}</p>
+                  <p>Màu: {template.themeColor}</p>
                 </div>
                 {selectedTemplate?.id === template.id && (
                   <div className="mt-3 rounded bg-blue-600 px-2 py-1 text-center text-xs font-medium text-white">
@@ -398,7 +398,7 @@ export default function MenuTemplatePage() {
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold text-slate-900">
-                Preview: {selectedTemplate.templateName}
+                Xem trước: {selectedTemplate.templateName}
               </h2>
               {selectedRestaurant && (
                 <p className="mt-1 text-sm text-slate-600">
@@ -413,7 +413,7 @@ export default function MenuTemplatePage() {
                   disabled={applying}
                   className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:bg-slate-400"
                 >
-                  {applying ? "Đang xử lý..." : "✓ Xác nhận áp dụng"}
+                  {applying ? "Đang xử lý..." : "✓ Áp dụng mẫu"}
                 </button>
               )}
               <button

@@ -120,7 +120,7 @@ type BackgroundMode = "color" | "image";
 const FIXED_SLOTS: FixedLayoutSlot[] = [
   {
     key: "header",
-    label: "Header / Tên nhà hàng",
+    label: "Đầu trang / Tên nhà hàng",
     x: 24,
     y: 24,
     width: 952,
@@ -129,7 +129,7 @@ const FIXED_SLOTS: FixedLayoutSlot[] = [
   },
   {
     key: "menu",
-    label: "Khối menu (category + dishes)",
+    label: "Khối thực đơn (danh mục + món ăn)",
     x: 24,
     y: 130,
     width: 952,
@@ -138,7 +138,7 @@ const FIXED_SLOTS: FixedLayoutSlot[] = [
   },
   {
     key: "footer",
-    label: "Footer / Ghi chú",
+    label: "Chân trang / Ghi chú",
     x: 24,
     y: 696,
     width: 952,
@@ -476,11 +476,11 @@ export default function TemplateManagementPage() {
           void handleSelectTemplate(res.data[0].id);
         }
       } else {
-        toast.error(res.message || "Failed to load templates");
+        toast.error(res.message || "Không thể tải danh sách mẫu giao diện");
       }
     } catch (e) {
       console.error(e);
-      toast.error("Error loading templates");
+      toast.error("Lỗi khi tải danh sách mẫu giao diện");
     } finally {
       setLoading(false);
     }
@@ -518,7 +518,7 @@ export default function TemplateManagementPage() {
       setLoadingDetailId(id);
       const res = await getMenuTemplateById(id);
       if (!res.isSuccess || !res.data) {
-        toast.error(res.message || "Failed to load template detail");
+        toast.error(res.message || "Không thể tải chi tiết mẫu giao diện");
         return;
       }
       const detail = res.data;
@@ -541,7 +541,7 @@ export default function TemplateManagementPage() {
       );
     } catch (e) {
       console.error(e);
-      toast.error("Error loading template detail");
+      toast.error("Lỗi khi tải chi tiết mẫu giao diện");
     } finally {
       setLoadingDetailId(null);
     }
@@ -610,7 +610,7 @@ export default function TemplateManagementPage() {
       );
       const result = res.data;
       if (!result.isSuccess || !result.data) {
-        toast.error(result.message || "Không thể cập nhật template");
+        toast.error(result.message || "Không thể cập nhật mẫu giao diện");
         return;
       }
 
@@ -620,10 +620,10 @@ export default function TemplateManagementPage() {
       setTemplates((prev) =>
         prev.map((t) => (t.id === updated.id ? updated : t))
       );
-      toast.success("Đã lưu template");
+      toast.success("Đã lưu mẫu giao diện");
     } catch (e) {
       console.error(e);
-      toast.error("Có lỗi xảy ra khi cập nhật template");
+      toast.error("Có lỗi xảy ra khi cập nhật mẫu giao diện");
     } finally {
       setUpdating(false);
     }
@@ -691,7 +691,7 @@ export default function TemplateManagementPage() {
       toast.success("AI đã tạo giao diện mẫu");
     } catch (error) {
       console.error("Error generating AI template:", error);
-      toast.error("Có lỗi xảy ra khi tạo template AI");
+      toast.error("Có lỗi xảy ra khi tạo mẫu bằng AI");
     } finally {
       setIsGeneratingAi(false);
     }
@@ -703,8 +703,8 @@ export default function TemplateManagementPage() {
       ...prev,
       {
         id: `section-${Date.now()}`,
-        name: `Category ${newIndex}`,
-        dishes: ["Dish mới"],
+        name: `Danh mục ${newIndex}`,
+        dishes: ["Món mới"],
       },
     ]);
   };
@@ -712,7 +712,7 @@ export default function TemplateManagementPage() {
   const removeCategory = (sectionId: string) => {
     setSections((prev) => {
       if (prev.length <= 1) {
-        toast.error("Cần ít nhất 1 category");
+        toast.error("Cần ít nhất 1 danh mục");
         return prev;
       }
       return prev.filter((s) => s.id !== sectionId);
@@ -729,7 +729,7 @@ export default function TemplateManagementPage() {
     setSections((prev) =>
       prev.map((s) =>
         s.id === sectionId
-          ? { ...s, dishes: [...s.dishes, `Dish ${s.dishes.length + 1}`] }
+          ? { ...s, dishes: [...s.dishes, `Món ${s.dishes.length + 1}`] }
           : s
       )
     );
@@ -740,7 +740,7 @@ export default function TemplateManagementPage() {
       prev.map((s) => {
         if (s.id !== sectionId) return s;
         if (s.dishes.length <= 1) {
-          toast.error("Mỗi category cần ít nhất 1 dish");
+          toast.error("Mỗi danh mục cần ít nhất 1 món");
           return s;
         }
         return { ...s, dishes: s.dishes.filter((_, i) => i !== dishIndex) };
@@ -769,15 +769,15 @@ export default function TemplateManagementPage() {
     e.preventDefault();
 
     if (!templateName.trim()) {
-      toast.error("Template name is required");
+      toast.error("Tên mẫu giao diện là bắt buộc");
       return;
     }
     if (sections.some((s) => !s.name.trim())) {
-      toast.error("Category name không được để trống");
+      toast.error("Tên danh mục không được để trống");
       return;
     }
     if (sections.some((s) => s.dishes.some((d) => !d.trim()))) {
-      toast.error("Dish name không được để trống");
+      toast.error("Tên món không được để trống");
       return;
     }
 
@@ -835,16 +835,16 @@ export default function TemplateManagementPage() {
 
       const response = await createMenuTemplate(formData);
       if (response.isSuccess) {
-        toast.success("Template created successfully");
+        toast.success("Tạo mẫu giao diện thành công");
         resetForm();
         setStep("list");
         await loadTemplates();
       } else {
-        toast.error(response.message || "Failed to create template");
+        toast.error(response.message || "Không thể tạo mẫu giao diện");
       }
     } catch (error) {
       console.error("Error creating template:", error);
-      toast.error("Error creating template");
+      toast.error("Lỗi khi tạo mẫu giao diện");
     } finally {
       setSubmitting(false);
     }
@@ -860,8 +860,8 @@ export default function TemplateManagementPage() {
         categoryName: section.name || "(Chưa đặt tên)",
         dishes: section.dishes.map((dish, dishIndex) => ({
           dishId: sectionIndex * 100 + dishIndex + 1,
-          dishName: dish || "(Dish trống)",
-          description: "Món mẫu để xem bố cục template.",
+          dishName: dish || "(Món trống)",
+          description: "Món mẫu để xem bố cục giao diện.",
           price: 35000,
           discountedPrice: 29000,
           hasPromotion: dishIndex % 2 === 0,
@@ -892,24 +892,24 @@ export default function TemplateManagementPage() {
             }}
             className="mb-2 text-blue-600 hover:text-blue-700"
           >
-            ← Back to Templates
+            ← Quay lại danh sách mẫu
           </button>
           <h1 className="text-2xl font-bold text-slate-900">
-            Create Menu Template
+            Tạo mẫu thực đơn
           </h1>
           <p className="mt-2 text-slate-600">
-            Thiết kế layout và style cho menu. Tenant sẽ áp dụng template này
-            và đổ data thật của họ vào.
+            Thiết kế bố cục và phong cách cho thực đơn. Tenant sẽ áp dụng mẫu này
+            và đổ dữ liệu thật của họ vào.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="rounded-xl border border-slate-200 bg-white p-6">
             <h2 className="mb-3 text-lg font-semibold text-slate-900">
-              Tạo template bằng AI
+              Tạo mẫu bằng AI
             </h2>
             <p className="mb-3 text-sm text-slate-600">
-              Chọn mẫu nhanh hoặc nhập ngày lễ hoặc nội dung mong muốn, AI sẽ tạo ra layout cho template.
+              Chọn mẫu nhanh hoặc nhập ngày lễ hoặc nội dung mong muốn, AI sẽ tạo ra bố cục cho mẫu giao diện.
             </p>
             <div className="mb-3 flex flex-wrap gap-2">
               {["Giáng Sinh", "8/3", "Khai trương", "Tết", "Halloween"].map(
@@ -943,20 +943,20 @@ export default function TemplateManagementPage() {
                 disabled={isGeneratingAi}
                 className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isGeneratingAi ? "AI đang thiết kế..." : "Tạo template AI"}
+                {isGeneratingAi ? "AI đang thiết kế..." : "Tạo mẫu bằng AI"}
               </button>
             </div>
           </div>
 
-          {/* Template Settings */}
+          {/* Cài đặt mẫu */}
           <div className="rounded-xl border border-slate-200 bg-white p-6">
             <h2 className="mb-4 text-lg font-semibold text-slate-900">
-              Template Settings
+              Cài đặt mẫu
             </h2>
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <label className="block text-sm font-medium text-slate-700">
-                  Template Name
+                  Tên mẫu
                 </label>
                 <input
                   type="text"
@@ -964,13 +964,13 @@ export default function TemplateManagementPage() {
                   value={templateName}
                   onChange={(e) => setTemplateName(e.target.value)}
                   className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., Hotpot Classic"
+                  placeholder="Ví dụ: Lẩu truyền thống"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700">
-                  Font Family
+                  Phông chữ
                 </label>
                 <select
                   value={fontFamily}
@@ -981,13 +981,13 @@ export default function TemplateManagementPage() {
                   <option value="Arial">Arial</option>
                   <option value="Helvetica">Helvetica</option>
                   <option value="Georgia">Georgia</option>
-                  <option value="System">System</option>
+                  <option value="System">Hệ thống</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700">
-                  Theme Color
+                  Màu chủ đạo
                 </label>
                 <div className="mt-1 flex items-center gap-2">
                   <input
@@ -1007,7 +1007,7 @@ export default function TemplateManagementPage() {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700">
-                  Background Mode
+                  Chế độ nền
                 </label>
                 <select
                   value={backgroundMode}
@@ -1016,15 +1016,15 @@ export default function TemplateManagementPage() {
                   }
                   className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="color">Color</option>
-                  <option value="image">Image</option>
+                  <option value="color">Màu</option>
+                  <option value="image">Ảnh</option>
                 </select>
               </div>
 
               {backgroundMode === "color" ? (
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-slate-700">
-                    Background Color
+                    Màu nền
                   </label>
                   <div className="mt-1 flex items-center gap-2">
                     <input
@@ -1045,7 +1045,7 @@ export default function TemplateManagementPage() {
                 <div className="space-y-3 md:col-span-2">
                   <div>
                     <label className="block text-sm font-medium text-slate-700">
-                      Upload ảnh nền
+                      Tải ảnh nền lên
                     </label>
                     <input
                       type="file"
@@ -1056,7 +1056,7 @@ export default function TemplateManagementPage() {
                       className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
                     />
                     <p className="mt-1 text-xs text-slate-500">
-                      Ảnh sẽ được upload qua field{" "}
+                      Ảnh sẽ được tải lên qua trường{" "}
                       <code className="rounded bg-slate-100 px-1">
                         BackgroundImageUrl
                       </code>
@@ -1065,7 +1065,7 @@ export default function TemplateManagementPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700">
-                      Hoặc nhập URL ảnh (preview local)
+                      Hoặc nhập URL ảnh (xem trước cục bộ)
                     </label>
                     <input
                       type="url"
@@ -1080,25 +1080,25 @@ export default function TemplateManagementPage() {
             </div>
           </div>
 
-          {/* Menu Structure (preview only) */}
+          {/* Cấu trúc menu (chỉ xem trước) */}
           <div className="rounded-xl border border-slate-200 bg-white p-6">
             <div className="mb-3 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900">
               <p className="font-semibold">
-                ℹ️ Phần này CHỈ dùng để preview UI
+                ℹ️ Phần này CHỈ dùng để xem trước giao diện
               </p>
               
             </div>
 
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-slate-900">
-                Cấu trúc menu (Preview only)
+                Cấu trúc menu (chỉ xem trước)
               </h2>
               <button
                 type="button"
                 onClick={addCategory}
                 className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700"
               >
-                + Category
+                + Danh mục
               </button>
             </div>
 
@@ -1116,21 +1116,21 @@ export default function TemplateManagementPage() {
                         updateCategoryName(section.id, e.target.value)
                       }
                       className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Tên category"
+                      placeholder="Tên danh mục"
                     />
                     <button
                       type="button"
                       onClick={() => addDish(section.id)}
                       className="rounded-lg bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700"
                     >
-                      + Dish
+                      + Món ăn
                     </button>
                     <button
                       type="button"
                       onClick={() => removeCategory(section.id)}
                       className="rounded-lg bg-rose-600 px-3 py-2 text-sm text-white hover:bg-rose-700"
                     >
-                      − Category
+                      − Danh mục
                     </button>
                   </div>
 
@@ -1151,14 +1151,14 @@ export default function TemplateManagementPage() {
                             )
                           }
                           className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          placeholder="Tên dish"
+                          placeholder="Tên món ăn"
                         />
                         <button
                           type="button"
                           onClick={() => removeDish(section.id, dishIndex)}
                           className="rounded-lg bg-rose-500 px-3 py-2 text-sm text-white hover:bg-rose-600"
                         >
-                          − Dish
+                          − Món
                         </button>
                       </div>
                     ))}
@@ -1171,7 +1171,7 @@ export default function TemplateManagementPage() {
           {/* Create form preview */}
           <div className="rounded-xl border border-slate-200 bg-white p-6">
             <h2 className="mb-4 text-lg font-semibold text-slate-900">
-              Menu Preview
+              Xem trước thực đơn
             </h2>
             <div className="flex items-stretch justify-center rounded-2xl border border-slate-300 bg-slate-50 p-6">
               <div className="relative flex h-[780px] w-[420px] items-center justify-center rounded-[40px] border border-slate-200 bg-slate-900/5 px-4 py-6">
@@ -1197,7 +1197,7 @@ export default function TemplateManagementPage() {
               disabled={submitting}
               className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              {submitting ? "Creating..." : "Save Template"}
+              {submitting ? "Đang tạo..." : "Lưu mẫu giao diện"}
             </button>
             <button
               type="button"
@@ -1207,7 +1207,7 @@ export default function TemplateManagementPage() {
               }}
               className="rounded-lg border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-50"
             >
-              Cancel
+              Hủy
             </button>
           </div>
         </form>
@@ -1223,30 +1223,30 @@ export default function TemplateManagementPage() {
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            Template Management
+            Quản lý mẫu giao diện
           </h1>
           <p className="mt-1 text-sm text-slate-600">
-            Chọn template, xem preview mobile và chỉnh màu sắc / font /
-            background.
+            Chọn mẫu, xem trước trên mobile và chỉnh màu sắc / font /
+            nền.
           </p>
         </div>
         <button
           onClick={() => setStep("create")}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
         >
-          + Create Template
+          + Tạo mẫu giao diện
         </button>
       </div>
 
       {loading ? (
         <div className="flex justify-center py-8 text-slate-500">
-          Loading templates...
+          Đang tải danh sách mẫu giao diện...
         </div>
       ) : templates.length === 0 ? (
         <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 py-8 text-center">
-          <p className="text-slate-600">Chưa có template nào.</p>
+          <p className="text-slate-600">Chưa có mẫu giao diện nào.</p>
           <p className="mt-1 text-sm text-slate-500">
-            Tạo template đầu tiên để bắt đầu.
+            Tạo mẫu giao diện đầu tiên để bắt đầu.
           </p>
         </div>
       ) : (
@@ -1254,7 +1254,7 @@ export default function TemplateManagementPage() {
           {/* ─── Sidebar: template list ─────────────────────────────── */}
           <aside className="rounded-xl border border-slate-200 bg-white p-3">
             <h2 className="mb-3 text-sm font-semibold text-slate-900">
-              Menu Template
+              Mẫu thực đơn
             </h2>
             <div className="space-y-2">
               {templates.map((tpl) => (
@@ -1300,7 +1300,7 @@ export default function TemplateManagementPage() {
               </div>
             ) : (
               <div className="flex flex-1 items-center justify-center text-sm text-slate-400">
-                Chọn một template ở sidebar để xem preview.
+                Chọn một mẫu ở thanh bên để xem trước.
               </div>
             )}
           </main>
@@ -1382,7 +1382,7 @@ export default function TemplateManagementPage() {
                     <option value="Arial">Arial</option>
                     <option value="Helvetica">Helvetica</option>
                     <option value="Georgia">Georgia</option>
-                    <option value="System">System</option>
+                    <option value="System">Hệ thống</option>
                   </select>
                 </div>
 
@@ -1412,12 +1412,12 @@ export default function TemplateManagementPage() {
                 {selectedLayout && (
                   <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
                     <h3 className="mb-2 text-xs font-semibold text-slate-700">
-                      Background
+                      Nền
                     </h3>
                     <div className="space-y-3 text-xs">
                       <div>
                         <p className="mb-1 font-medium text-slate-600">
-                          Background mode
+                          Chế độ nền
                         </p>
                         <div className="flex gap-2">
                           <button
@@ -1447,7 +1447,7 @@ export default function TemplateManagementPage() {
 
                       <div>
                         <p className="mb-1 font-medium text-slate-600">
-                          Màu background
+                          Màu nền
                         </p>
                         <div className="flex items-center gap-2">
                           <input
@@ -1494,7 +1494,7 @@ export default function TemplateManagementPage() {
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                   src={editBackgroundImageUrl}
-                                  alt="Background preview"
+                                  alt="Xem trước ảnh nền"
                                   className="h-full w-full object-cover"
                                 />
                               </div>
@@ -1516,7 +1516,7 @@ export default function TemplateManagementPage() {
               </div>
             ) : (
               <p className="text-sm text-slate-400">
-                Chọn một template ở sidebar để chỉnh sửa.
+                Chọn một mẫu ở thanh bên để chỉnh sửa.
               </p>
             )}
           </section>

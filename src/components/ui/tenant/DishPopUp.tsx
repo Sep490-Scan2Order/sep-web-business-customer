@@ -201,7 +201,7 @@ export default function DishPopUp({ categories, onClose, onSubmit, onUpdate, isL
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={imagePreview}
-                    alt="Preview"
+                    alt="Xem trước ảnh"
                     className="h-full w-full object-cover"
                   />
                 </div>

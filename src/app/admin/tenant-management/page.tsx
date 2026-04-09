@@ -7,32 +7,43 @@ import {
   SlidersHorizontal, 
   ArrowUpDown, 
   Search, 
-  Calendar, 
+  HandCoins, 
   Copy, 
   MoreHorizontal,
   ChevronLeft,
   ChevronRight,
   Ban,
+  LockOpen,
   Edit,
   Trash2,
   Eye
 } from "lucide-react";
 import { toast } from "react-toastify";
+import ConfirmActionPopup from "@/src/components/ui/common/ConfirmActionPopup";
 
 type TenantApiItem = {
-    id: string;
-    accountId: string;
-    name: string;
-    phone: string;
-    taxNumber: string;
-    bankName: string;
-    cardNumber: string;
-    status: string;
-    planName: string;
-    totalRestaurants: number;
-    totalDishes: number;
-    totalCategories: number;
-    checked?: boolean;
+      id: string,
+      name: string,
+      accountId: string,
+      email: string,
+      phone: string,
+      avatar: string | null,
+      role: string,
+      verified: boolean,
+      isActive: boolean,
+      taxNumber: string | null,
+      bankId: string | null,
+      cardNumber: string | null,
+      bankName: string | null,
+      bankLogo: string | null,
+      isVerifyBank: boolean,
+      isVerifyTax: boolean,
+      debtStartedAt: Date | null ,
+      subscriptionExpiryDate: Date | null,
+      lastWarningSentAt: Date | null,
+      totalDebtAmount: number,
+      isSuspended: boolean,
+      suspendedAt: Date | null,
 };
 
 type TenantApiResponse = {
@@ -52,6 +63,12 @@ export default function TenantManagementPage() {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const itemsPerPage = 10;
+  const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
+  const [confirmTitle, setConfirmTitle] = useState("Xác nhận hành động");
+  const [confirmMessage, setConfirmMessage] = useState("Bạn có chắc chắn muốn thực hiện hành động này không?");
+  const [confirmText, setConfirmText] = useState("Xác nhận");
+  const [confirmVariant, setConfirmVariant] = useState<"default" | "danger">("default");
 
   useEffect(() => {
     const fetchTenants = async () => {
@@ -83,25 +100,53 @@ export default function TenantManagementPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  //Block Tenant
-  const blockTenant = async (tenantId: string) => {
-    try {
-      const response = await apiClient.post(API.TENANT.BLOCK_TENANT(tenantId));
-      if (response.status === 200) {
-        setTenants(prevTenants => 
-          prevTenants.map(tenant => 
-            tenant.id === tenantId ? { ...tenant, status: 'False' } : tenant
-          )
-        );
-        toast.success("Tenant blocked successfully");
-        setOpenDropdownId(null);
-      } else {
-        toast.error("Failed to block tenant");
-      }
-    } catch (error) {
-      console.error("Error blocking tenant:", error);
-      toast.error("Error blocking tenant");
+  //Suspend Tenant
+  const toggleTenantStatus = async (tenantId: string) => {
+  const currentTenant = tenants.find(t => t.id === tenantId);
+  if (!currentTenant) return;
+
+  const newStatus = !currentTenant.isSuspended;
+
+  try {
+    const response = await apiClient.put(API.TENANT.IS_SUSPENDED(tenantId, newStatus));
+
+    if (response.status === 200) {
+      setTenants(prevTenants =>
+        prevTenants.map(tenant =>
+          tenant.id === tenantId ? { ...tenant, isSuspended: newStatus } : tenant
+        )
+      );
+
+      toast.success(newStatus ? "Đã đình chỉ hoạt động nhà hàng" : "Đã kích hoạt lại nhà hàng");
+      setOpenDropdownId(null);
     }
+  } catch (error) {
+    console.error("Error toggling tenant status:", error);
+    toast.error("Thao tác thất bại, vui lòng thử lại");
+  }
+};
+
+  const openConfirmSuspendPopup = (tenant: TenantApiItem) => {
+    const willSuspend = !tenant.isSuspended;
+
+    setConfirmTitle(willSuspend ? "Xác nhận đình chỉ bên thuê" : "Xác nhận kích hoạt lại bên thuê");
+    setConfirmMessage(
+      willSuspend
+        ? `Bạn có chắc chắn muốn đình chỉ hoạt động của ${tenant.name}?`
+        : `Bạn có chắc chắn muốn kích hoạt lại hoạt động của ${tenant.name}?`
+    );
+    setConfirmText(willSuspend ? "Đình chỉ" : "Kích hoạt lại");
+    setConfirmVariant(willSuspend ? "danger" : "default");
+    setConfirmAction(() => async () => {
+      await toggleTenantStatus(tenant.id);
+      setIsConfirmPopupOpen(false);
+    });
+    setIsConfirmPopupOpen(true);
+    setOpenDropdownId(null);
+  };
+
+  const closeConfirmPopup = () => {
+    setIsConfirmPopupOpen(false);
   };
 
   // Toggle dropdown
@@ -156,7 +201,7 @@ export default function TenantManagementPage() {
   const isSomeSelected = paginatedTenants.some(tenant => selectedIds.has(tenant.id)) && !isAllSelected;
 
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Just now';
+    if (!dateString) return 'Vừa xong';
     const date = new Date(dateString);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
@@ -164,18 +209,18 @@ export default function TenantManagementPage() {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    if (diffDays === 1) return 'Yesterday';
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    if (diffMins < 1) return 'Vừa xong';
+    if (diffMins < 60) return `${diffMins} phút trước`;
+    if (diffHours < 24) return `${diffHours} giờ trước`;
+    if (diffDays === 1) return 'Hôm qua';
+    return date.toLocaleDateString('vi-VN');
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200">
         <div className="px-6 py-4">
-          <h1 className="text-xl font-semibold text-gray-900">Tenant Management</h1>
+          <h1 className="text-xl font-semibold text-gray-900">Quản lý bên thuê</h1>
         </div>
 
         {/* Toolbar */}
@@ -197,7 +242,7 @@ export default function TenantManagementPage() {
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search"
+              placeholder="Tìm kiếm"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 pr-4 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
@@ -224,11 +269,11 @@ export default function TenantManagementPage() {
                   />
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Full Name</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Họ tên</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone Number</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số điện thoại</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tổng số nợ</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
                 <th className="w-12 px-4 py-3"></th>
               </tr>
             </thead>
@@ -236,13 +281,13 @@ export default function TenantManagementPage() {
               {isLoading ? (
                 <tr>
                   <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
-                    Loading...
+                    Đang tải...
                   </td>
                 </tr>
               ) : paginatedTenants.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
-                    No tenants found
+                    Không tìm thấy bên thuê
                   </td>
                 </tr>
               ) : (
@@ -283,23 +328,21 @@ export default function TenantManagementPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Calendar className="w-4 h-4 text-gray-400" />
-                        <span>{formatDate()}</span>
+                        <HandCoins className="w-4 h-4 text-gray-400" />
+                        <span>{tenant.totalDebtAmount?.toLocaleString()} VND</span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       {(() => {
-                        const status = tenant.status?.toLowerCase() || ''; 
-                        const isActive = status === 'true' || status === 'active';
-                        return isActive ? (
+                        return tenant.isSuspended === false ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-green-600 bg-green-50">
                             <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
-                            Active
+                            Hoạt động
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-red-600 bg-red-50">
                             <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
-                            Inactive
+                            Bị đình chỉ
                           </span>
                         );
                       })()}
@@ -308,7 +351,7 @@ export default function TenantManagementPage() {
                       <div className="relative" ref={openDropdownId === tenant.id ? dropdownRef : null}>
                         <button 
                           onClick={() => toggleDropdown(tenant.id)}
-                          className="p-1 hover:bg-gray-100 rounded transition-colors"
+                          className="cursor-pointer p-1 hover:bg-gray-100 rounded transition-colors"
                         >
                           <MoreHorizontal className="w-5 h-5 text-gray-400" />
                         </button>
@@ -321,38 +364,38 @@ export default function TenantManagementPage() {
                                 // View detail logic
                                 setOpenDropdownId(null);
                               }}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              className="cursor-pointer w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                             >
                               <Eye className="w-4 h-4" />
-                              View Details
+                              Xem chi tiết
                             </button>
                             <button
                               onClick={() => {
                                 // Edit logic
                                 setOpenDropdownId(null);
                               }}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                              className="cursor-pointer w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                             >
                               <Edit className="w-4 h-4" />
-                              Edit
+                              Chỉnh sửa
                             </button>
                             <div className="border-t border-gray-100 my-1"></div>
                             <button
-                              onClick={() => blockTenant(tenant.id)}
-                              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                              onClick={() => openConfirmSuspendPopup(tenant)}
+                              className="cursor-pointer w-full px-4 py-2 text-left text-sm {tenant.isSuspended ? 'text-green-600' : 'text-red-600'} hover:bg-red-50 flex items-center gap-2"
                             >
-                              <Ban className="w-4 h-4" />
-                              Block Tenant
+                              {tenant.isSuspended ? <LockOpen className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
+                              {tenant.isSuspended ? "Kích hoạt lại bên thuê" : "Đình chỉ bên thuê"}
                             </button>
                             <button
                               onClick={() => {
                                 // Delete logic
                                 setOpenDropdownId(null);
                               }}
-                              className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                              className="cursor-pointer w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                             >
                               <Trash2 className="w-4 h-4" />
-                              Delete
+                              Xóa
                             </button>
                           </div>
                         )}
@@ -398,6 +441,15 @@ export default function TenantManagementPage() {
           </button>
         </div>
       </div>
+      <ConfirmActionPopup 
+        isOpen={isConfirmPopupOpen}
+        title={confirmTitle}
+        message={confirmMessage}
+        confirmText={confirmText}
+        confirmVariant={confirmVariant}
+        onConfirm={confirmAction}
+        onClose={closeConfirmPopup}
+      />
     </div>
   )
 }

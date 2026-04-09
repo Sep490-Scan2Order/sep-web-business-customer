@@ -22,22 +22,22 @@ export default function TenantInfoDetails({ userInfo }: TenantInfoDetailsProps) 
   return (
     <section className="grid gap-4 lg:grid-cols-2">
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Account details</h3>
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Chi tiết tài khoản</h3>
         <div className="mt-4">
-          <InfoRow label="Tenant ID" value={maskId(userInfo.id)} />
-          <InfoRow label="Account ID" value={maskId(userInfo.accountId)} />
-          <InfoRow label="Role" value={formatOptional(userInfo.role)} />
-          <InfoRow label="Created" value={formatDate(userInfo.createdAt)} />
+          <InfoRow label="Mã tenant" value={maskId(userInfo.id)} />
+          <InfoRow label="Mã tài khoản" value={maskId(userInfo.accountId)} />
+          <InfoRow label="Vai trò" value={formatOptional(userInfo.role)} />
+          <InfoRow label="Ngày tạo" value={formatDate(userInfo.createdAt)} />
         </div>
       </div>
 
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Compliance</h3>
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Trạng thái tuân thủ</h3>
         <div className="mt-4">
-          <InfoRow label="Active" value={userInfo.isActive ? 'Active' : 'Inactive'} />
-          <InfoRow label="Verified" value={userInfo.verified ? 'Verified' : 'Unverified'} />
-          <InfoRow label="Debt started" value={formatDate(userInfo.debtStartedAt)} />
-          <InfoRow label="Last warning" value={formatDate(userInfo.lastWarningSentAt)} />
+          <InfoRow label="Hoạt động" value={userInfo.isActive ? 'Đang hoạt động' : 'Ngưng hoạt động'} />
+          <InfoRow label="Xác thực" value={userInfo.verified ? 'Đã xác thực' : 'Chưa xác thực'} />
+          <InfoRow label="Bắt đầu nợ" value={formatDate(userInfo.debtStartedAt)} />
+          <InfoRow label="Cảnh báo gần nhất" value={formatDate(userInfo.lastWarningSentAt)} />
         </div>
       </div>
     </section>

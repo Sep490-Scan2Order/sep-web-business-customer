@@ -60,7 +60,7 @@ export default function CreateBlogModal({
       <div className="mx-auto my-8 w-full max-w-5xl rounded-lg bg-white shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-          <h2 className="text-2xl font-bold text-gray-900">Tạo Blog Mới</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Tạo blog mới</h2>
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -70,12 +70,12 @@ export default function CreateBlogModal({
               {showPreview ? (
                 <>
                   <EyeOff className="h-4 w-4" />
-                  Editor
+                  Trình soạn thảo
                 </>
               ) : (
                 <>
                   <Eye className="h-4 w-4" />
-                  Preview
+                  Xem trước
                 </>
               )}
             </button>
@@ -144,7 +144,7 @@ export default function CreateBlogModal({
 
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">
-                  Thumbnail
+                  Ảnh thu nhỏ
                 </label>
                 <input
                   type="file"
@@ -157,7 +157,7 @@ export default function CreateBlogModal({
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={thumbnailPreview}
-                      alt="Thumbnail preview"
+                      alt="Xem trước ảnh thu nhỏ"
                       className="h-40 w-full object-cover"
                     />
                   </div>
@@ -191,7 +191,7 @@ export default function CreateBlogModal({
                   className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <Save className="h-4 w-4" />
-                  {loading ? "Đang tạo..." : "Tạo Blog"}
+                  {loading ? "Đang tạo..." : "Tạo blog"}
                 </button>
               </div>
             </form>

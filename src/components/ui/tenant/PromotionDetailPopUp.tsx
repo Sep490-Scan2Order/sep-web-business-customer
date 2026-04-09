@@ -47,9 +47,9 @@ const formatCurrency = (value: number) => {
 };
 
 const formatDate = (value: string) => {
-  if (!value) return "N/A";
+  if (!value) return "Không có";
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "N/A";
+  if (Number.isNaN(date.getTime())) return "Không có";
   return date.toLocaleDateString("vi-VN");
 };
 
@@ -145,7 +145,7 @@ export default function PromotionDetailPopUp({
               </div>
               <div className="space-y-1 text-sm text-slate-600">
                 <div>Loại: {PROMOTION_TYPE_LABELS[promotion.type] ?? `Loại ${promotion.type}`}</div>
-                <div>Phạm vi: {PROMOTION_SCOPE_LABELS[promotion.scope] ?? `Scope ${promotion.scope}`}</div>
+                <div>Phạm vi: {PROMOTION_SCOPE_LABELS[promotion.scope] ?? `Phạm vi ${promotion.scope}`}</div>
                 <div>Giảm: {getDiscountValueLabel(promotion)} ({getDiscountTypeLabel(promotion.discountType)})</div>
                 <div>Đơn tối thiểu: {formatCurrency(promotion.minOrderValue)}</div>
                 {promotion.maxDiscountValue > 0 && <div>Giảm tối đa: {formatCurrency(promotion.maxDiscountValue)}</div>}

@@ -468,6 +468,7 @@ export type PlanApiItem = {
   name: string,
   monthlyPrice: number,
   yearlyPrice: number,
+  durationInDays?: number,
   dailyRateMonth: number,
   dailyRateYear: number,
   level: number,
@@ -476,8 +477,24 @@ export type PlanApiItem = {
     maxStaff: number,
     canUseCombo: boolean,
     canUsePromotions: boolean,
-    canCustomMenuTemplate: boolean
+    canCustomMenuTemplate: boolean,
+    canUseAIUpsell?: boolean,
+    canRecommendationOnTop?: boolean
   };
+}
+
+export type PlanUpsertRequest = {
+  name: string,
+  monthlyPrice: number,
+  yearlyPrice: number,
+  durationInDays: number,
+  level: number,
+  features: {
+    canUseAIUpsell: boolean,
+    canRecommendationOnTop: boolean,
+    canUsePromotions: boolean,
+    canCustomMenuTemplate: boolean
+  }
 }
 
 export type SubscriptionTenantInfo = {

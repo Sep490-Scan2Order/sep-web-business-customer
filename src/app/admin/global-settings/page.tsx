@@ -30,12 +30,12 @@ export default function GlobalSettingsPage() {
   return (
     <div className="space-y-6 p-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Global Settings</h1>
-        <p className="mt-2 text-slate-600">Configure system-wide settings</p>
+        <h1 className="text-2xl font-bold text-slate-900">Cài đặt hệ thống</h1>
+        <p className="mt-2 text-slate-600">Cấu hình các thiết lập dùng chung toàn hệ thống</p>
       </div>
 
       <div className="max-w-2xl rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-900">Cronjob Testing</h2>
+        <h2 className="text-lg font-semibold text-slate-900">Kiểm thử cronjob</h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">
           Chạy test thủ công cho luồng cronjob tính phí hoa hồng và giám sát công nợ tenant.
         </p>

@@ -18,8 +18,8 @@ export default function AdminHeader() {
     <header className="border-b border-slate-200 bg-white px-6 py-4">
       <div className="flex flex-wrap items-center gap-4">
         <div className="min-w-[200px]">
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Dashboards</div>
-          <div className="text-lg font-semibold text-slate-900">Overview</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Bảng điều khiển</div>
+          <div className="text-lg font-semibold text-slate-900">Tổng quan</div>
         </div>
 
         <div className="flex flex-1 items-center gap-3">
@@ -27,7 +27,7 @@ export default function AdminHeader() {
             <IconSearch />
             <input
               type="search"
-              placeholder="Search..."
+              placeholder="Tìm kiếm..."
               className="w-full bg-transparent outline-none placeholder:text-slate-400"
             />
           </div>
@@ -39,13 +39,13 @@ export default function AdminHeader() {
             className="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
           >
             <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            <span>Active</span>
+            <span>Đang hoạt động</span>
           </button>
 
           <button
             type="button"
             className="flex items-center justify-center rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50"
-            aria-label="Notifications"
+            aria-label="Thông báo"
           >
             <IconBell />
           </button>

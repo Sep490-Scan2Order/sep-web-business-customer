@@ -14,8 +14,8 @@ const buildInitials = (name: string | null) => {
 }
 
 export default function TenantInfoHeader({ userInfo }: TenantInfoHeaderProps) {
-  const statusLabel = userInfo.isActive ? 'Active' : 'Inactive'
-  const verifiedLabel = userInfo.verified ? 'Verified' : 'Unverified'
+  const statusLabel = userInfo.isActive ? 'Đang hoạt động' : 'Ngưng hoạt động'
+  const verifiedLabel = userInfo.verified ? 'Đã xác thực' : 'Chưa xác thực'
   const statusTone = userInfo.isActive
     ? 'bg-emerald-100 text-emerald-700'
     : 'bg-rose-100 text-rose-700'
@@ -34,7 +34,7 @@ export default function TenantInfoHeader({ userInfo }: TenantInfoHeaderProps) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={userInfo.avatar}
-                  alt={formatOptional(userInfo.name, 'Tenant avatar')}
+                  alt={formatOptional(userInfo.name, 'Ảnh đại diện tenant')}
                   className="h-full w-full object-cover"
                 />
               ) : (
@@ -45,9 +45,9 @@ export default function TenantInfoHeader({ userInfo }: TenantInfoHeaderProps) {
             </div>
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Tenant profile</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Hồ sơ tenant</p>
               <h1 className="mt-2 text-2xl font-semibold text-slate-900">
-                {formatOptional(userInfo.name, 'Unnamed tenant')}
+                {formatOptional(userInfo.name, 'Tenant chưa đặt tên')}
               </h1>
               <div className="mt-3 flex flex-wrap gap-2">
                 <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${statusTone}`}>
@@ -57,7 +57,7 @@ export default function TenantInfoHeader({ userInfo }: TenantInfoHeaderProps) {
                   {verifiedLabel}
                 </span>
                 <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                  {formatOptional(userInfo.role, 'Role')}
+                  {formatOptional(userInfo.role, 'Vai trò')}
                 </span>
               </div>
             </div>
@@ -71,7 +71,7 @@ export default function TenantInfoHeader({ userInfo }: TenantInfoHeaderProps) {
               </p>
             </div>
             <div className="rounded-2xl border border-white/60 bg-white/70 px-4 py-3 shadow-sm">
-              <p className="text-xs font-semibold uppercase text-slate-500">Phone</p>
+              <p className="text-xs font-semibold uppercase text-slate-500">Số điện thoại</p>
               <p className="mt-2 text-sm font-medium text-slate-900">
                 {formatOptional(userInfo.phone)}
               </p>

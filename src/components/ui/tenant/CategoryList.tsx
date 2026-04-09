@@ -25,7 +25,7 @@ export default function CategoryList({
       {/* Header Section */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Category Management</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Quản lý danh mục</div>
           <div className="text-lg font-semibold text-slate-900">Danh mục món ăn</div>
         </div>
         <button
@@ -43,7 +43,7 @@ export default function CategoryList({
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Tìm kiếm..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 pl-9 text-sm text-slate-600 outline-none placeholder:text-slate-400 focus:border-slate-300 focus:bg-white"

@@ -77,7 +77,7 @@ export default function TermsAndPoliciesPage() {
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center rounded-xl bg-[rgb(var(--color-accent-dark))] px-6 py-3 text-white font-semibold hover:bg-[rgb(var(--color-primary))] transition-colors"
             >
-              PDF Online
+              Xem PDF trực tuyến
             </a>
             <a
               href={PDF_DOWNLOAD_URL}

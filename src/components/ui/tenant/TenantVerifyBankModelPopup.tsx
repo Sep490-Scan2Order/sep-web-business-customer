@@ -53,12 +53,12 @@ export default function TenantVerifyBankModelPopup({
             : [response.data.data];
           setBanks(bankList);
         } else {
-          console.error('Failed to fetch bank info:', response.data?.message || 'Unknown error');
-          toast.error('Failed to fetch bank information. Please try again later.');
+          console.error('Không thể tải danh sách ngân hàng:', response.data?.message || 'Lỗi không xác định');
+          toast.error('Không thể tải thông tin ngân hàng. Vui lòng thử lại sau.');
         }
       } catch (error) {
-        console.error('Error fetching bank info:', error);
-        toast.error('Error fetching bank information');
+        console.error('Lỗi khi tải thông tin ngân hàng:', error);
+        toast.error('Lỗi khi tải thông tin ngân hàng');
       } finally {
         setLoading(false);
       }
@@ -134,9 +134,9 @@ export default function TenantVerifyBankModelPopup({
         toast.error(updateResponse.data?.message || 'Cập nhật thông tin ngân hàng thất bại');
       }
     } catch (error) {
-      console.error('Error verifying bank info:', error);
+      console.error('Lỗi khi xác thực thông tin ngân hàng:', error);
       const backendMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message;
-      toast.error(backendMessage || 'Error verifying bank information');
+      toast.error(backendMessage || 'Lỗi khi xác thực thông tin ngân hàng');
     } finally {
       setIsSubmitting(false);
     }
@@ -153,7 +153,7 @@ export default function TenantVerifyBankModelPopup({
           <button
             onClick={onClose}
             className="flex items-center justify-center rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
-            aria-label="Close"
+            aria-label="Đóng"
           >
             <X className="h-5 w-5" />
           </button>
@@ -168,7 +168,7 @@ export default function TenantVerifyBankModelPopup({
               </div>
               <div className="flex items-center justify-center rounded-2xl border border-slate-200 bg-white p-6">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={qrUrl} alt="QR code" className="h-56 w-56 object-contain" />
+                <img src={qrUrl} alt="Mã QR xác thực" className="h-56 w-56 object-contain" />
               </div>
               {qrMessage ? (
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">

@@ -111,7 +111,7 @@ export default function DishImportPopUp({
             className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100"
           >
             <Download className="h-4 w-4" />
-            Tải file template mẫu Huong_dan.xlsx
+            Tải tệp mẫu Huong_dan.xlsx
           </a>
         </div>
 
@@ -131,7 +131,7 @@ export default function DishImportPopUp({
             {isLoading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Đang import...
+                Đang nhập dữ liệu...
               </>
             ) : (
               <>

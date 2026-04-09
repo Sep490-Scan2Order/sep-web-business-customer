@@ -105,7 +105,7 @@ export default function RestaurantLocationMap({
       )
 
       if (!response.ok) {
-        throw new Error('Search request failed')
+        throw new Error('Yeu cau tim kiem that bai')
       }
 
       const data = (await response.json()) as GeocodeSearchResult[]

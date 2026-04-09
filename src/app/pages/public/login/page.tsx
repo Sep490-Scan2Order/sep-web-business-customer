@@ -53,7 +53,7 @@ export default function LoginPage() {
       if (response.data?.isSuccess && response.data.data) {
         const { accessToken, refreshToken, userInfo } = response.data.data;
         
-        // Luu full userInfo de dung cho cac trang can du lieu tenant
+        // Lưu đầy đủ userInfo để dùng cho các trang cần dữ liệu tenant
         const user = {
           ...userInfo,
           email: userInfo.email || formData.email,
@@ -64,8 +64,8 @@ export default function LoginPage() {
         setAuth(user, accessToken);
         
         // Lưu refreshToken riêng vào localStorage
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('refreshToken', refreshToken);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("refreshToken", refreshToken);
         }
         
         console.log("Login successful:", user);
@@ -88,7 +88,7 @@ export default function LoginPage() {
     <div className="relative min-h-screen">
       <Image
         src={bgImage}
-        alt="Login background"
+        alt="Nền đăng nhập"
         fill
         className="object-cover"
         priority
@@ -97,7 +97,7 @@ export default function LoginPage() {
 
       <div className="relative z-10 min-h-screen">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          {/* Header */}
+          {/* Phần đầu trang */}
           <div className="flex items-center justify-between">
             <Link href={ROUTES.HOME} className="flex items-center gap-3 transition-transform hover:scale-105">
               <Image
@@ -109,7 +109,7 @@ export default function LoginPage() {
               />
               <div className="text-white">
                 <p className="text-lg font-bold">Scan To Order</p>
-                <p className="text-xs text-white/70">Smart Restaurant Solution</p>
+                <p className="text-xs text-white/70">Giải pháp nhà hàng thông minh</p>
               </div>
             </Link>
 
@@ -122,9 +122,9 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          {/* Main Content */}
+          {/* Nội dung chính */}
           <div className="mt-8 lg:mt-16 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12 lg:items-center">
-            {/* Left Side - Info */}
+            {/* Cột trái - Thông tin */}
             <div className="text-white space-y-6">
               <div>
                 <p className="inline-block rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">
@@ -142,7 +142,7 @@ export default function LoginPage() {
                 </p>
               </div>
 
-              {/* Stats */}
+              {/* Thống kê */}
               <div className="hidden lg:grid grid-cols-3 gap-6 pt-6">
                 {[
                   { label: "Nhà hàng", value: "300+" },
@@ -156,7 +156,7 @@ export default function LoginPage() {
                 ))}
               </div>
 
-              {/* Features */}
+              {/* Điểm nổi bật */}
               <div className="hidden lg:block space-y-3 pt-4">
                 {[
                   { icon: ShieldCheck, text: "Bảo mật dữ liệu tuyệt đối" },
@@ -171,7 +171,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Right Side - Form */}
+            {/* Cột phải - Biểu mẫu */}
             <div className="w-full max-w-md lg:justify-self-end">
               <div className="rounded-2xl border border-white/10 bg-black/40 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
                 <div className="text-center">
@@ -188,7 +188,7 @@ export default function LoginPage() {
                 </div>
 
                 <form className="mt-8 space-y-5" onSubmit={handleLogin}>
-                  {/* Email/Username */}
+                  {/* Email/Tài khoản */}
                   <div className="group">
                     <label className="mb-2 flex items-center gap-2 text-sm font-medium text-white/90">
                       <Mail className="h-4 w-4 text-[rgb(var(--color-accent))]" />
@@ -199,12 +199,12 @@ export default function LoginPage() {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      placeholder="email@example.com"
+                      placeholder="ten@nhahang.vn"
                       className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/40 backdrop-blur-sm transition-all focus:border-[rgb(var(--color-accent))] focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))]/20"
                     />
                   </div>
 
-                  {/* Password */}
+                  {/* Mật khẩu */}
                   <div className="group">
                     <label className="mb-2 flex items-center gap-2 text-sm font-medium text-white/90">
                       <Lock className="h-4 w-4 text-[rgb(var(--color-accent))]" />
@@ -234,7 +234,7 @@ export default function LoginPage() {
                     </div>
                   </div>
 
-                  {/* Remember me & Forgot password */}
+                  {/* Ghi nhớ đăng nhập và quên mật khẩu */}
                   <div className="flex items-center justify-between">
                     <label className="flex cursor-pointer items-center gap-2">
                       <input
@@ -253,7 +253,7 @@ export default function LoginPage() {
                     </Link>
                   </div>
 
-                  {/* Submit button */}
+                  {/* Nút gửi biểu mẫu */}
                   <button
                     type="submit"
                     disabled={loading}
@@ -278,7 +278,7 @@ export default function LoginPage() {
                     <div className="absolute inset-0 -z-0 bg-gradient-to-r from-[rgb(var(--color-accent-dark))] to-[rgb(var(--color-accent))] opacity-0 transition-opacity group-hover/submit:opacity-100" />
                   </button>
 
-                  {/* Divider */}
+                  {/* Đường phân tách */}
                   <div className="relative py-4">
                     <div className="absolute inset-0 flex items-center">
                       <div className="w-full border-t border-white/10"></div>
@@ -290,7 +290,7 @@ export default function LoginPage() {
                     </div>
                   </div>
 
-                  {/* Social login */}
+                  {/* Đăng nhập mạng xã hội */}
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"
@@ -323,7 +323,7 @@ export default function LoginPage() {
                   </div>
                 </form>
 
-                {/* Footer */}
+                {/* Chân trang */}
                 <p className="mt-6 text-center text-xs text-white/50">
                   Bằng việc đăng nhập, bạn đồng ý với{" "}
                   <Link href="#" className="text-[rgb(var(--color-accent))] hover:underline">

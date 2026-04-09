@@ -123,7 +123,7 @@ export default function PlanPage() {
       <section>
         {/* Header Titles */}
         <div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Plan Management</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Quản lý gói dịch vụ</div>
           <div className="text-lg font-semibold text-slate-900">Gói dịch vụ</div>
         </div>
 
@@ -222,8 +222,8 @@ export default function PlanPage() {
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-2 text-sm text-gray-600">{info.startDate ? new Date(info.startDate).toLocaleDateString("vi-VN") : 'N/A'}</td>
-                  <td className="px-4 py-2 text-sm text-gray-600">{info.endDate ? new Date(info.endDate).toLocaleDateString("vi-VN") : 'N/A'}</td>
+                  <td className="px-4 py-2 text-sm text-gray-600">{info.startDate ? new Date(info.startDate).toLocaleDateString("vi-VN") : 'Không có'}</td>
+                  <td className="px-4 py-2 text-sm text-gray-600">{info.endDate ? new Date(info.endDate).toLocaleDateString("vi-VN") : 'Không có'}</td>
                   <td className="px-4 py-2 text-sm text-gray-600">
                     {info.isActive ? (
                       <span className="text-xs font-medium text-green-800">Hoạt động</span>

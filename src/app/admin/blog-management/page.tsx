@@ -326,7 +326,7 @@ export default function BlogManagementPage() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Quản lý Blog
+              Quản lý blog
             </h1>
             <p className="mt-2 text-sm text-gray-600">
               Quản lý các bài viết, thông báo và khuyến mãi
@@ -337,7 +337,7 @@ export default function BlogManagementPage() {
             className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
           >
             <Plus className="h-4 w-4" />
-            Tạo Blog Mới
+            Tạo blog mới
           </button>
         </div>
 

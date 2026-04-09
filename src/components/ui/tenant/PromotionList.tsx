@@ -67,9 +67,9 @@ export default function PromotionList({
   };
 
   const formatDate = (value: string) => {
-    if (!value) return "N/A";
+    if (!value) return "Không có";
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "N/A";
+    if (Number.isNaN(date.getTime())) return "Không có";
     return date.toLocaleDateString("vi-VN");
   };
 
@@ -87,7 +87,7 @@ export default function PromotionList({
   };
 
   const getScopeLabel = (promotion: PromotionDto) => {
-    return PROMOTION_SCOPE_LABELS[promotion.scope] ?? `Scope ${promotion.scope}`;
+    return PROMOTION_SCOPE_LABELS[promotion.scope] ?? `Phạm vi ${promotion.scope}`;
   };
 
   const getPromotionTypeLabel = (promotionType: number) => {
@@ -186,7 +186,7 @@ export default function PromotionList({
       {/* Header Section */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Promotion Management</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Quản lý khuyến mãi</div>
           <div className="text-lg font-semibold text-slate-900">Khuyến mãi</div>
         </div>
         <button
@@ -204,7 +204,7 @@ export default function PromotionList({
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Tìm kiếm..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 pl-9 text-sm text-slate-600 outline-none placeholder:text-slate-400 focus:border-slate-300 focus:bg-white"
@@ -214,8 +214,8 @@ export default function PromotionList({
 
       {/* Promotions Table */}
       {filteredPromotions.length > 0 ? (
-        <div className="mx-auto max-w-8xl mt-2 overflow-x-auto">
-          <table className="w-full table-auto border-collapse text-left">
+        <div className="mt-2 w-full overflow-x-auto">
+          <table className="w-full min-w-max table-auto border-collapse text-left">
             <thead>
               <tr>
                 <th className="border-b-2 border-gray-200 px-2 py-2 text-sm font-medium text-gray-700 whitespace-nowrap">ID</th>
@@ -367,7 +367,7 @@ export default function PromotionList({
               disabled={!hasPreviousPage || isLoading}
               className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Prev
+              Trước
             </button>
 
             {visiblePages.map((page, index) =>
@@ -396,7 +396,7 @@ export default function PromotionList({
               disabled={!hasNextPage || isLoading}
               className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Next
+              Sau
             </button>
           </div>
         </div>

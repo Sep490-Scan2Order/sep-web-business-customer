@@ -3,8 +3,8 @@ import AdminLayoutClient from '@/src/components/ui/common/layout/AdminLayoutClie
 import { AdminAuthProvider } from '@/src/components/providers/AdminAuthProvider'
 
 export const metadata = {
-  title: 'Scan To Order - Admin',
-  description: 'Trang quan ly danh cho nguoi quan tri he thong.',
+  title: 'Scan To Order - Quản trị',
+  description: 'Trang quản lý dành cho người quản trị hệ thống.',
 }
 
 

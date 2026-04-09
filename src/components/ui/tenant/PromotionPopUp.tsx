@@ -469,7 +469,7 @@ export default function PromotionPopUp({
             )}
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Scope</label>
+              <label className="mb-2 block text-sm font-medium text-slate-700">Phạm vi áp dụng</label>
               <select
                 value={scope}
                 onChange={(e) => {
@@ -515,10 +515,10 @@ export default function PromotionPopUp({
                 disabled={isLoading}
                 className="rounded border-slate-300"
               />
-              Áp dụng toàn cục (isGlobal)
+              Áp dụng toàn cục
             </label>
             <p className="mt-1 text-xs text-slate-500">
-              Khi bật, payload sẽ gửi restaurantIds = null và dishIds = null.
+              Khi bật, khuyến mãi sẽ áp dụng cho toàn bộ chi nhánh và món ăn.
             </p>
           </div>
 
@@ -532,7 +532,7 @@ export default function PromotionPopUp({
                   disabled={isLoading}
                   className="rounded border-slate-300"
                 />
-                Bật khuyến mãi (isActive)
+                Bật khuyến mãi
               </label>
               <p className="mt-1 text-xs text-slate-500">
                 {isActive
@@ -660,7 +660,7 @@ export default function PromotionPopUp({
             <p className="text-xs font-medium text-red-600">Ngày bắt đầu phải nhỏ hơn ngày kết thúc.</p>
           )}
           {!isOptionalDatePairValid && (
-            <p className="text-xs font-medium text-red-600">Happy Hour: vui lòng nhập đủ Từ ngày và Đến ngày, hoặc để trống cả hai.</p>
+            <p className="text-xs font-medium text-red-600">Giờ vàng: vui lòng nhập đủ Từ ngày và Đến ngày, hoặc để trống cả hai.</p>
           )}
           {!isDailyRangeValid && (
             <p className="text-xs font-medium text-red-600">Giờ bắt đầu phải nhỏ hơn giờ kết thúc.</p>
@@ -669,13 +669,13 @@ export default function PromotionPopUp({
             <p className="text-xs font-medium text-red-600">Khung giờ tùy chọn cần nhập đủ cả giờ bắt đầu và giờ kết thúc.</p>
           )}
           {!isRestaurantSelectionValid && (
-            <p className="text-xs font-medium text-red-600">Khi isGlobal = false, vui lòng chọn ít nhất 1 chi nhánh.</p>
+            <p className="text-xs font-medium text-red-600">Khi tắt áp dụng toàn cục, vui lòng chọn ít nhất 1 chi nhánh.</p>
           )}
           {!isDishSelectionValid && (
-            <p className="text-xs font-medium text-red-600">Scope theo món yêu cầu chọn ít nhất 1 món khi isGlobal = false.</p>
+            <p className="text-xs font-medium text-red-600">Phạm vi theo món yêu cầu chọn ít nhất 1 món khi tắt áp dụng toàn cục.</p>
           )}
           {!isWeeklyDaysValid && (
-            <p className="text-xs font-medium text-red-600">Weekly Special yêu cầu chọn ít nhất 1 ngày trong tuần.</p>
+            <p className="text-xs font-medium text-red-600">Ngày đặc biệt tuần yêu cầu chọn ít nhất 1 ngày trong tuần.</p>
           )}
           {!isMaxDiscountValid && (
             <p className="text-xs font-medium text-red-600">
@@ -684,7 +684,7 @@ export default function PromotionPopUp({
           )}
           {!isMinOrderValueValid && (
             <p className="text-xs font-medium text-red-600">
-              Scope theo đơn hàng yêu cầu Giá trị đơn tối thiểu lớn hơn 1000.
+              Phạm vi theo đơn hàng yêu cầu giá trị đơn tối thiểu lớn hơn 1.000.
             </p>
           )}
           {!isDiscountValueValid && (

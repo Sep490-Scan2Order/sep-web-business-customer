@@ -35,29 +35,29 @@ type NavItem = {
 
 const sections: { label: string; items: NavItem[] }[] = [
   {
-    label: 'Dashboards',
+    label: 'Bảng điều khiển',
     items: [
-      { label: 'Overview', href: "/admin/overview", icon: LayoutDashboard, match: 'prefix' },
-      { label: 'Business Insight', href: "/admin/business-insight", icon: TrendingUp, match: 'prefix' },
+      { label: 'Tổng quan', href: "/admin/overview", icon: LayoutDashboard, match: 'prefix' },
+      { label: 'Phân tích kinh doanh', href: "/admin/business-insight", icon: TrendingUp, match: 'prefix' },
     ],
   },
   {
-    label: 'Management',
+    label: 'Quản lý',
     items: [
-      { label: 'User Management', href: "/admin/user-management", icon: Users, hasChildren: true, match: 'prefix' },
-      { label: 'Tenant Management', href: "/admin/tenant-management", icon: Store, hasChildren: true, match: 'prefix' },
-      { label: 'Restaurant Management', href: "/admin/restaurant-management", icon: UtensilsCrossed, hasChildren: true, match: 'prefix' },
-      { label: 'Billing & Subscriptions', href: "/admin/billing-subscriptions", icon: CreditCard, hasChildren: true, match: 'prefix' },
-      { label: 'Template Management', href: "/admin/template-management", icon: FileText, hasChildren: true, match: 'prefix' },
-      { label: 'Blog Management', href: "/admin/blog-management", icon: Paperclip, hasChildren: true, match: 'prefix' },
-      { label: 'Notification Management', href: "/admin/notification-management", icon: Bell, hasChildren: true, match: 'prefix' },
+      { label: 'Quản lý người dùng', href: "/admin/user-management", icon: Users, hasChildren: true, match: 'prefix' },
+      { label: 'Quản lý bên thuê', href: "/admin/tenant-management", icon: Store, hasChildren: true, match: 'prefix' },
+      { label: 'Quản lý nhà hàng', href: "/admin/restaurant-management", icon: UtensilsCrossed, hasChildren: true, match: 'prefix' },
+      { label: 'Thanh toán & gói dịch vụ', href: "/admin/billing-subscriptions", icon: CreditCard, hasChildren: true, match: 'prefix' },
+      { label: 'Quản lý mẫu thực đơn', href: "/admin/template-management", icon: FileText, hasChildren: true, match: 'prefix' },
+      { label: 'Quản lý blog', href: "/admin/blog-management", icon: Paperclip, hasChildren: true, match: 'prefix' },
+      { label: 'Quản lý thông báo', href: "/admin/notification-management", icon: Bell, hasChildren: true, match: 'prefix' },
     ],
   },
   {
-    label: 'Settings',
+    label: 'Cài đặt',
     items: [
-      { label: 'AI Settings', href: "/admin/ai-settings", icon: Bot, hasChildren: true, match: 'prefix' },
-      { label: 'Global Settings', href: "/admin/global-settings", icon: Settings, hasChildren: true, match: 'prefix' },
+      { label: 'Cài đặt AI', href: "/admin/ai-settings", icon: Bot, hasChildren: true, match: 'prefix' },
+      { label: 'Cài đặt hệ thống', href: "/admin/global-settings", icon: Settings, hasChildren: true, match: 'prefix' },
     ],
   },
 ]
@@ -83,13 +83,13 @@ export default function AdminSidebar() {
           <div className="flex flex-1 items-center justify-between">
             <div>
               <div className="text-sm font-semibold text-slate-800">Admin</div>
-              <div className="text-xs text-slate-400">Admin Portal</div>
+              <div className="text-xs text-slate-400">Cổng quản trị</div>
             </div>
             <button
               type="button"
               className="flex items-center justify-center rounded-lg border border-slate-200 p-1 text-slate-600 hover:bg-slate-50"
               onClick={() => setCollapsed(true)}
-              aria-label="Collapse sidebar"
+              aria-label="Thu gọn thanh bên"
             >
               <ChevronsLeft className="h-4 w-4" />
             </button>
@@ -99,7 +99,7 @@ export default function AdminSidebar() {
             type="button"
             className="flex items-center justify-center rounded-lg border border-slate-200 p-1 text-slate-600 hover:bg-slate-50"
             onClick={() => setCollapsed(false)}
-            aria-label="Expand sidebar"
+              aria-label="Mở rộng thanh bên"
           >
             <ChevronsRight className="h-4 w-4" />
           </button>
@@ -153,7 +153,7 @@ export default function AdminSidebar() {
       >
         <button className="cursor-pointer flex items-center gap-2">
           <LogOut className="h-4 w-4" />
-          {!collapsed ? <span className="text-sm font-medium">Logout</span> : null}
+          {!collapsed ? <span className="text-sm font-medium">Đăng xuất</span> : null}
         </button>
       </div>
 

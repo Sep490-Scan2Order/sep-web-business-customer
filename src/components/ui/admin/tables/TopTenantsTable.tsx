@@ -36,7 +36,7 @@ export default function TopTenantsTable() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-base font-semibold text-slate-900 mb-1">
-            Top 10 Tenant
+            Top 10 tenant
           </h3>
           <p className="text-xs text-slate-500">
             Tổng doanh thu theo tenant trong hệ thống

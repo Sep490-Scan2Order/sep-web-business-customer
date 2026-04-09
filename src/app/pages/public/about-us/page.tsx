@@ -16,7 +16,7 @@ const CORE_VALUES = [
   },
   {
     title: "Công nghệ tiên phong",
-    description: "Ứng dụng kiến trúc Multi-tenant hiện đại và AI gợi ý món ăn để cá nhân hóa hành trình thực khách.",
+    description: "Ứng dụng kiến trúc đa tenant hiện đại và AI gợi ý món ăn để cá nhân hóa hành trình thực khách.",
   },
 ];
 
@@ -58,7 +58,7 @@ export default function AboutUsPage() {
                 <div>
                   <p className="text-xs font-bold text-[rgb(var(--color-primary))] uppercase tracking-widest">Tầm nhìn</p>
                   <p className="mt-2 text-sm text-gray-600 italic">
-                    "Trở thành nền tảng công nghệ hàng đầu hỗ trợ các mô hình Self-service, Fast-food và Takeaway tại Việt Nam, kết nối hàng triệu thực khách với những trải nghiệm ẩm thực số hóa."
+                    "Trở thành nền tảng công nghệ hàng đầu hỗ trợ các mô hình tự phục vụ, thức ăn nhanh và mang đi tại Việt Nam, kết nối hàng triệu thực khách với những trải nghiệm ẩm thực số hóa."
                   </p>
                 </div>
                 <hr className="border-gray-100" />
@@ -105,7 +105,7 @@ export default function AboutUsPage() {
                 {[
                   { title: "Dành cho khách hàng", desc: "Không cần cài đặt, quét mã là đặt món." },
                   { title: "Dành cho vận hành", desc: "KDS (Kitchen Display System) tinh gọn trên di động." },
-                  { title: "Dành cho quản lý", desc: "Báo cáo Real-time, quản lý kho và nhân sự tập trung." }
+                  { title: "Dành cho quản lý", desc: "Báo cáo thời gian thực, quản lý kho và nhân sự tập trung." }
                 ].map((item, index) => (
                   <div key={index} className="flex gap-4">
                     <span className="flex-shrink-0 w-8 h-8 rounded-full bg-[rgb(var(--color-primary))] text-white flex items-center justify-center font-bold text-sm">
@@ -123,16 +123,16 @@ export default function AboutUsPage() {
               <h3 className="text-xl font-bold text-[rgb(var(--color-primary))] mb-6 text-center">Nền tảng công nghệ mạnh mẽ</h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-                  <span className="font-medium">Backend & AI</span>
+                  <span className="font-medium">Nền tảng lõi và AI</span>
                   <span className="text-sm text-gray-500 text-right">.NET Core, Python, Recommendation AI</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-                  <span className="font-medium">Frontend</span>
+                  <span className="font-medium">Nền tảng giao diện</span>
                   <span className="text-sm text-gray-500">Next.js, React Native</span>
                 </div>
                 <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
                   <span className="font-medium">Cơ sở dữ liệu</span>
-                  <span className="text-sm text-gray-500">PostgreSQL (Multi-tenant)</span>
+                  <span className="text-sm text-gray-500">PostgreSQL (đa tenant)</span>
                 </div>
               </div>
               <p className="mt-6 text-[13px] text-gray-400 text-center uppercase tracking-tighter">

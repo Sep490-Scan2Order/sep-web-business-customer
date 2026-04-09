@@ -170,7 +170,7 @@ export default function TenantHeader() {
       <div className="flex flex-wrap items-center gap-4">
         <div className="min-w-[200px]">
           <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Scan to Order</div>
-          <div className="text-lg font-semibold text-slate-900">Management</div>
+          <div className="text-lg font-semibold text-slate-900">Quản trị vận hành</div>
         </div>
 
         <div className="flex flex-1 items-center gap-3">
@@ -178,7 +178,7 @@ export default function TenantHeader() {
             <IconSearch />
             <input
               type="search"
-              placeholder="Search..."
+              placeholder="Tìm kiếm..."
               className="w-full bg-transparent outline-none placeholder:text-slate-400"
             />
           </div>
@@ -190,14 +190,14 @@ export default function TenantHeader() {
             className="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
           >
             <span className={`h-2 w-2 rounded-full ${tenantInfo?.isActive ? "bg-emerald-500" : "bg-red-500"}`} />
-            <span>{tenantInfo?.isActive ? "Active" : "Inactive"}</span>
+            <span>{tenantInfo?.isActive ? "Đang hoạt động" : "Ngưng hoạt động"}</span>
           </button>
 
           <div className="relative" ref={notificationPanelRef}>
             <button
               type="button"
               className="relative flex items-center justify-center rounded-xl border border-slate-200 p-2 text-slate-600 hover:bg-slate-50"
-              aria-label="Notifications"
+              aria-label="Thông báo"
               onClick={() => {
                 setDetailPage(1);
                 setShowNotifications((prev) => !prev);
@@ -297,7 +297,7 @@ export default function TenantHeader() {
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={tenantInfo.avatar}
-                alt="Tenant avatar"
+                alt="Ảnh đại diện bên thuê"
                 className="h-full w-full object-cover"
               />
             ) : (

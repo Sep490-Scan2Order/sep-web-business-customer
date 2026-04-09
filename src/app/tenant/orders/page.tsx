@@ -321,7 +321,7 @@ export default function TenantOrdersPage() {
                             </span>
                             {order.isPreOrder && (
                                 <span className="ml-2 inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700">
-                                    Pre-order
+                                Đặt trước
                                 </span>
                             )}
                         </td>
@@ -341,7 +341,7 @@ export default function TenantOrdersPage() {
                         </td>
                         <td className="px-6 py-4">
                             <div className="font-medium text-slate-700">{order.type}</div>
-                            <div className="text-xs text-slate-400">{PAYMENT_TYPE_MAP[order.typeOrder] || "N/A"}</div>
+                          <div className="text-xs text-slate-400">{PAYMENT_TYPE_MAP[order.typeOrder] || "Không có"}</div>
                         </td>
                         <td className="px-6 py-4">
                             {getStatusDisplay(order.status)}
@@ -450,13 +450,13 @@ export default function TenantOrdersPage() {
                 </div>
                 <div>
                   <p className="text-slate-500 mb-1">Hình thức</p>
-                  <p className="font-medium text-slate-900">{selectedOrder.type} - {PAYMENT_TYPE_MAP[selectedOrder.typeOrder] || "N/A"}</p>
+                  <p className="font-medium text-slate-900">{selectedOrder.type} - {PAYMENT_TYPE_MAP[selectedOrder.typeOrder] || "Không có"}</p>
                 </div>
                 {selectedOrder.isPreOrder && (
                     <div className="col-span-2">
                         <p className="text-slate-500 mb-1">Giờ đặt trước (Yêu cầu / Xác nhận)</p>
                         <p className="font-medium text-purple-700 bg-purple-50 inline-block px-2 py-1 rounded">
-                            {selectedOrder.requestedPickupAt ? new Date(selectedOrder.requestedPickupAt).toLocaleString('vi-VN') : 'N/A'} 
+                      {selectedOrder.requestedPickupAt ? new Date(selectedOrder.requestedPickupAt).toLocaleString('vi-VN') : 'Không có'} 
                             {' --> '}
                             {selectedOrder.confirmedPickupAt ? new Date(selectedOrder.confirmedPickupAt).toLocaleString('vi-VN') : 'Chưa xác nhận'}
                         </p>

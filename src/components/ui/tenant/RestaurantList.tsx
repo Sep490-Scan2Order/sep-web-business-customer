@@ -62,7 +62,7 @@ export default function RestaurantList({ restaurants, onCreateClick, onEditClick
     <div className="p-6">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Restaurant Management</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Quản lý nhà hàng</div>
           <div className="text-lg font-semibold text-slate-900">Nhà hàng</div>
         </div>
         <button

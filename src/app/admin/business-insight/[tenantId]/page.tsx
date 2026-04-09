@@ -48,7 +48,7 @@ function RestaurantCard({
               : "bg-red-100 text-red-600"
           }`}
         >
-          {r.isActive ? "Active" : "Inactive"}
+          {r.isActive ? "Đang hoạt động" : "Không hoạt động"}
         </span>
       </div>
 
@@ -156,7 +156,7 @@ export default function TenantDetailPage() {
             onClick={() => router.push("/admin/business-insight")}
             className="cursor-pointer hover:text-indigo-600 transition-colors"
           >
-            Business Insight
+            Phân tích kinh doanh
           </button>
           <span>›</span>
           <span className="text-slate-800 font-medium">
@@ -171,7 +171,7 @@ export default function TenantDetailPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-slate-900">
-                {data ? data.tenantName : "Dang tai..."}
+                {data ? data.tenantName : "Đang tải..."}
               </h1>
               {data && (
                 <span
@@ -181,7 +181,7 @@ export default function TenantDetailPage() {
                       : "bg-emerald-100 text-emerald-700"
                   }`}
                 >
-                  {data.isSuspended ? "Suspended" : "Active"}
+                  {data.isSuspended ? "Đã tạm khóa" : "Đang hoạt động"}
                 </span>
               )}
             </div>
@@ -256,7 +256,7 @@ export default function TenantDetailPage() {
         <div className="bg-white border rounded-2xl shadow-sm py-16 text-center text-red-500">
           <p>{error}</p>
           <button onClick={fetchData} className="mt-4 text-sm text-indigo-600 hover:underline cursor-pointer">
-            Thu lại
+            Thử lại
           </button>
         </div>
       ) : data && data.restaurants.length === 0 ? (

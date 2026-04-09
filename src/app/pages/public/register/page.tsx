@@ -60,7 +60,7 @@ export default function RegisterPage() {
       return;
     }
 
-    // Validate email format
+    // Kiểm tra định dạng email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       toast.error("Email không hợp lệ");
@@ -132,7 +132,7 @@ export default function RegisterPage() {
     <div className="relative min-h-screen">
       <Image
         src={bgImage}
-        alt="Register background"
+        alt="Nền đăng ký"
         fill
         className="object-cover"
         priority
@@ -141,7 +141,7 @@ export default function RegisterPage() {
 
       <div className="relative z-10 min-h-screen">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          {/* Header */}
+          {/* Phần đầu trang */}
           <div className="flex items-center justify-between">
             <Link href={ROUTES.HOME} className="flex items-center gap-3 transition-transform hover:scale-105">
               <Image
@@ -153,15 +153,15 @@ export default function RegisterPage() {
               />
               <div className="text-white">
                 <p className="text-lg font-bold">Scan To Order</p>
-                <p className="text-xs text-white/70">Smart Restaurant Solution</p>
+                <p className="text-xs text-white/70">Giải pháp nhà hàng thông minh</p>
               </div>
             </Link>
 
           </div>
 
-          {/* Main Content */}
+          {/* Nội dung chính */}
           <div className="mt-8 lg:mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12 lg:items-center">
-            {/* Left Side - Info */}
+            {/* Cột trái - Thông tin */}
             <div className="text-white space-y-6">
               <div>
                 <p className="inline-block rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">
@@ -179,7 +179,7 @@ export default function RegisterPage() {
                 </p>
               </div>
 
-              {/* Features */}
+              {/* Điểm nổi bật */}
               <div className="hidden lg:block space-y-3">
                 {[
                   "Quản lý menu và đơn hàng tự động",
@@ -195,7 +195,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Right Side - Form */}
+            {/* Cột phải - Biểu mẫu */}
             <div className="w-full max-w-xl lg:justify-self-end">
               <div className="rounded-2xl border border-white/10 bg-black/40 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
                 <div className="text-center">
@@ -229,9 +229,9 @@ export default function RegisterPage() {
                     />
                   </div>
 
-                  {/* Email & OTP Row - 7:3 ratio */}
+                  {/* Hàng Email và OTP - tỷ lệ 7:3 */}
                   <div className="grid grid-cols-10 gap-3">
-                    {/* Email - 7 columns */}
+                    {/* Email - 7 cột */}
                     <div className="col-span-7 group">
                       <label className="mb-2 flex items-center gap-2 text-sm font-medium text-white/90">
                         <Mail className="h-4 w-4 text-[rgb(var(--color-accent))]" />
@@ -244,7 +244,7 @@ export default function RegisterPage() {
                           required
                           value={formData.email}
                           onChange={handleInputChange}
-                          placeholder="email@example.com"
+                          placeholder="ten@nhahang.vn"
                           className="flex-1 rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/40 backdrop-blur-sm transition-all focus:border-[rgb(var(--color-accent))] focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))]/20"
                         />
                         <button
@@ -262,7 +262,7 @@ export default function RegisterPage() {
                       </div>
                     </div>
 
-                    {/* OTP - 3 columns */}
+                    {/* OTP - 3 cột */}
                     <div className="col-span-3 group">
                       <label className="mb-2 flex items-center gap-2 text-sm font-medium text-white/90">
                         <Lock className="h-4 w-4 text-[rgb(var(--color-accent))]" />
@@ -388,7 +388,7 @@ export default function RegisterPage() {
                     </span>
                   </label>
 
-                  {/* Submit button */}
+                  {/* Nút gửi biểu mẫu */}
                   <button
                     type="submit"
                     disabled={loading}
@@ -414,7 +414,7 @@ export default function RegisterPage() {
                   </button>
                 </form>
 
-                {/* Footer */}
+                {/* Chân trang */}
                 <p className="mt-6 text-center text-xs text-white/50">
                   Bằng việc đăng ký, bạn đồng ý nhận email marketing từ Scan To Order
                 </p>

@@ -197,14 +197,14 @@ export default function NotificationManagementPage() {
 
 	const handleAssignTenant = async () => {
 		if (!createdNotificationId) {
-			toast.warning("Chưa có thông báo để gán tenant");
+			toast.warning("Chưa có thông báo để gán bên thuê");
 			return;
 		}
 
 		const tenantIds = selectAllTenants ? filteredTenants.map((tenant) => tenant.id) : Array.from(selectedTenantIds);
 
 		if (tenantIds.length === 0) {
-			toast.warning("Vui lòng chọn ít nhất một tenant");
+			toast.warning("Vui lòng chọn ít nhất một bên thuê");
 			return;
 		}
 
@@ -219,16 +219,16 @@ export default function NotificationManagementPage() {
 			const response = await notificationService.assignTenants(payload);
 
 			if (response.data?.isSuccess) {
-				toast.success("Gán tenant nhận thông báo thành công");
+				toast.success("Gán bên thuê nhận thông báo thành công");
 				setShowAssignModal(false);
 				resetAssignState();
 				await fetchAll();
 			} else {
-				toast.error(response.data?.message || "Gán tenant thất bại");
+				toast.error(response.data?.message || "Gán bên thuê thất bại");
 			}
 		} catch (error) {
 			console.error("Error assigning tenant", error);
-			toast.error("Không thể gán tenant");
+			toast.error("Không thể gán bên thuê");
 		} finally {
 			setIsAssigning(false);
 		}
@@ -285,7 +285,7 @@ export default function NotificationManagementPage() {
 					<p className="mt-2 text-2xl font-bold text-gray-900">{tenants.length}</p>
 				</div>
 				<div className="rounded-xl border border-gray-200 bg-white p-4">
-					<p className="text-sm text-gray-500">Tổng blog URL</p>
+					<p className="text-sm text-gray-500">Tổng liên kết blog</p>
 					<p className="mt-2 text-2xl font-bold text-gray-900">{blogOptions.length}</p>
 				</div>
 			</div>
@@ -298,7 +298,7 @@ export default function NotificationManagementPage() {
 								<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">ID</th>
 								<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Tiêu đề</th>
 								<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Nội dung</th>
-								<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Blog URL</th>
+								<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Liên kết blog</th>
 								<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Ngày gửi</th>
 								<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Tenant nhận</th>
 								<th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Thao tác</th>
@@ -327,10 +327,10 @@ export default function NotificationManagementPage() {
 										<td className="px-4 py-3 text-sm text-blue-600">
 											{item.systemBlogUrl ? (
 												<a href={item.systemBlogUrl} target="_blank" rel="noopener noreferrer" className="underline">
-													Link
+													Mở liên kết
 												</a>
 											) : (
-												<span className="text-gray-400">N/A</span>
+												<span className="text-gray-400">Không có</span>
 											)}
 										</td>
 										<td className="px-4 py-3 text-sm text-gray-700">
@@ -414,7 +414,7 @@ export default function NotificationManagementPage() {
 
 						<form onSubmit={handleCreateNotification} className="space-y-4">
 							<div>
-								<label className="mb-1 block text-sm font-medium text-gray-700">Notify title</label>
+								<label className="mb-1 block text-sm font-medium text-gray-700">Tiêu đề thông báo</label>
 								<input
 									type="text"
 									value={notificationForm.notifyTitle}
@@ -428,7 +428,7 @@ export default function NotificationManagementPage() {
 							</div>
 
 							<div>
-								<label className="mb-1 block text-sm font-medium text-gray-700">Notify sub</label>
+								<label className="mb-1 block text-sm font-medium text-gray-700">Nội dung tóm tắt</label>
 								<textarea
 									value={notificationForm.notifySub}
 									onChange={(e) =>
@@ -442,7 +442,7 @@ export default function NotificationManagementPage() {
 							</div>
 
 							<div>
-								<label className="mb-1 block text-sm font-medium text-gray-700">System blog URL (optional)</label>
+								<label className="mb-1 block text-sm font-medium text-gray-700">Liên kết blog hệ thống (không bắt buộc)</label>
 								<select
 									value={notificationForm.systemBlogUrl}
 									onChange={(e) =>
@@ -472,7 +472,7 @@ export default function NotificationManagementPage() {
 									disabled={isCreating}
 									className="rounded-xl bg-[rgb(var(--color-primary))] px-4 py-2 text-sm font-semibold text-white hover:bg-[rgb(var(--color-accent-dark))] disabled:opacity-50"
 								>
-									{isCreating ? "Đang tạo..." : "Tạo và chọn tenant"}
+									{isCreating ? "Đang tạo..." : "Tạo và chọn bên thuê"}
 								</button>
 							</div>
 						</form>
@@ -485,8 +485,8 @@ export default function NotificationManagementPage() {
 					<div className="w-full max-w-3xl rounded-2xl bg-white p-6 shadow-xl">
 						<div className="mb-5 flex items-center justify-between">
 							<div>
-								<h2 className="text-lg font-bold text-gray-900">Chỉ định tenant nhận thông báo</h2>
-								<p className="text-sm text-gray-500">Thông báo ID: #{createdNotificationId}{createdNotificationId && (notifyCountMap.get(createdNotificationId)?.size ?? 0) > 0 ? ` · Đã gửi cho ${notifyCountMap.get(createdNotificationId)!.size} tenant` : ""}</p>
+								<h2 className="text-lg font-bold text-gray-900">Chỉ định bên thuê nhận thông báo</h2>
+								<p className="text-sm text-gray-500">Thông báo ID: #{createdNotificationId}{createdNotificationId && (notifyCountMap.get(createdNotificationId)?.size ?? 0) > 0 ? ` · Đã gửi cho ${notifyCountMap.get(createdNotificationId)!.size} bên thuê` : ""}</p>
 							</div>
 							<button
 								onClick={() => {
@@ -511,14 +511,14 @@ export default function NotificationManagementPage() {
 										}
 									}}
 								/>
-								Chọn tất cả tenant đã tạo
+								Chọn tất cả bên thuê đã tạo
 							</label>
 						</div>
 
 						<div className="mb-3">
 							<input
 								type="text"
-								placeholder="Tìm tenant theo tên, accountId, số điện thoại"
+								placeholder="Tìm bên thuê theo tên, mã tài khoản, số điện thoại"
 								value={searchTenant}
 								onChange={(e) => setSearchTenant(e.target.value)}
 								disabled={selectAllTenants}
@@ -530,10 +530,10 @@ export default function NotificationManagementPage() {
 							<table className="min-w-full divide-y divide-gray-200">
 								<thead className="bg-gray-50">
 									<tr>
-										<th className="w-12 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Pick</th>
-										<th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Name</th>
-										<th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Account</th>
-										<th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Phone</th>
+										<th className="w-12 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Chọn</th>
+										<th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Tên</th>
+										<th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Tài khoản</th>
+										<th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Điện thoại</th>
 									</tr>
 								</thead>
 								<tbody className="divide-y divide-gray-200">
@@ -559,8 +559,8 @@ export default function NotificationManagementPage() {
 						<div className="mt-5 flex items-center justify-between">
 							<p className="text-sm text-gray-500">
 								{selectAllTenants
-									? `Đã chọn tất cả ${filteredTenants.length} tenant chưa nhận`
-									: `Đã chọn ${selectedTenantIds.size} tenant`}
+									? `Đã chọn tất cả ${filteredTenants.length} bên thuê chưa nhận`
+									: `Đã chọn ${selectedTenantIds.size} bên thuê`}
 							</p>
 
 							<div className="flex gap-2">
@@ -580,7 +580,7 @@ export default function NotificationManagementPage() {
 									disabled={isAssigning}
 									className="rounded-xl bg-[rgb(var(--color-primary))] px-4 py-2 text-sm font-semibold text-white hover:bg-[rgb(var(--color-accent-dark))] disabled:opacity-50"
 								>
-									{isAssigning ? "Đang gửi..." : "Gửi đến tenant đã chọn"}
+									{isAssigning ? "Đang gửi..." : "Gửi đến bên thuê đã chọn"}
 								</button>
 							</div>
 						</div>
