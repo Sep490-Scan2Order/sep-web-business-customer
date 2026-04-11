@@ -40,9 +40,47 @@ interface TemplateLayoutConfig {
   };
 }
 
-const getAllMenuTemplates = async (): Promise<ApiResponse<MenuTemplate[]>> => {
+const APPLIED_TEMPLATE_STORAGE_KEY = "tenant_menu_applied_template_by_restaurant_v1";
+
+const loadAppliedTemplateMap = (): Record<number, number> => {
+  if (typeof window === "undefined") {
+    return {};
+  }
+  try {
+    const raw = window.localStorage.getItem(APPLIED_TEMPLATE_STORAGE_KEY);
+    if (!raw) {
+      return {};
+    }
+    const parsed = JSON.parse(raw) as Record<string, number>;
+    return Object.entries(parsed).reduce<Record<number, number>>((acc, [key, value]) => {
+      const restaurantId = Number(key);
+      const templateId = Number(value);
+      if (Number.isFinite(restaurantId) && Number.isFinite(templateId)) {
+        acc[restaurantId] = templateId;
+      }
+      return acc;
+    }, {});
+  } catch {
+    return {};
+  }
+};
+
+const persistAppliedTemplateMap = (map: Record<number, number>) => {
+  if (typeof window === "undefined") {
+    return;
+  }
+  try {
+    window.localStorage.setItem(APPLIED_TEMPLATE_STORAGE_KEY, JSON.stringify(map));
+  } catch {
+    // ignore quota / private mode errors
+  }
+};
+
+const getMenuTemplatesByRestaurant = async (
+  restaurantId: number
+): Promise<ApiResponse<MenuTemplate[]>> => {
   const response = await apiClient.get<ApiResponse<MenuTemplate[]>>(
-    API.MENU_TEMPLATE.GET_ALL
+    API.MENU_TEMPLATE.GET_BY_RESTAURANT(restaurantId)
   );
   return response.data;
 };
@@ -82,6 +120,7 @@ const applyTemplateToRestaurant = async (request: ApplyMenuTemplateRequest): Pro
 export default function MenuTemplatePage() {
   const { user } = useAuth();
   const [templates, setTemplates] = useState<MenuTemplate[]>([]);
+  const [templatesLoading, setTemplatesLoading] = useState(false);
   const [restaurantMenu, setRestaurantMenu] = useState<MenuCategoryDto[]>([]);
   const [menuLoading, setMenuLoading] = useState(false);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -90,6 +129,13 @@ export default function MenuTemplatePage() {
   const [selectedTemplate, setSelectedTemplate] = useState<MenuTemplate | null>(null);
   const [selectedLayout, setSelectedLayout] = useState<TemplateLayoutConfig | null>(null);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
+  const [appliedTemplateByRestaurant, setAppliedTemplateByRestaurant] = useState<
+    Record<number, number>
+  >({});
+
+  useEffect(() => {
+    setAppliedTemplateByRestaurant(loadAppliedTemplateMap());
+  }, []);
 
   useEffect(() => {
     if (!user?.id) {
@@ -108,16 +154,9 @@ export default function MenuTemplatePage() {
         return;
       }
 
-      const [templatesRes, restaurantsRes] = await Promise.all([
-        getAllMenuTemplates(),
-        getRestaurantsByTenant(),
-      ]);
+      setTemplates([]);
 
-      if (templatesRes.isSuccess && templatesRes.data) {
-        setTemplates(templatesRes.data);
-      } else {
-        toast.error(templatesRes.message || "Không thể tải danh sách mẫu thực đơn");
-      }
+      const restaurantsRes = await getRestaurantsByTenant();
 
       if (restaurantsRes.isSuccess && restaurantsRes.data) {
         setRestaurants(restaurantsRes.data);
@@ -219,6 +258,47 @@ export default function MenuTemplatePage() {
     fetchMenu();
   }, [selectedRestaurant?.id]);
 
+  useEffect(() => {
+    if (!selectedRestaurant?.id) {
+      setTemplates([]);
+      setTemplatesLoading(false);
+      setSelectedTemplate(null);
+      setSelectedLayout(null);
+      return;
+    }
+
+    const restaurantId = selectedRestaurant.id;
+
+    const fetchTemplatesForRestaurant = async () => {
+      try {
+        setTemplatesLoading(true);
+        setSelectedTemplate(null);
+        setSelectedLayout(null);
+
+        const templatesRes = await getMenuTemplatesByRestaurant(restaurantId);
+        if (templatesRes.isSuccess && templatesRes.data) {
+          setTemplates(templatesRes.data);
+        } else {
+          setTemplates([]);
+          toast.error(templatesRes.message || "Không thể tải danh sách mẫu thực đơn của nhà hàng");
+        }
+      } catch (error) {
+        console.error("Error loading restaurant templates:", error);
+        setTemplates([]);
+        toast.error("Lỗi khi tải danh sách mẫu thực đơn của nhà hàng");
+      } finally {
+        setTemplatesLoading(false);
+      }
+    };
+
+    fetchTemplatesForRestaurant();
+  }, [selectedRestaurant?.id]);
+
+  const appliedTemplateIdForSelectedRestaurant =
+    selectedRestaurant && appliedTemplateByRestaurant[selectedRestaurant.id] != null
+      ? appliedTemplateByRestaurant[selectedRestaurant.id]
+      : null;
+
   const handleApplyTemplate = async () => {
     if (!selectedTemplate || !selectedRestaurant) {
       toast.error("Vui lòng chọn mẫu thực đơn và nhà hàng");
@@ -236,6 +316,11 @@ export default function MenuTemplatePage() {
       
       if (response.isSuccess) {
         toast.success("Bạn đã áp dụng mẫu vào thực đơn thành công");
+        setAppliedTemplateByRestaurant((prev) => {
+          const next = { ...prev, [selectedRestaurant.id]: selectedTemplate.id };
+          persistAppliedTemplateMap(next);
+          return next;
+        });
       } else {
         toast.error(response.message || "Không thể áp dụng mẫu thực đơn");
       }
@@ -268,7 +353,12 @@ export default function MenuTemplatePage() {
       <div className="mb-6 grid gap-4 md:grid-cols-3">
         <div className="rounded-lg border border-slate-200 bg-white p-4">
           <p className="text-sm text-slate-500">Số mẫu hiện có</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{templates.length}</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900">
+            {!selectedRestaurant ? "—" : templatesLoading ? "..." : templates.length}
+          </p>
+          {!selectedRestaurant && (
+            <p className="mt-1 text-xs text-slate-400">Chọn nhà hàng để tải danh sách mẫu</p>
+          )}
         </div>
         <div className="rounded-lg border border-slate-200 bg-white p-4">
           <p className="text-sm text-slate-500">Nhà hàng của bạn</p>
@@ -354,9 +444,17 @@ export default function MenuTemplatePage() {
         <h2 className="mb-4 text-lg font-semibold text-slate-900">
           Chọn mẫu thực đơn
         </h2>
-        {templates.length === 0 ? (
+        {!selectedRestaurant ? (
           <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 py-8 text-center">
-            <p className="text-slate-600">Chưa có mẫu thực đơn nào</p>
+            <p className="text-slate-600">Vui lòng chọn nhà hàng để tải danh sách mẫu thực đơn</p>
+          </div>
+        ) : templatesLoading ? (
+          <div className="rounded-lg border border-slate-200 bg-white py-8 text-center text-sm text-slate-500">
+            Đang tải mẫu thực đơn cho nhà hàng...
+          </div>
+        ) : templates.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 py-8 text-center">
+            <p className="text-slate-600">Nhà hàng này chưa có mẫu thực đơn nào</p>
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -364,12 +462,22 @@ export default function MenuTemplatePage() {
               <button
                 key={template.id}
                 onClick={() => handleSelectTemplate(template)}
-                className={`rounded-lg border p-4 text-left transition-all hover:shadow-md ${
-                  selectedTemplate?.id === template.id
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-slate-200 bg-white"
+                className={`relative rounded-lg border p-4 text-left transition-all hover:shadow-md ${
+                  appliedTemplateIdForSelectedRestaurant === template.id
+                    ? "border-emerald-500 bg-emerald-50 ring-2 ring-emerald-400"
+                    : selectedTemplate?.id === template.id
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-slate-200 bg-white"
                 }`}
               >
+                {appliedTemplateIdForSelectedRestaurant === template.id && (
+                  <span
+                    className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white shadow"
+                    aria-hidden
+                  >
+                    ✓
+                  </span>
+                )}
                 <div
                   className="mb-3 h-12 w-full rounded-lg border border-slate-200"
                   style={{ backgroundColor: template.themeColor }}
@@ -381,9 +489,12 @@ export default function MenuTemplatePage() {
                   <p>Font: {template.fontFamily}</p>
                   <p>Màu: {template.themeColor}</p>
                 </div>
+                {appliedTemplateIdForSelectedRestaurant === template.id && (
+                  <p className="mt-2 text-xs font-medium text-emerald-800">Đang áp dụng cho nhà hàng</p>
+                )}
                 {selectedTemplate?.id === template.id && (
                   <div className="mt-3 rounded bg-blue-600 px-2 py-1 text-center text-xs font-medium text-white">
-                    ✓ Đã chọn
+                    ✓ Đã chọn để xem trước
                   </div>
                 )}
               </button>

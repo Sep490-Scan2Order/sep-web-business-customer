@@ -84,6 +84,7 @@ export const API = {
     MENU_TEMPLATE: {
         CREATE: "/MenuTemplate",
         GET_ALL: "/MenuTemplate",
+        GET_BY_RESTAURANT: (restaurantId: number) => `/MenuTemplate/restaurant/${restaurantId}`,
         GET_BY_ID: (id: number) => `/MenuTemplate/${id}`,
         UPDATE: (id: number) => `/MenuTemplate/${id}`,
         GENERATE_HOLIDAY_AI: "/MenuTemplate/generate-holiday-ai",
