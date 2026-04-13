@@ -24,7 +24,7 @@ import { ROUTES, TENANT_ROUTES } from "@/src/constants/routes";
 import { useAuth } from "@/src/hooks/useAuth";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { UserInfo } from '@/src/types/type'
+import { UserInfo } from "@/src/types/type";
 
 type ChildItem = {
   label: string;
@@ -104,7 +104,7 @@ const sections: { label: string; items: NavItem[] }[] = [
           {
             label: "Quản lý món theo chi nhánh",
             href: TENANT_ROUTES.BRANCH_DISH_MANAGEMENT,
-          }
+          },
         ],
         match: "prefix",
       },
@@ -121,7 +121,7 @@ const sections: { label: string; items: NavItem[] }[] = [
         icon: TicketPercent,
         hasChildren: true,
         match: "prefix",
-      }
+      },
     ],
   },
   {
@@ -143,21 +143,22 @@ const sections: { label: string; items: NavItem[] }[] = [
   },
 ];
 
-
 export default function TenantSidebar() {
   const pathname = usePathname() || "";
   const [collapsed, setCollapsed] = React.useState(false);
-  const [openDropdowns, setOpenDropdowns] = React.useState<Set<string>>(new Set());
+  const [openDropdowns, setOpenDropdowns] = React.useState<Set<string>>(
+    new Set(),
+  );
   const sidebarWidth = collapsed ? "w-20" : "w-60";
   const { user, logout } = useAuth();
   const router = useRouter();
 
-  const tenantInfo = (user ?? null) as UserInfo | null
+  const tenantInfo = (user ?? null) as UserInfo | null;
 
   const handleLogOut = async () => {
-      logout();
-      toast.success("Đăng xuất thành công");
-      router.push(ROUTES.HOME);
+    logout();
+    toast.success("Đăng xuất thành công");
+    router.push(ROUTES.HOME);
   };
 
   const toggleDropdown = (label: string) => {
@@ -188,7 +189,7 @@ export default function TenantSidebar() {
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-lg font-semibold">
-                {tenantInfo.name}
+                S20
               </div>
             )}
           </div>
@@ -258,7 +259,9 @@ export default function TenantSidebar() {
                         />
                         {!collapsed ? (
                           <>
-                            <span className="flex-1 text-left">{item.label}</span>
+                            <span className="flex-1 text-left">
+                              {item.label}
+                            </span>
                             <ChevronDown
                               className={`h-4 w-4 text-slate-400 transition-transform ${
                                 isDropdownOpen ? "rotate-180" : ""

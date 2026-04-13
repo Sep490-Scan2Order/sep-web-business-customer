@@ -7,7 +7,6 @@ import apiClient from "@/src/services/apiClient";
 import { useEffect, useState } from "react";
 import { PlanApiItem } from "@/src/types/type";
 
-
 type PlanApiResponse = {
   isSuccess: boolean;
   message: string;
@@ -55,7 +54,9 @@ export default function PlanPage() {
               <h1 className="mt-2 text-3xl md:text-4xl font-extrabold leading-tight text-gray-900">
                 Bảng giá linh hoạt
                 <br />
-                <span className="text-[rgb(var(--color-primary))]">cho mọi quy mô nhà hàng</span>
+                <span className="text-[rgb(var(--color-primary))]">
+                  cho mọi quy mô nhà hàng
+                </span>
               </h1>
               <p className="mt-4 text-sm md:text-base text-gray-600 max-w-md">
                 Chọn gói phù hợp, bắt đầu nhanh và nâng cấp khi cần. Mọi gói đều
@@ -78,19 +79,24 @@ export default function PlanPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              {["Giảm 30% thời gian gọi món", "Tăng 20% giá trị đơn", "Tối ưu nhân sự", "Báo cáo realtime"].map(
-                (item) => (
-                  <div
-                    key={item}
-                    className="rounded-2xl border border-[rgb(var(--color-primary)/0.15)] bg-white/80 px-4 py-5 shadow-sm"
-                  >
-                    <p className="text-sm font-semibold text-[rgb(var(--color-primary))]">{item}</p>
-                    <p className="mt-2 text-xs text-gray-600">
-                      Theo dữ liệu vận hành trung bình của khách hàng.
-                    </p>
-                  </div>
-                )
-              )}
+              {[
+                "Giảm 30% thời gian gọi món",
+                "Tăng 20% giá trị đơn",
+                "Tối ưu nhân sự",
+                "Báo cáo realtime",
+              ].map((item) => (
+                <div
+                  key={item}
+                  className="rounded-2xl border border-[rgb(var(--color-primary)/0.15)] bg-white/80 px-4 py-5 shadow-sm"
+                >
+                  <p className="text-sm font-semibold text-[rgb(var(--color-primary))]">
+                    {item}
+                  </p>
+                  <p className="mt-2 text-xs text-gray-600">
+                    Theo dữ liệu vận hành trung bình của khách hàng.
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -118,61 +124,63 @@ export default function PlanPage() {
                   <h3 className="text-xl font-bold text-[rgb(var(--color-primary))]">
                     {plan.name}
                   </h3>
-                   <span className="rounded-full bg-[rgb(var(--color-accent-light))] px-3 py-1 text-xs font-semibold text-[rgb(var(--color-accent-dark))]">
-                      1 tháng {/* Fixed duration display */}
-                    </span>
+                  <span className="rounded-full bg-[rgb(var(--color-accent-light))] px-3 py-1 text-xs font-semibold text-[rgb(var(--color-accent-dark))]">
+                    1 tháng {/* Fixed duration display */}
+                  </span>
                 </div>
-              
-                  <div className="mt-6 flex items-end gap-2">
-                    <span className="text-3xl font-extrabold text-gray-900">
-                      {formatPrice(plan.monthlyPrice)}đ
-                    </span>
-                    <span className="text-sm text-gray-600">/tháng</span>
-                  </div>
 
-                  <div className="mt-4 text-sm text-[rgb(var(--color-accent-dark))]">
-                    <p className="mb-2 font-semibold">Các chức năng chính:</p>
-                    <ul className="space-y-1">
-                      {/* Always shows if > 0 */}
-                      {plan.features.maxStaff > 0 && (
-                        <li>
-                          - Quản lý tối đa {plan.features.maxStaff} nhân viên
-                        </li>
-                      )}
+                <div className="mt-6 flex items-end gap-2">
+                  <span className="text-3xl font-extrabold text-gray-900">
+                    {formatPrice(plan.monthlyPrice)}đ
+                  </span>
+                  <span className="text-sm text-gray-600">/tháng</span>
+                </div>
 
-                      {/* Shows standard if true, grayed-out/strikethrough if false */}
-                      <li
-                        className={
-                          plan.features.canCustomMenuTemplate
-                            ? ""
-                            : "text-gray-400 line-through"
-                        }
-                      >
-                        - Tùy chỉnh mẫu thực đơn
-                      </li>
+                <div className="mt-4 text-sm text-[rgb(var(--color-accent-dark))]">
+                  <p className="mb-2 font-semibold">Các chức năng chính:</p>
+                  <ul className="space-y-1">
+                    <li
+                      className={
+                        plan.features.canRecommendationOnTop
+                          ? ""
+                          : "text-gray-400 line-through"
+                      }
+                    >
+                      - Hỗ trợ ưu tiên gợi ý món ăn theo chiến lược nhà hàng
+                    </li>
 
-                      <li
-                        className={
-                          plan.features.canUseCombo
-                            ? ""
-                            : "text-gray-400 line-through"
-                        }
-                      >
-                        - Hỗ trợ tạo Combo
-                      </li>
+                    {/* Shows standard if true, grayed-out/strikethrough if false */}
+                    <li
+                      className={
+                        plan.features.canUseAIUpsell
+                          ? ""
+                          : "text-gray-400 line-through"
+                      }
+                    >
+                      - Hỗ trợ gợi ý upsell bằng AI
+                    </li>
 
-                      <li
-                        className={
-                          plan.features.canUsePromotions
-                            ? ""
-                            : "text-gray-400 line-through"
-                        }
-                      >
-                        - Quản lý Khuyến mãi
-                      </li>
-                    </ul>
-                  </div>
+                    <li
+                      className={
+                        plan.features.canCustomMenuTemplate
+                          ? ""
+                          : "text-gray-400 line-through"
+                      }
+                    >
+                      - Tùy chỉnh mẫu thực đơn
+                    </li>
 
+                    <li
+                      className={
+                        plan.features.canUsePromotions
+                          ? ""
+                          : "text-gray-400 line-through"
+                      }
+                    >
+                      - Quản lý Khuyến mãi
+                    </li>
+                  </ul>
+                </div>
 
                 <Link
                   href={ROUTES.PAGES.PUBLIC.REGISTER}
@@ -202,7 +210,8 @@ export default function PlanPage() {
             Cần tư vấn gói phù hợp?
           </h3>
           <p className="mt-3 text-sm md:text-base text-[rgb(var(--color-secondary))]">
-            Đội ngũ chúng tôi sẽ khảo sát mô hình, gợi ý gói tối ưu chi phí nhất.
+            Đội ngũ chúng tôi sẽ khảo sát mô hình, gợi ý gói tối ưu chi phí
+            nhất.
           </p>
           <Link
             href={ROUTES.PAGES.PUBLIC.REGISTER}
