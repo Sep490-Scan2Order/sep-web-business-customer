@@ -727,6 +727,9 @@ export interface PaymentMethodStats {
 export interface OrderTypeDetail {
   revenue: number;
   count: number;
+  objective?: OrderTypeDetail;
+  staffError?: OrderTypeDetail;
+  systemError?: OrderTypeDetail;
 }
 
 export interface OrderTypeStats {
@@ -815,6 +818,7 @@ export interface TenantOrderDetailDto {
   originalPrice: number;
   discountedPrice: number;
   promotionAmount: number;
+  refundedQuantity: number;
 }
 
 export interface TenantOrderResponseDto {
@@ -832,6 +836,10 @@ export interface TenantOrderResponseDto {
   type: string;
   paymentProofUrl?: string;
   typeOrder: number; // TypeOrder
+  refundType?: number;
+  refundOrderId?: string;
+  originalOrderCode?: number;
+  responsibleStaffName?: string;
   createdAt: string;
   orderDetails: TenantOrderDetailDto[];
 }

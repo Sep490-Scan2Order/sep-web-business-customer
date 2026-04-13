@@ -5,6 +5,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   PieChart, Pie, Cell, Legend 
 } from "recharts";
+import { useRouter } from "next/navigation";
 import { 
   TrendingUp, Users, ShoppingBag, CreditCard, Banknote, 
   ArrowUpRight, ArrowDownRight, Calendar, Package, Utensils
@@ -21,7 +22,8 @@ interface RevenueSummaryProps {
 
 const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6"];
 
-const RevenueSummary: React.FC<RevenueSummaryProps> = ({ restaurantId }) => {
+export default function RevenueSummary({ restaurantId }: RevenueSummaryProps) {
+  const router = useRouter();
   const [data, setData] = useState<RevenueSummaryData | null>(null);
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState("today"); // today, week, month, all
@@ -61,11 +63,46 @@ const RevenueSummary: React.FC<RevenueSummaryProps> = ({ restaurantId }) => {
 
   const orderTypeData = useMemo(() => {
     if (!data) return [];
-    return [
-      { name: "Đơn hàng thường", revenue: data.orderTypes.regular.revenue, count: data.orderTypes.regular.count },
-      { name: "Hoàn tiền", revenue: data.orderTypes.refund.revenue, count: data.orderTypes.refund.count },
+    const stats: any[] = [
+      { name: "Đơn thành công", value: data.orderTypes.regular.revenue, color: "#10b981", typeOrder: 0, status: 4 }
     ];
+
+    if (data.orderTypes.refund.objective && data.orderTypes.refund.objective.revenue > 0) {
+      stats.push({ name: "Hoàn tiền (Khách quan)", value: data.orderTypes.refund.objective.revenue, color: "#f59e0b", typeOrder: 1, refundType: 0, status: 5 });
+    }
+    if (data.orderTypes.refund.staffError && data.orderTypes.refund.staffError.revenue > 0) {
+      stats.push({ name: "Hoàn tiền (Lỗi NV)", value: data.orderTypes.refund.staffError.revenue, color: "#ef4444", typeOrder: 1, refundType: 1, status: 5 });
+    }
+    if (data.orderTypes.refund.systemError && data.orderTypes.refund.systemError.revenue > 0) {
+      stats.push({ name: "Hoàn tiền (Lỗi HT)", value: data.orderTypes.refund.systemError.revenue, color: "#6366f1", typeOrder: 1, refundType: 2, status: 5 });
+    }
+
+    if (stats.length === 1 && data.orderTypes.refund.revenue > 0) {
+      stats.push({ name: "Hoàn tiền", value: data.orderTypes.refund.revenue, color: "#f43f5e", typeOrder: 1, status: 5 });
+    }
+
+    return stats;
   }, [data]);
+
+  const handleChartClick = (entry: any) => {
+    if (!data) return;
+    
+    const params = new URLSearchParams();
+    params.set("restaurantId", restaurantId.toString());
+    params.set("typeOrder", entry.typeOrder.toString());
+    if (entry.status !== undefined) {
+      params.set("status", entry.status.toString());
+    }
+    if (entry.refundType !== undefined) {
+      params.set("refundType", entry.refundType.toString());
+    }
+    
+    // Thêm ngày tháng hiện tại từ dashboard
+    params.set("fromDate", data.period.startDate.split("T")[0]);
+    params.set("toDate", data.period.endDate.split("T")[0]);
+
+    router.push(`/tenant/orders?${params.toString()}`);
+  };
 
   if (loading) {
     return (
@@ -110,28 +147,24 @@ const RevenueSummary: React.FC<RevenueSummaryProps> = ({ restaurantId }) => {
           title="Tổng doanh thu (gộp)" 
           value={formatMoney(data.summary.grossRevenue)} 
           icon={<TrendingUp className="w-5 h-5 text-emerald-600" />} 
-          trend="+12.5%" 
           color="bg-emerald-50 text-emerald-600"
         />
         <MetricCard 
           title="Doanh thu thuần" 
           value={formatMoney(data.summary.netRevenue)} 
           icon={<Banknote className="w-5 h-5 text-blue-600" />} 
-          trend="+8.2%" 
           color="bg-blue-50 text-blue-600"
         />
         <MetricCard 
           title="Tổng số đơn hàng" 
           value={formatNumber(data.summary.totalOrders)} 
           icon={<ShoppingBag className="w-5 h-5 text-amber-600" />} 
-          trend="+5.4%" 
           color="bg-amber-50 text-amber-600"
         />
         <MetricCard 
           title="Giá trị đơn trung bình" 
           value={formatMoney(data.summary.averageOrderValue)} 
           icon={<CreditCard className="w-5 h-5 text-purple-600" />} 
-          trend="-2.1%" 
           color="bg-purple-50 text-purple-600"
         />
       </div>
@@ -143,20 +176,43 @@ const RevenueSummary: React.FC<RevenueSummaryProps> = ({ restaurantId }) => {
             <Package className="w-5 h-5 text-emerald-500" />
             Phân tích loại đơn hàng
           </h3>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={orderTypeData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: "#64748b", fontSize: 12 }} />
-                <Tooltip 
-                  contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)" }}
-                  cursor={{ fill: "#f8fafc" }}
-                />
-                <Bar dataKey="revenue" name="Doanh thu" fill="#10b981" radius={[6, 6, 0, 0]} barSize={40} />
-                <Bar dataKey="count" name="Số lượng" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={40} />
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="h-80 flex flex-col md:flex-row items-center gap-6">
+            <div className="w-full md:w-1/2 h-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={orderTypeData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={70}
+                    outerRadius={100}
+                    paddingAngle={4}
+                    dataKey="value"
+                    onClick={handleChartClick}
+                    className="cursor-pointer"
+                  >
+                    {orderTypeData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    formatter={(value: number) => formatMoney(value)}
+                    contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)" }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="w-full md:w-1/2 space-y-3">
+              {orderTypeData.map((item, index) => (
+                <div key={item.name} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100/50">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                    <span className="text-sm font-medium text-slate-600">{item.name}</span>
+                  </div>
+                  <span className="text-sm font-bold text-slate-800">{formatMoney(item.value)}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -281,21 +337,41 @@ const RevenueSummary: React.FC<RevenueSummaryProps> = ({ restaurantId }) => {
                 <div className="p-2 rounded-lg bg-emerald-100 text-emerald-600">
                   <Package className="w-5 h-5" />
                 </div>
-                <div>
-                  <p className="text-sm text-slate-500">Đơn hàng hoàn tất</p>
-                  <p className="text-lg font-bold text-slate-800">{data.orderTypes.regular.count} đơn</p>
-                  <p className="text-xs text-emerald-600 font-medium">{formatMoney(data.orderTypes.regular.revenue)}</p>
+                <div className="flex-1">
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-slate-500 font-medium">Đơn hàng hoàn tất</p>
+                    <span className="text-xs px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full font-bold">{data.orderTypes.regular.count}</span>
+                  </div>
+                  <p className="text-sm text-emerald-600 font-bold">{formatMoney(data.orderTypes.regular.revenue)}</p>
                 </div>
               </div>
               
               <div className="flex items-start gap-4">
                 <div className="p-2 rounded-lg bg-rose-100 text-rose-600">
-                  <Users className="w-5 h-5" />
+                  <ArrowDownRight className="w-5 h-5" />
                 </div>
-                <div>
-                  <p className="text-sm text-slate-500">Đơn hàng hoàn tiền</p>
-                  <p className="text-lg font-bold text-slate-800">{data.orderTypes.refund.count} đơn</p>
-                  <p className="text-xs text-rose-600 font-medium">-{formatMoney(data.orderTypes.refund.revenue)}</p>
+                <div className="flex-1">
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-slate-500 font-medium">Đơn hàng hoàn tiền</p>
+                    <span className="text-xs px-2 py-0.5 bg-rose-100 text-rose-700 rounded-full font-bold">{data.orderTypes.refund.count}</span>
+                  </div>
+                  <p className="text-sm text-rose-600 font-bold">-{formatMoney(data.orderTypes.refund.revenue)}</p>
+                  
+                  {/* Refund Breakdown List */}
+                  <div className="mt-3 space-y-2 pl-2 border-l-2 border-rose-100">
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-slate-400">• Khách quan:</span>
+                      <span className="text-slate-600 font-medium">{formatMoney(data.orderTypes.refund.objective?.revenue || 0)} ({data.orderTypes.refund.objective?.count || 0})</span>
+                    </div>
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-slate-400">• Lỗi NV:</span>
+                      <span className="text-slate-600 font-medium">{formatMoney(data.orderTypes.refund.staffError?.revenue || 0)} ({data.orderTypes.refund.staffError?.count || 0})</span>
+                    </div>
+                    <div className="flex justify-between text-[11px]">
+                      <span className="text-slate-400">• Lỗi HT:</span>
+                      <span className="text-slate-600 font-medium">{formatMoney(data.orderTypes.refund.systemError?.revenue || 0)} ({data.orderTypes.refund.systemError?.count || 0})</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -322,18 +398,12 @@ const MetricCard: React.FC<{
   title: string; 
   value: string; 
   icon: React.ReactNode; 
-  trend: string; 
   color: string;
-}> = ({ title, value, icon, trend, color }) => {
-  const isPositive = trend.startsWith("+");
+}> = ({ title, value, icon, color }) => {
   return (
     <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start mb-4">
         <div className={`p-2.5 rounded-xl ${color}`}>{icon}</div>
-        <div className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${isPositive ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"}`}>
-          {isPositive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-          {trend}
-        </div>
       </div>
       <div>
         <p className="text-sm text-slate-500 font-medium mb-1">{title}</p>
@@ -343,4 +413,3 @@ const MetricCard: React.FC<{
   );
 };
 
-export default RevenueSummary;

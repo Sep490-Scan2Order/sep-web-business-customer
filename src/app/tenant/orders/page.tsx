@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { 
   ArrowLeft, Calendar, FileText, Search, Store, Eye, Receipt 
 } from "lucide-react";
@@ -29,7 +30,14 @@ const PAYMENT_TYPE_MAP: Record<number, string> = {
   2: "Giao hàng",
 };
 
-export default function TenantOrdersPage() {
+const REFUND_TYPE_MAP: Record<number, string> = {
+  0: "Khách quan",
+  1: "Lỗi nhân viên",
+  2: "Lỗi hệ thống",
+};
+
+function TenantOrdersContent() {
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
@@ -41,6 +49,8 @@ export default function TenantOrdersPage() {
   const [toDate, setToDate] = useState<string>("");
   const [keyword, setKeyword] = useState<string>("");
   const [status, setStatus] = useState<number | "">("");
+  const [typeOrder, setTypeOrder] = useState<number | "">("");
+  const [refundType, setRefundType] = useState<number | "">("");
   
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
@@ -65,6 +75,28 @@ export default function TenantOrdersPage() {
     fetchRestaurants();
   }, [user?.id]);
 
+  // Handle drill-down parameters from URL
+  useEffect(() => {
+    if (restaurants.length === 0) return;
+
+    const rid = searchParams.get("restaurantId");
+    const to = searchParams.get("typeOrder");
+    const rt = searchParams.get("refundType");
+    const st = searchParams.get("status");
+    const fd = searchParams.get("fromDate");
+    const td = searchParams.get("toDate");
+
+    if (rid) {
+      const rest = restaurants.find(r => r.id === Number(rid));
+      if (rest) setSelectedRestaurant(rest);
+    }
+    if (to !== null) setTypeOrder(Number(to));
+    if (rt !== null) setRefundType(Number(rt));
+    if (st !== null) setStatus(Number(st));
+    if (fd) setFromDate(fd);
+    if (td) setToDate(td);
+  }, [searchParams, restaurants]);
+
   useEffect(() => {
     const fetchOrders = async () => {
       if (!selectedRestaurant?.id) return;
@@ -80,7 +112,9 @@ export default function TenantOrdersPage() {
             keyword || undefined, 
             statusParam, 
             fromDate || undefined, 
-            toDate || undefined
+            toDate || undefined,
+            typeOrder !== "" ? Number(typeOrder) : undefined,
+            refundType !== "" ? Number(refundType) : undefined
           )
         );
 
@@ -108,7 +142,7 @@ export default function TenantOrdersPage() {
         }
     }, 500);
     return () => clearTimeout(timeoutId);
-  }, [selectedRestaurant, currentPage, pageSize, keyword, status, fromDate, toDate]);
+  }, [selectedRestaurant, currentPage, pageSize, keyword, status, fromDate, toDate, typeOrder, refundType]);
 
   const handleUpdateClick = (order: TenantOrderResponseDto) => {
     setSelectedOrder(order);
@@ -223,65 +257,137 @@ export default function TenantOrdersPage() {
                 </div>
               </div>
 
-              {/* Filters */}
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 focus-within:border-slate-300">
-                  <Search className="h-4 w-4 text-slate-400" />
-                  <input
-                    type="text"
-                    value={keyword}
-                    onChange={(e) => {
-                      setKeyword(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="bg-transparent text-sm w-36 text-slate-700 outline-none"
-                    placeholder="SĐT / Mã Đơn"
-                  />
-                </div>
-                
-                <select
-                  value={status}
-                  onChange={(e) => {
-                     setStatus(e.target.value === "" ? "" : Number(e.target.value));
-                     setCurrentPage(1);
-                  }}
-                  className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm outline-none focus-within:border-slate-300 text-slate-600 cursor-pointer"
-                >
-                    <option value="">Tất cả trạng thái</option>
-                    <option value="0">Chờ thanh toán</option>
-                    <option value="1">Đang chờ bếp</option>
-                    <option value="2">Đang chế biến</option>
-                    <option value="3">Hoàn thành</option>
-                    <option value="4">Đã giao</option>
-                    <option value="5">Đã hủy</option>
-                </select>
+              {/* Filters Section */}
+              <div className="flex flex-col gap-4 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                <div className="flex flex-wrap items-center gap-3">
+                  {/* Search */}
+                  <div className="flex flex-1 min-w-[200px] items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-100 transition-all">
+                    <Search className="h-4 w-4 text-slate-400" />
+                    <input
+                      type="text"
+                      value={keyword}
+                      onChange={(e) => {
+                        setKeyword(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      className="bg-transparent text-sm w-full text-slate-700 outline-none placeholder:text-slate-400"
+                      placeholder="Tìm theo SĐT hoặc mã đơn..."
+                    />
+                  </div>
 
-                <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 focus-within:border-slate-300">
-                  <Calendar className="h-4 w-4 text-slate-400" />
-                  <input
-                    type="date"
-                    value={fromDate}
-                    onChange={(e) => {
-                      setFromDate(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="bg-transparent text-sm text-slate-700 outline-none"
-                    placeholder="Từ ngày"
-                  />
+                  {/* Dates */}
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 transition-all hover:border-slate-300">
+                      <Calendar className="h-4 w-4 text-slate-400" />
+                      <input
+                        type="date"
+                        value={fromDate}
+                        onChange={(e) => {
+                          setFromDate(e.target.value);
+                          setCurrentPage(1);
+                        }}
+                        className="bg-transparent text-sm text-slate-700 outline-none cursor-pointer"
+                      />
+                    </div>
+                    <span className="text-slate-400">→</span>
+                    <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 transition-all hover:border-slate-300">
+                      <Calendar className="h-4 w-4 text-slate-400" />
+                      <input
+                        type="date"
+                        value={toDate}
+                        onChange={(e) => {
+                          setToDate(e.target.value);
+                          setCurrentPage(1);
+                        }}
+                        className="bg-transparent text-sm text-slate-700 outline-none cursor-pointer"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <span className="text-slate-400">-</span>
-                <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 focus-within:border-slate-300">
-                  <Calendar className="h-4 w-4 text-slate-400" />
-                  <input
-                    type="date"
-                    value={toDate}
-                    onChange={(e) => {
-                      setToDate(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="bg-transparent text-sm text-slate-700 outline-none"
-                    placeholder="Đến ngày"
-                  />
+
+                <div className="flex flex-wrap items-center gap-3 border-t border-slate-100 pt-3">
+                  {/* Status Dropdown */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] uppercase font-bold text-slate-400 px-1">Trạng thái</label>
+                    <select
+                      value={status}
+                      onChange={(e) => {
+                        setStatus(e.target.value === "" ? "" : Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-400 text-slate-600 cursor-pointer min-w-[150px]"
+                    >
+                      <option value="">Tất cả trạng thái</option>
+                      <option value="0">⏳ Chờ thanh toán</option>
+                      <option value="1">👨‍🍳 Đang chờ bếp</option>
+                      <option value="2">🔥 Đang chế biến</option>
+                      <option value="3">✅ Hoàn thành</option>
+                      <option value="4">🛵 Đã giao</option>
+                      <option value="5">❌ Đã hủy</option>
+                    </select>
+                  </div>
+
+                  {/* Order Type Dropdown */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] uppercase font-bold text-slate-400 px-1">Loại đơn</label>
+                    <select
+                      value={typeOrder}
+                      onChange={(e) => {
+                        const val = e.target.value === "" ? "" : Number(e.target.value);
+                        setTypeOrder(val);
+                        if (val !== 1) setRefundType("");
+                        setCurrentPage(1);
+                      }}
+                      className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-400 text-slate-600 cursor-pointer min-w-[150px]"
+                    >
+                      <option value="">Tất cả loại đơn</option>
+                      <option value="0">🍴 Đơn thường</option>
+                      <option value="1">🔄 Đơn hoàn tiền</option>
+                    </select>
+                  </div>
+
+                  {/* Refund Type (Conditional) */}
+                  {typeOrder === 1 && (
+                    <div className="flex flex-col gap-1 animate-in slide-in-from-left-2 duration-200">
+                      <label className="text-[10px] uppercase font-bold text-rose-400 px-1">Lý do hoàn</label>
+                      <select
+                        value={refundType}
+                        onChange={(e) => {
+                          setRefundType(e.target.value === "" ? "" : Number(e.target.value));
+                          setCurrentPage(1);
+                        }}
+                        className="rounded-xl border border-rose-200 bg-white px-3 py-2 text-sm outline-none focus:border-rose-400 text-rose-700 cursor-pointer min-w-[150px]"
+                      >
+                        <option value="">Tất cả lý do</option>
+                        <option value="0">🍃 Khách quan</option>
+                        <option value="1">👤 Lỗi nhân viên</option>
+                        <option value="2">💻 Lỗi hệ thống</option>
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Reset Button */}
+                  <div className="flex flex-col gap-1 self-end">
+                    <button
+                      onClick={() => {
+                        setKeyword("");
+                        setStatus("");
+                        setFromDate("");
+                        setToDate("");
+                        setTypeOrder("");
+                        setRefundType("");
+                        setCurrentPage(1);
+                      }}
+                      className="h-[38px] px-4 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-rose-600 hover:border-rose-200 transition-all cursor-pointer flex items-center gap-2"
+                    >
+                      Xóa lọc
+                    </button>
+                  </div>
+                  
+                  {/* Results Count */}
+                  <div className="ml-auto text-xs text-slate-400 font-medium italic">
+                    Tìm thấy {totalItems} đơn hàng
+                  </div>
                 </div>
               </div>
             </div>
@@ -323,6 +429,18 @@ export default function TenantOrdersPage() {
                                 <span className="ml-2 inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700">
                                 Đặt trước
                                 </span>
+                            )}
+                            {order.typeOrder === 1 && (
+                                <div className="mt-1 flex flex-col gap-1 items-start">
+                                    <span className="inline-flex items-center rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-medium text-rose-700 border border-rose-200">
+                                    Hoàn tiền
+                                    </span>
+                                    {order.originalOrderCode && (
+                                        <span className="text-[9px] text-slate-500 italic">
+                                            Đơn gốc: #{order.originalOrderCode}
+                                        </span>
+                                    )}
+                                </div>
                             )}
                         </td>
                         <td className="px-6 py-4 font-medium text-slate-700">
@@ -435,6 +553,7 @@ export default function TenantOrdersPage() {
             </div>
             
             <div className="px-6 py-4 overflow-y-auto">
+              {/* Order Info Grid */}
               <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
                 <div>
                   <p className="text-slate-500 mb-1">Khách hàng</p>
@@ -462,6 +581,33 @@ export default function TenantOrdersPage() {
                         </p>
                     </div>
                 )}
+                {selectedOrder.typeOrder === 1 && selectedOrder.originalOrderCode && (
+                  <div>
+                    <p className="text-slate-500 mb-1 font-semibold text-rose-600">Đơn gốc</p>
+                    <p className="font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded inline-block">#{selectedOrder.originalOrderCode}</p>
+                  </div>
+                )}
+                {selectedOrder.responsibleStaffName && (
+                  <div>
+                    <p className="text-slate-500 mb-1">Nhân viên xử lý</p>
+                    <p className="font-medium text-slate-900">{selectedOrder.responsibleStaffName}</p>
+                  </div>
+                )}
+                {selectedOrder.refundType !== undefined && selectedOrder.refundType !== null && (
+                  <div>
+                    <p className="text-slate-500 mb-1 text-xs">Loại/Lý do hoàn</p>
+                    <p className="font-medium text-slate-900 truncate">{REFUND_TYPE_MAP[selectedOrder.refundType] || "N/A"}</p>
+                  </div>
+                )}
+                {selectedOrder.paymentProofUrl && (
+                    <div className="col-span-2">
+                        <p className="text-slate-500 mb-2">Minh chứng chuyển khoản (Ảnh)</p>
+                        <a href={selectedOrder.paymentProofUrl} target="_blank" rel="noopener noreferrer" className="block w-full max-h-48 overflow-hidden rounded-lg border border-slate-200 hover:border-indigo-400 transition-colors">
+                            <img src={selectedOrder.paymentProofUrl} alt="Payment Proof" className="w-full h-full object-cover" />
+                        </a>
+                        <p className="text-[10px] text-slate-400 mt-1 italic">* Click vào ảnh để xem kích thước lớn</p>
+                    </div>
+                )}
                 {selectedOrder.note && (
                     <div className="col-span-2">
                         <p className="text-slate-500 mb-1">Ghi chú</p>
@@ -472,7 +618,8 @@ export default function TenantOrdersPage() {
                 )}
               </div>
 
-              <div className="border border-slate-200 rounded-lg overflow-hidden">
+              {/* Order Items Table */}
+              <div className="border border-slate-200 rounded-lg overflow-hidden my-6">
                 <table className="w-full text-left text-sm text-slate-600">
                     <thead className="bg-slate-50 text-xs text-slate-500">
                         <tr>
@@ -485,8 +632,19 @@ export default function TenantOrdersPage() {
                     <tbody className="divide-y divide-slate-100">
                         {selectedOrder.orderDetails?.map((item, index) => (
                             <tr key={index}>
-                                <td className="px-4 py-3 font-medium text-slate-800">{item.dishName}</td>
-                                <td className="px-4 py-3 text-center">{item.quantity}</td>
+                                <td className="px-4 py-3 font-medium text-slate-800">
+                                  {item.dishName}
+                                  {item.refundedQuantity > 0 && (
+                                    <div className="text-[10px] text-rose-500 font-normal">
+                                      (Đã hoàn {item.refundedQuantity})
+                                    </div>
+                                  )}
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  <div className={item.refundedQuantity >= item.quantity ? "line-through text-slate-400" : ""}>
+                                    {item.quantity}
+                                  </div>
+                                </td>
                                 <td className="px-4 py-3 text-right">
                                     {item.promotionAmount > 0 ? (
                                         <div className="flex flex-col items-end">
@@ -536,5 +694,17 @@ export default function TenantOrdersPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function TenantOrdersPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-indigo-600"></div>
+      </div>
+    }>
+      <TenantOrdersContent />
+    </Suspense>
   );
 }
