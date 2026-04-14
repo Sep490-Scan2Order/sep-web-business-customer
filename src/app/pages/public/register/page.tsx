@@ -12,6 +12,7 @@ import { ROUTES } from "@/src/constants/routes";
 import { API } from "@/src/constants/api";
 import apiClient from "@/src/services/apiClient";
 import { ApiResponse, DistrictSummary, OtpResponse, ProvinceSummary, RegisterTenantRequest, TenantDto } from "@/src/types/type";
+import { getApiErrorMessage, PASSWORD_POLICY_MESSAGE, PASSWORD_POLICY_REGEX } from "@/src/utils/utils";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -87,6 +88,11 @@ export default function RegisterPage() {
       return;
     }
 
+    if (!PASSWORD_POLICY_REGEX.test(formData.password)) {
+      toast.error(PASSWORD_POLICY_MESSAGE);
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       toast.error("Mật khẩu xác nhận không khớp");
       return;
@@ -122,7 +128,7 @@ export default function RegisterPage() {
         router.push(ROUTES.PAGES.PUBLIC.LOGIN);
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Đăng ký thất bại");
+      toast.error(getApiErrorMessage(error) || "Đăng ký thất bại");
     } finally {
       setLoading(false);
     }
@@ -318,7 +324,7 @@ export default function RegisterPage() {
                         required
                         value={formData.password}
                         onChange={handleInputChange}
-                        placeholder="Tối thiểu 6 ký tự"
+                        placeholder="Ít nhất 8 ký tự, có chữ hoa, số và ký tự đặc biệt"
                         className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 pr-12 text-sm text-white placeholder-white/40 backdrop-blur-sm transition-all focus:border-[rgb(var(--color-accent))] focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))]/20"
                       />
                       <button

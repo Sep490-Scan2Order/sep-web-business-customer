@@ -117,6 +117,7 @@ export interface VerifyForgotPasswordOtpRequest {
 export interface CompleteForgotPasswordRequest {
   email: string;
   newPassword: string;
+  confirmPassword?: string;
   resetToken: string;
 }
 
