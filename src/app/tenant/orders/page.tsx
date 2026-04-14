@@ -447,7 +447,9 @@ function TenantOrdersContent() {
                             {order.numberPhone}
                         </td>
                         <td className="px-6 py-4">
-                            <span className="font-medium text-emerald-600">{formatCurrency(order.finalAmount)}</span>
+                            <span className="font-medium text-emerald-600">
+                                {formatCurrency(order.typeOrder === 0 ? (order.totalAmount - order.promotionDiscount) : order.finalAmount)}
+                            </span>
                             {order.promotionDiscount > 0 && (
                                 <span className="block text-xs line-through text-slate-400">
                                     {formatCurrency(order.totalAmount)}
@@ -676,7 +678,9 @@ function TenantOrdersContent() {
                     )}
                     <div className="flex justify-between pt-2 border-t border-slate-200 text-base">
                         <span className="font-semibold text-slate-900">Tổng cộng</span>
-                        <span className="font-bold text-emerald-600">{formatCurrency(selectedOrder.finalAmount)}</span>
+                        <span className="font-bold text-emerald-600">
+                            {formatCurrency(selectedOrder.typeOrder === 0 ? (selectedOrder.totalAmount - selectedOrder.promotionDiscount) : selectedOrder.finalAmount)}
+                        </span>
                     </div>
                 </div>
               </div>

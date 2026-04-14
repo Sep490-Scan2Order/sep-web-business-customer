@@ -7,9 +7,11 @@ import RestaurantPage from "@/src/app/tenant/restaurant/page";
 import { API } from "@/src/constants/api";
 import apiClient from "@/src/services/apiClient";
 
+const mockRouterPush = vi.fn();
+
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
-    push: vi.fn(),
+    push: mockRouterPush,
     replace: vi.fn(),
     prefetch: vi.fn(),
   }),
@@ -48,6 +50,7 @@ const createRestaurant = (overrides: Partial<Record<string, unknown>> = {}) =>
 describe("Integration: Tenant Restaurant Management Flow", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
+    mockRouterPush.mockReset();
     localStorage.clear();
 
     vi.stubGlobal(
@@ -55,7 +58,7 @@ describe("Integration: Tenant Restaurant Management Flow", () => {
       vi.fn(async () => ({
         ok: false,
         json: async () => [],
-      }))
+      })),
     );
   });
 
@@ -135,7 +138,12 @@ describe("Integration: Tenant Restaurant Management Flow", () => {
       expect(screen.getByText("Nhà hàng Mới")).toBeInTheDocument();
       expect(
         screen.getByText((content, element) => {
-          return element?.tagName === "P" && content.includes("Giờ mở cửa:") && content.includes("08:30") && content.includes("21:30")
+          return (
+            element?.tagName === "P" &&
+            content.includes("Giờ mở cửa:") &&
+            content.includes("08:30") &&
+            content.includes("21:30")
+          );
         }),
       ).toBeInTheDocument();
     });
@@ -189,7 +197,12 @@ describe("Integration: Tenant Restaurant Management Flow", () => {
       expect(screen.getByText("Nhà hàng A")).toBeInTheDocument();
       expect(
         screen.getByText((content, element) => {
-          return element?.tagName === "P" && content.includes("Giờ mở cửa:") && content.includes("08:00") && content.includes("22:00")
+          return (
+            element?.tagName === "P" &&
+            content.includes("Giờ mở cửa:") &&
+            content.includes("08:00") &&
+            content.includes("22:00")
+          );
         }),
       ).toBeInTheDocument();
     });
@@ -241,9 +254,98 @@ describe("Integration: Tenant Restaurant Management Flow", () => {
       FormData,
       unknown,
     ];
-    expect(submittedFormData.get("RestaurantName")).toBe("Nhà hàng A - Updated");
+    expect(submittedFormData.get("RestaurantName")).toBe(
+      "Nhà hàng A - Updated",
+    );
     expect(submittedFormData.get("Address")).toBe("789 Đường C");
     expect(submittedFormData.get("OpenTime")).toBe("09:00");
     expect(submittedFormData.get("CloseTime")).toBe("23:00");
+  });
+
+  it("opens create restaurant modal from list view", async () => {
+    vi.spyOn(apiClient, "get").mockResolvedValue({
+      data: {
+        isSuccess: true,
+        data: [createRestaurant()],
+      },
+    } as never);
+
+    const user = userEvent.setup();
+    render(<RestaurantPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Nhà hàng A")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: "Thêm nhà hàng" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Tạo nhà hàng mới")).toBeInTheDocument();
+      expect(screen.getByLabelText("Tên nhà hàng *")).toBeInTheDocument();
+    });
+  });
+
+  it("filters restaurants by search keyword and renders no-result state", async () => {
+    vi.spyOn(apiClient, "get").mockResolvedValue({
+      data: {
+        isSuccess: true,
+        data: [
+          createRestaurant(),
+          createRestaurant({
+            id: 102,
+            restaurantName: "Nhà hàng B",
+            slug: "nha-hang-b",
+          }),
+        ],
+      },
+    } as never);
+
+    const user = userEvent.setup();
+    render(<RestaurantPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Nhà hàng A")).toBeInTheDocument();
+      expect(screen.getByText("Nhà hàng B")).toBeInTheDocument();
+    });
+
+    await user.type(
+      screen.getByPlaceholderText("Tìm kiếm nhà hàng..."),
+      "khong-ton-tai",
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Không tìm thấy nhà hàng")).toBeInTheDocument();
+      expect(screen.queryByText("Nhà hàng A")).not.toBeInTheDocument();
+      expect(screen.queryByText("Nhà hàng B")).not.toBeInTheDocument();
+    });
+
+    await user.clear(screen.getByPlaceholderText("Tìm kiếm nhà hàng..."));
+
+    await waitFor(() => {
+      expect(screen.getByText("Nhà hàng A")).toBeInTheDocument();
+      expect(screen.getByText("Nhà hàng B")).toBeInTheDocument();
+    });
+  });
+
+  it("navigates to restaurant detail when clicking restaurant card", async () => {
+    vi.spyOn(apiClient, "get").mockResolvedValue({
+      data: {
+        isSuccess: true,
+        data: [createRestaurant({ slug: "nha-hang-a" })],
+      },
+    } as never);
+
+    const user = userEvent.setup();
+    render(<RestaurantPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Nhà hàng A")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByText("Nhà hàng A"));
+
+    expect(mockRouterPush).toHaveBeenCalledWith(
+      "/tenant/restaurant/nha-hang-a",
+    );
   });
 });
