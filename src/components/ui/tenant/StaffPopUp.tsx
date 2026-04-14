@@ -31,6 +31,10 @@ export default function StaffPopUp({
   const [restaurantId, setRestaurantId] = useState<number>(
     Number(staffData?.restaurantId) || Number(restaurants[0]?.id) || 0,
   );
+  // Role enum: Staff = 3, Cashier = 4 (from backend Role.cs)
+  const [role, setRole] = useState<number>(
+    staffData?.role === "Cashier" ? 4 : 3
+  );
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -43,6 +47,7 @@ export default function StaffPopUp({
     formData.append("email", email);
     formData.append("phone", phone);
     formData.append("restaurantId", restaurantId.toString());
+    formData.append("role", role.toString());
 
     if (staffData?.id) {
       onUpdate(staffData.id, restaurantId, formData);
@@ -171,6 +176,22 @@ export default function StaffPopUp({
                   disabled={isLoading}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-slate-300 focus:bg-white disabled:cursor-not-allowed disabled:opacity-50"
                 />
+              </div>
+
+              {/* Role Selection */}
+              <div>
+                <label className="text-sm font-medium text-slate-700 mb-2 block">
+                  Vai trò <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={role}
+                  onChange={(e) => setRole(parseInt(e.target.value))}
+                  disabled={isLoading}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-300 focus:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value={3}>Nhân viên</option>
+                  <option value={4}>Thu ngân</option>
+                </select>
               </div>
             </div>
 
