@@ -242,7 +242,7 @@ export enum BlogType {
   Promotion = 2,
   Update = 3,
   Event = 4,
-  Other = 5
+  Other = 5,
 }
 
 // Add System Blog Request
@@ -266,7 +266,6 @@ export interface AddSystemBlogDtoResponse {
   imageUrl: string;
   blogType: BlogType;
 }
-
 
 export interface BankInfo {
   id: string;
@@ -365,15 +364,15 @@ export interface UpdateConfigurationRequest {
 }
 
 export interface StaffDto {
-  id: string,
-  accountId: string,
-  restaurantId: number,
-  restaurantName: string,
-  name: string,
-  role: string,
-  avatar: string,
-  isActive: boolean,
-  createdAt: string
+  id: string;
+  accountId: string;
+  restaurantId: number;
+  restaurantName: string;
+  name: string;
+  role: string;
+  avatar: string;
+  isActive: boolean;
+  createdAt: string;
 }
 
 export interface BlogListResponse {
@@ -473,69 +472,67 @@ export interface NotifyTenantCreateRequest {
 }
 
 export type PlanApiItem = {
-  id: number,
-  name: string,
-  monthlyPrice: number,
-  yearlyPrice: number,
-  durationInDays?: number,
-  dailyRateMonth: number,
-  dailyRateYear: number,
-  level: number,
-  status: string,
+  id: number;
+  name: string;
+  monthlyPrice: number;
+  yearlyPrice: number;
+  durationInDays?: number;
+  dailyRateMonth: number;
+  dailyRateYear: number;
+  level: number;
+  status: string;
   features: {
-    maxStaff: number,
-    canUseCombo: boolean,
-    canUsePromotions: boolean,
-    canCustomMenuTemplate: boolean,
-    canUseAIUpsell?: boolean,
-    canRecommendationOnTop?: boolean
+    canUseAIUpsell: boolean;
+    canRecommendationOnTop: boolean;
+    canUsePromotions: boolean;
+    canCustomMenuTemplate: boolean;
   };
-}
+};
 
 export type PlanUpsertRequest = {
-  name: string,
-  monthlyPrice: number,
-  yearlyPrice: number,
-  durationInDays: number,
-  level: number,
+  name: string;
+  monthlyPrice: number;
+  yearlyPrice: number;
+  durationInDays: number;
+  level: number;
   features: {
-    canUseAIUpsell: boolean,
-    canRecommendationOnTop: boolean,
-    canUsePromotions: boolean,
-    canCustomMenuTemplate: boolean
-  }
-}
+    canUseAIUpsell: boolean;
+    canRecommendationOnTop: boolean;
+    canUsePromotions: boolean;
+    canCustomMenuTemplate: boolean;
+  };
+};
 
 export type SubscriptionTenantInfo = {
-  restaurantId: number,
-  restaurantName: string,
-  address: string,
-  isActive: boolean,
-  currentSubscriptionId: number,
-  currentPlanId: number,
-  currentPlanName: string,
-  startDate: string,
-  endDate: string,
-  status: string
-}
+  restaurantId: number;
+  restaurantName: string;
+  address: string;
+  isActive: boolean;
+  currentSubscriptionId: number;
+  currentPlanId: number;
+  currentPlanName: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+};
 
 export type PreviewSubscriptionResponse = {
-  totalAmountToPay: number,
+  totalAmountToPay: number;
   details: [
     {
-      restaurantId: number,
-      restaurantName: string,
-      actionType: number,
-      targetPlanName: string,
-      cycle: number,
-      quantity: number,
-      basePrice: number,
-      balanceConverted: number,
-      amountToPay: number,
-      message: string
-    }
-  ]
-}
+      restaurantId: number;
+      restaurantName: string;
+      actionType: number;
+      targetPlanName: string;
+      cycle: number;
+      quantity: number;
+      basePrice: number;
+      balanceConverted: number;
+      amountToPay: number;
+      message: string;
+    },
+  ];
+};
 
 export enum PromotionType {
   Standard = 0,
@@ -556,17 +553,17 @@ export enum DiscountType {
 
 export enum PromotionDaysOfWeek {
   None = 0,
-  Sunday = 1 << 0,    // 1 
-  Monday = 1 << 1,    // 2 
-  Tuesday = 1 << 2,   // 4
-  Wednesday = 1 << 3, // 8 
-  Thursday = 1 << 4,  // 16
-  Friday = 1 << 5,    // 32 
-  Saturday = 1 << 6,  // 64 
+  Sunday = 1 << 0, // 1
+  Monday = 1 << 1, // 2
+  Tuesday = 1 << 2, // 4
+  Wednesday = 1 << 3, // 8
+  Thursday = 1 << 4, // 16
+  Friday = 1 << 5, // 32
+  Saturday = 1 << 6, // 64
 
   Weekdays = Monday | Tuesday | Wednesday | Thursday | Friday, // 62
   Weekend = Saturday | Sunday, // 65
-  All = 127
+  All = 127,
 }
 
 export const PROMOTION_PRIORITY_DEFAULTS: Record<PromotionType, number> = {
@@ -577,50 +574,50 @@ export const PROMOTION_PRIORITY_DEFAULTS: Record<PromotionType, number> = {
 };
 
 export type PromotionUpsertPayload = {
-  id?: number,
-  isActive?: boolean,
-  name: string,
-  type: number,
-  discountType: number,
-  discountValue: number,
-  maxDiscountValue: number,
-  minOrderValue: number,
-  startDate: string | null,
-  endDate: string | null,
-  dailyStartTime: string | null,
-  dailyEndTime: string | null,
-  daysOfWeek: number,
-  isGlobal: boolean,
-  priority: number,
-  scope: number,
-  dishIds: number[] | null,
-  restaurantIds: number[] | null,
-}
+  id?: number;
+  isActive?: boolean;
+  name: string;
+  type: number;
+  discountType: number;
+  discountValue: number;
+  maxDiscountValue: number;
+  minOrderValue: number;
+  startDate: string | null;
+  endDate: string | null;
+  dailyStartTime: string | null;
+  dailyEndTime: string | null;
+  daysOfWeek: number;
+  isGlobal: boolean;
+  priority: number;
+  scope: number;
+  dishIds: number[] | null;
+  restaurantIds: number[] | null;
+};
 
 export type PromotionDto = {
-  id?: number,
-  isActive: boolean,
-  name: string,
-  type: number,
-  discountType: number,
-  discountValue: number,
-  maxDiscountValue: number,
-  minOrderValue: number,
-  startDate: string,
-  endDate: string,
-  dailyStartTime: string | null,
-  dailyEndTime: string | null,
-  daysOfWeek: number,
-  isGlobal: boolean,
-  priority: number,
-  scope: number,
-  dishIds: number[] | null,
-  restaurantIds: number[] | null
-}
+  id?: number;
+  isActive: boolean;
+  name: string;
+  type: number;
+  discountType: number;
+  discountValue: number;
+  maxDiscountValue: number;
+  minOrderValue: number;
+  startDate: string;
+  endDate: string;
+  dailyStartTime: string | null;
+  dailyEndTime: string | null;
+  daysOfWeek: number;
+  isGlobal: boolean;
+  priority: number;
+  scope: number;
+  dishIds: number[] | null;
+  restaurantIds: number[] | null;
+};
 
 export type PromotionResponse = {
-  isSuccess: boolean,
-  message: string,
+  isSuccess: boolean;
+  message: string;
   data: {
     items: PromotionDto[];
     totalCount: number;
@@ -629,10 +626,10 @@ export type PromotionResponse = {
     totalPages: number;
     hasPreviousPage: boolean;
     hasNextPage: boolean;
-  },
+  };
   errors?: null;
   timestamp: string;
-}
+};
 
 // ===== Admin Dashboard Types =====
 

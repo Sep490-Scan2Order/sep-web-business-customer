@@ -1,5 +1,6 @@
 export const ROUTES = {
   HOME: "/",
+  WEBHOOK_GUIDE: "/webhook-guide",
   PAGES: {
     ROOT: "/pages",
 
@@ -56,4 +57,5 @@ export const TENANT_ROUTES = {
   BRANCH_DISH_MANAGEMENT: "/tenant/branch-dish-management",
   SHIFT_REPORTS: "/tenant/shift-reports",
   ORDERS: "/tenant/orders",
+  SEPAY_GUIDE: "/tenant/sepay-guide",
 };
