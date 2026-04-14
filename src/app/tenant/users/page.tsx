@@ -110,6 +110,7 @@ export default function UsersPage() {
         email: formData.get("email") as string,
         name: formData.get("name") as string,
         phone: formData.get("phone") as string,
+        role: Number(formData.get("role")),
       });
 
       if (response.data.isSuccess) {
