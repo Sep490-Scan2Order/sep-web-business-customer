@@ -186,6 +186,7 @@ describe("Integration: Tenant Users Flow", () => {
       email: "staff@example.com",
       name: "Tran Thi B",
       phone: "0987654321",
+      role: 3,
     });
   });
 
