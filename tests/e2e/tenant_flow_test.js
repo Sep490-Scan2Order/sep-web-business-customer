@@ -530,3 +530,302 @@ Scenario(
     });
   },
 );
+
+Scenario("tenant can submit create promotion request", async ({ I }) => {
+  const email = process.env.E2E_TENANT_EMAIL || "owner1@gmail.com";
+  const password = process.env.E2E_TENANT_PASSWORD || "123456";
+  let promotionCreateRequested = false;
+
+  await loginTenant({ I }, email, password);
+
+  I.usePlaywrightTo("mock promotion APIs for create flow", async ({ page }) => {
+    await page.route("**/Promotion/tenant-logged-in**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          isSuccess: true,
+          data: {
+            items: [],
+            totalPages: 1,
+            totalCount: 0,
+            hasPreviousPage: false,
+            hasNextPage: false,
+          },
+        }),
+      });
+    });
+
+    await page.route(
+      "**/Restaurant/get-all-restaurant-by-tenant",
+      async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            isSuccess: true,
+            data: [
+              {
+                id: 101,
+                tenantId: "e2e-tenant-id",
+                restaurantName: "Nhà hàng A",
+                address: "123 Đường A",
+              },
+            ],
+          }),
+        });
+      },
+    );
+
+    await page.route("**/Dish/get-all", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          isSuccess: true,
+          data: [
+            {
+              id: 1,
+              dishName: "Món A",
+              categoryId: 1,
+            },
+          ],
+        }),
+      });
+    });
+
+    await page.route("**/Promotion", async (route) => {
+      if (route.request().method() === "POST") {
+        promotionCreateRequested = true;
+      }
+
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          isSuccess: true,
+          message: "Tạo khuyến mãi thành công",
+          data: { id: 9001 },
+        }),
+      });
+    });
+  });
+
+  I.amOnPage("/tenant/promotion");
+  I.waitForElement("button", 10);
+  I.click("Thêm khuyến mãi");
+  I.waitForText("Tạo khuyến mãi mới", 10);
+
+  I.usePlaywrightTo("fill required promotion fields", async ({ page }) => {
+    await page.getByPlaceholder("Nhập tên khuyến mãi").fill("Khuyến mãi E2E");
+    await page.getByPlaceholder("Nhập 1-100 (%)").fill("10");
+
+    const numberInputs = page.locator('input[type="number"]');
+    if ((await numberInputs.count()) > 1) {
+      await numberInputs.nth(1).fill("10000");
+    }
+
+    const dateInputs = page.locator('input[type="date"]');
+    if ((await dateInputs.count()) > 1) {
+      await dateInputs.nth(0).fill("2026-04-16");
+      await dateInputs.nth(1).fill("2026-04-30");
+    }
+  });
+
+  I.click("Tạo mới");
+
+  I.usePlaywrightTo("verify promotion create request", async () => {
+    if (!promotionCreateRequested) {
+      throw new Error("Promotion create request was not sent.");
+    }
+  });
+});
+
+Scenario("tenant orders search triggers keyword request", async ({ I }) => {
+  const email = process.env.E2E_TENANT_EMAIL || "owner1@gmail.com";
+  const password = process.env.E2E_TENANT_PASSWORD || "123456";
+  let keywordSearchRequested = false;
+
+  await loginTenant({ I }, email, password);
+
+  I.usePlaywrightTo("mock orders APIs for keyword search", async ({ page }) => {
+    await page.route(
+      "**/Restaurant/get-all-restaurant-by-tenant",
+      async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            isSuccess: true,
+            data: [
+              {
+                id: 101,
+                tenantId: "e2e-tenant-id",
+                restaurantName: "Nhà hàng A",
+                address: "123 Đường A",
+              },
+            ],
+          }),
+        });
+      },
+    );
+
+    await page.route("**/Order/tenant/restaurant/**", async (route) => {
+      const url = new URL(route.request().url());
+      const keyword = url.searchParams.get("keyword");
+      if (keyword === "abc123") {
+        keywordSearchRequested = true;
+      }
+
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          isSuccess: true,
+          data: {
+            items: [],
+            totalPages: 1,
+            totalCount: 0,
+            hasPreviousPage: false,
+            hasNextPage: false,
+          },
+        }),
+      });
+    });
+  });
+
+  I.amOnPage("/tenant/orders");
+  I.waitForText("Chọn nhà hàng để xem đơn hàng", 10);
+  I.usePlaywrightTo(
+    "select restaurant card for keyword search",
+    async ({ page }) => {
+      await page.getByText("Nhà hàng A", { exact: true }).click();
+    },
+  );
+  I.waitForText("Quản lý Đơn Hàng", 10);
+  I.fillField('input[placeholder="Tìm theo SĐT hoặc mã đơn..."]', "abc123");
+
+  I.usePlaywrightTo("wait and verify keyword request", async () => {
+    await new Promise((resolve) => setTimeout(resolve, 900));
+    if (!keywordSearchRequested) {
+      throw new Error(
+        "Orders keyword request with expected query was not sent.",
+      );
+    }
+  });
+});
+
+Scenario(
+  "tenant can apply menu template and send apply request",
+  async ({ I }) => {
+    const email = process.env.E2E_TENANT_EMAIL || "owner1@gmail.com";
+    const password = process.env.E2E_TENANT_PASSWORD || "123456";
+    let applyTemplateRequested = false;
+
+    await loginTenant({ I }, email, password);
+
+    I.usePlaywrightTo(
+      "mock menu template apply flow APIs",
+      async ({ page }) => {
+        await page.route(
+          "**/Restaurant/get-all-restaurant-by-tenant",
+          async (route) => {
+            await route.fulfill({
+              status: 200,
+              contentType: "application/json",
+              body: JSON.stringify({
+                isSuccess: true,
+                data: [
+                  {
+                    id: 101,
+                    tenantId: "e2e-tenant-id",
+                    restaurantName: "Nhà hàng A",
+                    address: "123 Đường A",
+                  },
+                ],
+              }),
+            });
+          },
+        );
+
+        await page.route("**/Restaurant/101/menu", async (route) => {
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+              isSuccess: true,
+              data: [],
+            }),
+          });
+        });
+
+        await page.route("**/MenuTemplate/restaurant/**", async (route) => {
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+              isSuccess: true,
+              data: [
+                {
+                  id: 7,
+                  templateName: "Template E2E",
+                  layoutConfigJson:
+                    '{"version":1,"canvas":{"width":1000,"height":800}}',
+                  themeColor: "#333333",
+                  fontFamily: "Arial",
+                },
+              ],
+            }),
+          });
+        });
+
+        await page.route("**/MenuTemplate/7", async (route) => {
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+              isSuccess: true,
+              data: {
+                id: 7,
+                templateName: "Template E2E",
+                layoutConfigJson:
+                  '{"version":1,"canvas":{"width":1000,"height":800}}',
+                themeColor: "#333333",
+                fontFamily: "Arial",
+              },
+            }),
+          });
+        });
+
+        await page.route("**/MenuRestaurant", async (route) => {
+          if (route.request().method() === "POST") {
+            applyTemplateRequested = true;
+          }
+
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+              isSuccess: true,
+              message: "Bạn đã áp dụng mẫu vào thực đơn thành công",
+            }),
+          });
+        });
+      },
+    );
+
+    I.amOnPage("/tenant/menu-template");
+    I.waitForText("Chọn Nhà Hàng", 10);
+    I.click("Nhà hàng A");
+    I.waitForText("Template E2E", 10);
+    I.click("Template E2E");
+    I.waitForText("Áp dụng cho: Nhà hàng A", 10);
+    I.click("✓ Áp dụng mẫu");
+
+    I.usePlaywrightTo("verify template apply request", async () => {
+      if (!applyTemplateRequested) {
+        throw new Error("Menu template apply request was not sent.");
+      }
+    });
+  },
+);
