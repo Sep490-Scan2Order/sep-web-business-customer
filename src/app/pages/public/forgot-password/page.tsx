@@ -20,6 +20,7 @@ import logoDefault from "@/src/images/logo/logo_no_background.png";
 import { ROUTES } from "@/src/constants/routes";
 import { API } from "@/src/constants/api";
 import apiClient from "@/src/services/apiClient";
+import { getApiErrorMessage, PASSWORD_POLICY_MESSAGE, PASSWORD_POLICY_REGEX } from "@/src/utils/utils";
 
 type Step = "email" | "otp" | "password";
 
@@ -131,13 +132,13 @@ export default function ForgotPasswordPage() {
       return;
     }
 
-    if (formData.newPassword !== formData.confirmPassword) {
-      toast.error("Mật khẩu xác nhận không khớp");
+    if (!PASSWORD_POLICY_REGEX.test(formData.newPassword)) {
+      toast.error(PASSWORD_POLICY_MESSAGE);
       return;
     }
 
-    if (formData.newPassword.length < 6) {
-      toast.error("Mật khẩu phải có ít nhất 6 ký tự");
+    if (formData.newPassword !== formData.confirmPassword) {
+      toast.error("Mật khẩu xác nhận không khớp");
       return;
     }
 
@@ -163,11 +164,7 @@ export default function ForgotPasswordPage() {
         toast.error(response.data?.message || "Đặt lại mật khẩu thất bại");
       }
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Đặt lại mật khẩu thất bại"
-      );
+      toast.error(getApiErrorMessage(error) || "Đặt lại mật khẩu thất bại");
     } finally {
       setLoading(false);
     }

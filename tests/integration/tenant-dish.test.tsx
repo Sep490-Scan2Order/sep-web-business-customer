@@ -76,7 +76,7 @@ describe("Integration: Tenant Dish Flow", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Pho Bo")).toBeInTheDocument();
-      expect(screen.getByText("Dish Management")).toBeInTheDocument();
+      expect(screen.getByText("Quản lý món ăn")).toBeInTheDocument();
     });
 
     expect(apiClient.get).toHaveBeenCalledWith(
@@ -85,6 +85,98 @@ describe("Integration: Tenant Dish Flow", () => {
     expect(apiClient.get).toHaveBeenCalledWith(
       API.DISHES.GET_ALL_BY_TENANT_ID("tenant-1"),
     );
+  });
+
+  it("shows prerequisite empty state when tenant has no categories", async () => {
+    vi.spyOn(apiClient, "get").mockImplementation((url: string) => {
+      if (url === API.CATEGORY.GET_ALL_BY_TENANT_ID("tenant-1")) {
+        return Promise.resolve({
+          data: {
+            isSuccess: true,
+            data: [],
+          },
+        } as never);
+      }
+
+      if (url === API.DISHES.GET_ALL_BY_TENANT_ID("tenant-1")) {
+        return Promise.resolve({
+          data: {
+            isSuccess: true,
+            data: [],
+          },
+        } as never);
+      }
+
+      return Promise.reject(new Error(`Unexpected GET ${url}`));
+    });
+
+    render(<DishPage />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Bạn cần tạo danh mục trước"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Vui lòng tạo danh mục món ăn trước khi thêm món ăn"),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      screen.queryByRole("button", { name: "Tạo món ăn" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("filters dishes by search keyword and shows no-result state", async () => {
+    vi.spyOn(apiClient, "get").mockImplementation((url: string) => {
+      if (url === API.CATEGORY.GET_ALL_BY_TENANT_ID("tenant-1")) {
+        return Promise.resolve({
+          data: {
+            isSuccess: true,
+            data: [mockCategory],
+          },
+        } as never);
+      }
+
+      if (url === API.DISHES.GET_ALL_BY_TENANT_ID("tenant-1")) {
+        return Promise.resolve({
+          data: {
+            isSuccess: true,
+            data: [
+              createDish({ id: 101, dishName: "Pho Bo" }),
+              createDish({ id: 102, dishName: "Com Tam", price: 55000 }),
+            ],
+          },
+        } as never);
+      }
+
+      return Promise.reject(new Error(`Unexpected GET ${url}`));
+    });
+
+    const user = userEvent.setup();
+    render(<DishPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Pho Bo")).toBeInTheDocument();
+      expect(screen.getByText("Com Tam")).toBeInTheDocument();
+    });
+
+    await user.type(
+      screen.getByPlaceholderText("Tìm kiếm..."),
+      "khong-ton-tai",
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Không tìm thấy món ăn")).toBeInTheDocument();
+      expect(screen.queryByText("Pho Bo")).not.toBeInTheDocument();
+      expect(screen.queryByText("Com Tam")).not.toBeInTheDocument();
+    });
+
+    await user.clear(screen.getByPlaceholderText("Tìm kiếm..."));
+
+    await waitFor(() => {
+      expect(screen.getByText("Pho Bo")).toBeInTheDocument();
+      expect(screen.getByText("Com Tam")).toBeInTheDocument();
+    });
   });
 
   it("creates a new dish from empty state", async () => {
@@ -121,7 +213,9 @@ describe("Integration: Tenant Dish Flow", () => {
     render(<DishPage />);
 
     await waitFor(() => {
-      expect(screen.getByText("Tạo món ăn đầu tiên của bạn")).toBeInTheDocument();
+      expect(
+        screen.getByText("Tạo món ăn đầu tiên của bạn"),
+      ).toBeInTheDocument();
     });
 
     await user.click(screen.getByRole("button", { name: "Tạo món ăn" }));
@@ -164,7 +258,9 @@ describe("Integration: Tenant Dish Flow", () => {
 
     expect(submittedFormData.get("dishName")).toBe("Bun Cha");
     expect(submittedFormData.get("price")).toBe("60000");
-    expect(submittedFormData.get("description")).toBe("Grilled pork with noodles");
+    expect(submittedFormData.get("description")).toBe(
+      "Grilled pork with noodles",
+    );
   });
 
   it("deletes a dish after confirmation", async () => {
@@ -217,7 +313,9 @@ describe("Integration: Tenant Dish Flow", () => {
       expect(screen.queryByText("Pho Bo")).not.toBeInTheDocument();
     });
 
-    expect(apiClient.delete).toHaveBeenCalledWith(API.DISHES.DELETE_DISH(10, 101));
+    expect(apiClient.delete).toHaveBeenCalledWith(
+      API.DISHES.DELETE_DISH(10, 101),
+    );
   });
 
   it("updates an existing dish from dish list", async () => {
@@ -270,7 +368,9 @@ describe("Integration: Tenant Dish Flow", () => {
 
     const nameInput = screen.getByPlaceholderText("Nhập tên món ăn...");
     const priceInput = screen.getByPlaceholderText("Nhập giá tiền...");
-    const descriptionInput = screen.getByPlaceholderText("Nhập mô tả món ăn...");
+    const descriptionInput = screen.getByPlaceholderText(
+      "Nhập mô tả món ăn...",
+    );
 
     await user.clear(nameInput);
     await user.type(nameInput, "Pho Bo Special");
@@ -327,7 +427,10 @@ describe("Integration: Tenant Dish Flow", () => {
             data:
               dishListCallCount === 1
                 ? [createDish()]
-                : [createDish(), createDish({ id: 202, dishName: "Com Tam", price: 55000 })],
+                : [
+                    createDish(),
+                    createDish({ id: 202, dishName: "Com Tam", price: 55000 }),
+                  ],
           },
         } as never);
       }
@@ -349,7 +452,9 @@ describe("Integration: Tenant Dish Flow", () => {
       expect(screen.getByText("Pho Bo")).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole("button", { name: "Nhập món ăn bằng file Excel" }));
+    await user.click(
+      screen.getByRole("button", { name: "Nhập món ăn bằng file Excel" }),
+    );
 
     await waitFor(() => {
       expect(
@@ -358,7 +463,9 @@ describe("Integration: Tenant Dish Flow", () => {
     });
 
     const popup = screen.getByRole("dialog", { name: "Nhập món ăn bằng file" });
-    const fileInput = popup.querySelector("input[type='file']") as HTMLInputElement | null;
+    const fileInput = popup.querySelector(
+      "input[type='file']",
+    ) as HTMLInputElement | null;
     expect(fileInput).not.toBeNull();
 
     const excelFile = new File(["fake excel content"], "dishes.xlsx", {
@@ -382,7 +489,9 @@ describe("Integration: Tenant Dish Flow", () => {
       },
     );
 
-    expect(apiClient.get).toHaveBeenCalledWith(API.DISHES.GET_ALL_BY_TENANT_ID("tenant-1"));
+    expect(apiClient.get).toHaveBeenCalledWith(
+      API.DISHES.GET_ALL_BY_TENANT_ID("tenant-1"),
+    );
     expect(dishListCallCount).toBe(2);
   });
 });

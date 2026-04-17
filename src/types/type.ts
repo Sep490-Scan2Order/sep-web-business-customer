@@ -117,6 +117,7 @@ export interface VerifyForgotPasswordOtpRequest {
 export interface CompleteForgotPasswordRequest {
   email: string;
   newPassword: string;
+  confirmPassword?: string;
   resetToken: string;
 }
 
@@ -846,4 +847,46 @@ export interface PagedTenantOrderResponseDto {
   totalCount: number;
   page: number;
   pageSize: number;
+}
+
+export interface PaymentTransactionHistory {
+  isSuccess: boolean;
+  message: string;
+  data: TransactionData[];
+  errors: unknown[] | null;
+  timestamp: string;
+}
+
+export interface TransactionData {
+  id: number;
+  transactionCode: string;
+  totalAmount: number;
+  paymentDate: string;
+  status: "Success" | "Pending" | "Canceled";
+  paymentTransactionType: "Subscription" | "CommissionFee";
+  subscriptionDetails: SubscriptionDetail[] | null;
+  commissionDetails: CommissionDetail | null;
+}
+
+export interface SubscriptionDetail {
+  restaurantId: number;
+  restaurantName: string;
+  actionType: "BuyNew" | "Upgrade" | "Renew" | "Downgrade";
+  oldPlanId: number | null;
+  oldPlanName: string | null;
+  newPlanId: number;
+  newPlanName: "Pro" | "Basic" | string;
+  cycle: "Monthly" | "Yearly" | string;
+  quantity: number;
+  amountAllocated: number;
+  balanceConverted: number;
+  descriptionMessage: string;
+}
+
+export interface CommissionDetail {
+  periodStart: string;
+  periodEnd: string;
+  totalOrdersScanned: number;
+  totalOrderAmount: number;
+  commissionRate: number;
 }

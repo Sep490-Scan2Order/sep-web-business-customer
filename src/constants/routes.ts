@@ -4,23 +4,20 @@ export const ROUTES = {
   PAGES: {
     ROOT: "/pages",
 
-    PUBLIC:{
+    PUBLIC: {
       LOGIN: "/pages/public/login",
       ADMIN_LOGIN: "/admin-login",
       REGISTER: "/pages/public/register",
       FORGOT_PASSWORD: "/pages/public/forgot-password",
-      PLAN:"/pages/public/plan",
+      PLAN: "/pages/public/plan",
       ABOUT_US: "/pages/public/about-us",
-      FEATURES: "/pages/public/features",   
-      BLOGS: "/pages/public/blogs",  
+      FEATURES: "/pages/public/features",
+      BLOGS: "/pages/public/blogs",
       TERMS_AND_POLICIES: "/pages/public/terms-and-policies",
     },
 
-    PRIVATE:{
-      
-    },
-
-  }
+    PRIVATE: {},
+  },
 };
 
 // Admin routes
@@ -58,4 +55,6 @@ export const TENANT_ROUTES = {
   SHIFT_REPORTS: "/tenant/shift-reports",
   ORDERS: "/tenant/orders",
   SEPAY_GUIDE: "/tenant/sepay-guide",
+  WEBHOOK_GUIDE: "/tenant/webhook-guide",
+  TRANSACTION_HISTORY: "/tenant/history-transaction",
 };

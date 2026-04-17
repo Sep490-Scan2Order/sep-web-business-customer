@@ -19,9 +19,12 @@ function MockCategoryPage() {
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<CategoryDto | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<CategoryDto | null>(
+    null,
+  );
   const [categoryName, setCategoryName] = useState("");
-  const [pendingDeleteCategory, setPendingDeleteCategory] = useState<CategoryDto | null>(null);
+  const [pendingDeleteCategory, setPendingDeleteCategory] =
+    useState<CategoryDto | null>(null);
 
   // Fetch categories on mount
   useEffect(() => {
@@ -34,7 +37,7 @@ function MockCategoryPage() {
       setLoading(true);
       try {
         const response = await apiClient.get(
-          API.CATEGORY.GET_ALL_BY_TENANT_ID(user.id)
+          API.CATEGORY.GET_ALL_BY_TENANT_ID(user.id),
         );
         if (response.data.isSuccess && response.data.data) {
           setCategories(response.data.data);
@@ -89,7 +92,7 @@ function MockCategoryPage() {
     try {
       const response = await apiClient.put(
         API.CATEGORY.UPDATE_CATEGORY(selectedCategory.id),
-        { categoryName: categoryName.trim() }
+        { categoryName: categoryName.trim() },
       );
 
       if (response.data.isSuccess) {
@@ -97,8 +100,8 @@ function MockCategoryPage() {
           prev.map((cat) =>
             cat.id === selectedCategory.id
               ? { ...cat, categoryName: categoryName.trim() }
-              : cat
-          )
+              : cat,
+          ),
         );
         toast.success("Category updated successfully");
         handleCloseModal();
@@ -121,12 +124,12 @@ function MockCategoryPage() {
     setDeleteLoading(true);
     try {
       const response = await apiClient.delete(
-        API.CATEGORY.DELETE_CATEGORY(pendingDeleteCategory.id)
+        API.CATEGORY.DELETE_CATEGORY(pendingDeleteCategory.id),
       );
 
       if (response.data.isSuccess) {
         setCategories((prev) =>
-          prev.filter((cat) => cat.id !== pendingDeleteCategory.id)
+          prev.filter((cat) => cat.id !== pendingDeleteCategory.id),
         );
         toast.success("Category deleted successfully");
         setPendingDeleteCategory(null);
@@ -257,7 +260,11 @@ function MockCategoryPage() {
                 disabled={loading}
                 className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
               >
-                {loading ? "Loading..." : selectedCategory ? "Update" : "Create"}
+                {loading
+                  ? "Loading..."
+                  : selectedCategory
+                    ? "Update"
+                    : "Create"}
               </button>
             </div>
           </div>
@@ -273,7 +280,8 @@ function MockCategoryPage() {
           <div className="w-full max-w-md rounded-lg border bg-white p-6 shadow-lg">
             <h2 className="mb-4 text-lg font-bold">Confirm Delete</h2>
             <p className="mb-6 text-gray-600">
-              Are you sure you want to delete "{pendingDeleteCategory.categoryName}"?
+              Are you sure you want to delete "
+              {pendingDeleteCategory.categoryName}"?
             </p>
             <div className="flex justify-end gap-2">
               <button
@@ -304,7 +312,7 @@ function MockCategoryPage() {
 
 /**
  * Integration Test Suite: Tenant Category Management
- * 
+ *
  * Tests the complete flow of:
  * - Fetching categories
  * - Creating new category
@@ -314,6 +322,8 @@ function MockCategoryPage() {
  */
 describe("Tenant Category Management - Integration Tests", () => {
   beforeEach(() => {
+    vi.restoreAllMocks();
+
     // Clear auth store
     useAuthStore.setState({
       user: {
@@ -402,7 +412,9 @@ describe("Tenant Category Management - Integration Tests", () => {
       });
 
       // Check for the modal title using getByRole to be more specific
-      const modalHeading = await screen.findByRole("heading", { name: /Create Category/ });
+      const modalHeading = await screen.findByRole("heading", {
+        name: /Create Category/,
+      });
       expect(modalHeading).toBeInTheDocument();
     });
 
@@ -487,7 +499,9 @@ describe("Tenant Category Management - Integration Tests", () => {
       expect(screen.getByText("Edit Category")).toBeInTheDocument();
 
       // Input should have current category name
-      const input = screen.getByTestId("category-name-input") as HTMLInputElement;
+      const input = screen.getByTestId(
+        "category-name-input",
+      ) as HTMLInputElement;
       expect(input.value).toBe("Đồ ăn nhanh");
     });
 
@@ -550,7 +564,9 @@ describe("Tenant Category Management - Integration Tests", () => {
 
       // Original name should remain
       expect(screen.getByText("Đồ ăn nhanh")).toBeInTheDocument();
-      expect(screen.queryByText("Đồ ăn nhanh - Updated")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Đồ ăn nhanh - Updated"),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -573,7 +589,9 @@ describe("Tenant Category Management - Integration Tests", () => {
       });
 
       // Check for confirmation message
-      const confirmMessage = await screen.findByText(/Are you sure you want to delete/);
+      const confirmMessage = await screen.findByText(
+        /Are you sure you want to delete/,
+      );
       expect(confirmMessage).toBeInTheDocument();
     });
 
@@ -606,7 +624,9 @@ describe("Tenant Category Management - Integration Tests", () => {
       expect(screen.getByTestId("category-item-2")).toBeInTheDocument();
 
       // Modal should close
-      expect(screen.queryByTestId("delete-confirm-modal")).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("delete-confirm-modal"),
+      ).not.toBeInTheDocument();
     });
 
     it("should cancel delete without removing category", async () => {
@@ -626,7 +646,9 @@ describe("Tenant Category Management - Integration Tests", () => {
       await userEvent.click(cancelBtn);
 
       // Modal should close
-      expect(screen.queryByTestId("delete-confirm-modal")).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("delete-confirm-modal"),
+      ).not.toBeInTheDocument();
 
       // Category should still exist
       expect(screen.getByTestId("category-item-1")).toBeInTheDocument();
@@ -709,6 +731,24 @@ describe("Tenant Category Management - Integration Tests", () => {
     });
 
     it("should handle rapid category creation", async () => {
+      let nextCategoryId = 3;
+      vi.spyOn(apiClient, "post").mockImplementation(async (_url, payload) => {
+        const request = payload as { categoryName?: string };
+
+        return {
+          data: {
+            isSuccess: true,
+            data: {
+              id: nextCategoryId++,
+              categoryName: request.categoryName || "",
+              tenantId: "tenant-1",
+              createdAt: new Date().toISOString(),
+            },
+            message: "Category created successfully",
+          },
+        } as never;
+      });
+
       render(<MockCategoryPage />);
 
       // Create first category
@@ -786,7 +826,17 @@ describe("Tenant Category Management - Integration Tests", () => {
       });
 
       // Step 3: Update the new category
-      const editBtn = screen.getByTestId("edit-btn-3");
+      const createdCategoryItem = screen
+        .getByText("Tráng miệng")
+        .closest("[data-testid^='category-item-']");
+      expect(createdCategoryItem).not.toBeNull();
+
+      const editBtn = within(createdCategoryItem as HTMLElement).getByRole(
+        "button",
+        {
+          name: "Edit",
+        },
+      );
       await userEvent.click(editBtn);
 
       const editInput = screen.getByTestId("category-name-input");
@@ -801,14 +851,26 @@ describe("Tenant Category Management - Integration Tests", () => {
       });
 
       // Step 4: Delete the category
-      const deleteBtn = screen.getByTestId("delete-btn-3");
+      const updatedCategoryItem = screen
+        .getByText("Tráng miệng - Đặc biệt")
+        .closest("[data-testid^='category-item-']");
+      expect(updatedCategoryItem).not.toBeNull();
+
+      const deleteBtn = within(updatedCategoryItem as HTMLElement).getByRole(
+        "button",
+        {
+          name: "Delete",
+        },
+      );
       await userEvent.click(deleteBtn);
 
       const confirmBtn = screen.getByTestId("delete-confirm-btn");
       await userEvent.click(confirmBtn);
 
       await waitFor(() => {
-        expect(screen.queryByTestId("category-item-3")).not.toBeInTheDocument();
+        expect(
+          screen.queryByText("Tráng miệng - Đặc biệt"),
+        ).not.toBeInTheDocument();
       });
 
       // Verify original categories still exist
