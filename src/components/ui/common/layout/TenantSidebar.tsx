@@ -139,6 +139,12 @@ const sections: { label: string; items: NavItem[] }[] = [
         icon: CreditCard,
         match: "prefix",
       },
+      {
+        label: "Lịch sử giao dịch",
+        href: TENANT_ROUTES.TRANSACTION_HISTORY,
+        icon: Receipt,
+        match: "prefix",
+      },
     ],
   },
 ];

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ChevronLeft, ExternalLink } from "lucide-react";
-import { ROUTES, TENANT_ROUTES } from "@/src/constants/routes";
+import { TENANT_ROUTES } from "@/src/constants/routes";
 
 const sepayBankGuideSteps = [
   {
@@ -39,7 +39,8 @@ const sepayBankGuideSteps = [
       "https://ysafyqmiutvhohvsthnt.supabase.co/storage/v1/object/public/sepay_guide/sepay_integration4.png",
   },
   {
-    title: "Nhập các thông tin cần thiết (mã thẻ, tên chủ thẻ, CCCD, số điện thoại)",
+    title:
+      "Nhập các thông tin cần thiết (mã thẻ, tên chủ thẻ, CCCD, số điện thoại)",
     imageUrl:
       "https://ysafyqmiutvhohvsthnt.supabase.co/storage/v1/object/public/sepay_guide/sepay_integration5.png",
   },
@@ -80,14 +81,20 @@ export default function SepayGuidePage() {
       </header>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-lg font-semibold text-slate-900">Luồng liên kết ngân hàng</h2>
+        <h2 className="text-lg font-semibold text-slate-900">
+          Luồng liên kết ngân hàng
+        </h2>
         <p className="mt-1 text-sm text-slate-500">
-          Làm theo 11 bước dưới đây để hoàn tất liên kết tài khoản ngân hàng trên Sepay.
+          Làm theo 11 bước dưới đây để hoàn tất liên kết tài khoản ngân hàng
+          trên Sepay.
         </p>
 
         <div className="mt-5 space-y-4">
           {sepayBankGuideSteps.map((step, index) => (
-            <div key={index} className="rounded-xl border border-slate-200 bg-slate-50 p-3 sm:p-4">
+            <div
+              key={index}
+              className="rounded-xl border border-slate-200 bg-slate-50 p-3 sm:p-4"
+            >
               <p className="text-sm font-medium text-slate-900">
                 Bước {index + 1}: {step.title}
               </p>
@@ -103,7 +110,8 @@ export default function SepayGuidePage() {
                 </div>
               ) : (
                 <p className="mt-2 text-xs text-slate-500">
-                  Xác nhận OTP trên ứng dụng hoặc SMS của ngân hàng để hoàn tất bước này.
+                  Xác nhận OTP trên ứng dụng hoặc SMS của ngân hàng để hoàn tất
+                  bước này.
                 </p>
               )}
             </div>
@@ -112,12 +120,15 @@ export default function SepayGuidePage() {
       </section>
 
       <section className="rounded-2xl border border-sky-200 bg-sky-50 p-5 shadow-sm sm:p-6">
-        <h2 className="text-lg font-semibold text-slate-900">Tiếp theo: cấu hình webhook</h2>
+        <h2 className="text-lg font-semibold text-slate-900">
+          Tiếp theo: cấu hình webhook
+        </h2>
         <p className="mt-2 text-sm text-slate-700">
-          Sau khi liên kết ngân hàng thành công, bạn có thể sang trang hướng dẫn webhook để hoàn tất cấu hình callback thanh toán.
+          Sau khi liên kết ngân hàng thành công, bạn có thể sang trang hướng dẫn
+          webhook để hoàn tất cấu hình callback thanh toán.
         </p>
         <Link
-          href={ROUTES.WEBHOOK_GUIDE}
+          href={TENANT_ROUTES.WEBHOOK_GUIDE}
           className="mt-3 inline-flex items-center gap-2 rounded-lg border border-sky-300 bg-white px-3 py-2 text-sm font-medium text-sky-700 hover:bg-sky-100"
         >
           Đi tới trang webhook guide

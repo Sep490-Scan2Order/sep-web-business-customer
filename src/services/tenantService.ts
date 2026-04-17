@@ -1,6 +1,13 @@
 import { API } from "@/src/constants/api";
 import apiClient from "@/src/services/apiClient";
-import { ApiResponse, TenantDashboardRevenue, User, UserInfo } from "@/src/types/type";
+import {
+  ApiResponse,
+  PaymentTransactionHistory,
+  TenantDashboardRevenue,
+  TransactionData,
+  User,
+  UserInfo,
+} from "@/src/types/type";
 
 type TenantByIdResponse = ApiResponse<UserInfo>;
 type TenantDashboardRevenueResponse = ApiResponse<TenantDashboardRevenue>;
@@ -31,7 +38,9 @@ export const getTenantById = async (tenantId: string): Promise<User> => {
     const apiResponse = payload as TenantByIdResponse;
 
     if (!apiResponse.isSuccess || !apiResponse.data) {
-      throw new Error(apiResponse.message || "Failed to fetch tenant information");
+      throw new Error(
+        apiResponse.message || "Failed to fetch tenant information",
+      );
     }
 
     return apiResponse.data as User;
@@ -55,12 +64,31 @@ export const getTenantDashboardRevenue = async (
     ? `${API.TENANT.DASHBOARD_REVENUE}?${query}`
     : API.TENANT.DASHBOARD_REVENUE;
 
-  const response = await apiClient.get<TenantDashboardRevenueResponse>(endpoint);
+  const response =
+    await apiClient.get<TenantDashboardRevenueResponse>(endpoint);
   const payload = response.data;
 
   if (!payload.isSuccess || !payload.data) {
-    throw new Error(payload.message || "Failed to fetch tenant dashboard revenue");
+    throw new Error(
+      payload.message || "Failed to fetch tenant dashboard revenue",
+    );
   }
 
   return payload.data;
+};
+
+export const getPaymentTransactionHistory = async (): Promise<
+  TransactionData[]
+> => {
+  const response = await apiClient.get<PaymentTransactionHistory>(
+    API.SUBSCRIPTION.VIEW_HISTORY,
+  );
+
+  const payload = response.data;
+
+  if (!payload.isSuccess) {
+    throw new Error(payload.message || "Failed to fetch transaction history");
+  }
+
+  return payload.data ?? [];
 };
