@@ -24,6 +24,7 @@ import apiClient from "@/src/services/apiClient";
 import { API } from "@/src/constants/api";
 import { formatMoney, formatNumber } from "./tenantInfoFormatters";
 import { toast } from "react-toastify";
+import { getDateInputValue, toUtcDateString } from "@/src/app/tenant/dashboard/components/dashboardUtils";
 
 interface RevenueSummaryProps {
   restaurantId: number;
@@ -37,12 +38,12 @@ export default function RevenueSummary({ restaurantId }: RevenueSummaryProps) {
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState("today");
 
-  const fetchRevenueSummary = async () => {
+  const fetchRevenueSummary = async (startDate?: string, endDate?: string) => {
     setLoading(true);
+    const url = API.RESTAURANT.REVENUE_SUMMARY(restaurantId, startDate, endDate);
+    console.log("Fetching revenue summary:", { dateRange, startDate, endDate, url });
     try {
-      const response = await apiClient.get(
-        API.RESTAURANT.REVENUE_SUMMARY(restaurantId),
-      );
+      const response = await apiClient.get(url);
       if (response.data.isSuccess) {
         setData(response.data.data);
       } else {
@@ -58,7 +59,30 @@ export default function RevenueSummary({ restaurantId }: RevenueSummaryProps) {
 
   useEffect(() => {
     if (restaurantId) {
-      fetchRevenueSummary();
+      let start: string | undefined;
+      let end: string | undefined;
+
+      const now = new Date();
+      if (dateRange === "today") {
+        const todayStr = getDateInputValue(now);
+        start = toUtcDateString(todayStr, false);
+        end = toUtcDateString(todayStr, true);
+      } else if (dateRange === "week") {
+        const weekAgo = new Date();
+        weekAgo.setDate(now.getDate() - 7);
+        start = toUtcDateString(getDateInputValue(weekAgo), false);
+        end = toUtcDateString(getDateInputValue(now), true);
+      } else if (dateRange === "month") {
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        start = toUtcDateString(getDateInputValue(monthStart), false);
+        end = toUtcDateString(getDateInputValue(now), true);
+      } else {
+        // "all" range - no dates
+        start = undefined;
+        end = undefined;
+      }
+
+      fetchRevenueSummary(start, end);
     }
   }, [restaurantId, dateRange]);
 

@@ -14,6 +14,7 @@ import {
   TenantOrderResponseDto,
   PagedTenantOrderResponseDto 
 } from "@/src/types/type";
+import TablePagination from "@/src/components/ui/common/TablePagination";
 
 const ORDER_STATUS_MAP: Record<number, { text: string; bg: string; textCol: string }> = {
   0: { text: "Chờ thanh toán", bg: "bg-yellow-50", textCol: "text-yellow-700" },
@@ -496,43 +497,13 @@ function TenantOrdersContent() {
 
             {/* Pagination Controls */}
             {totalItems > 0 && (
-              <div className="flex items-center justify-between border-t border-slate-200 bg-white px-6 py-3">
-                <div className="text-sm text-slate-500">
-                  Hiển thị <span className="font-medium text-slate-900">{Math.min((currentPage - 1) * pageSize + 1, totalItems)}</span> đến <span className="font-medium text-slate-900">{Math.min(currentPage * pageSize, totalItems)}</span> trong số <span className="font-medium text-slate-900">{totalItems}</span> đơn
-                </div>
-                
-                <div className="flex gap-1 items-center">
-                  <button
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                    className="p-1 rounded-md text-slate-500 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                  </button>
-                  
-                  {Array.from({ length: Math.ceil(totalItems / pageSize) }).map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentPage(index + 1)}
-                      className={`h-8 min-w-[32px] rounded-lg px-2 text-sm font-medium transition-colors cursor-pointer ${
-                        currentPage === index + 1
-                          ? "bg-slate-900 text-white"
-                          : "text-slate-600 hover:bg-slate-100"
-                      }`}
-                    >
-                      {index + 1}
-                    </button>
-                  ))}
-
-                  <button
-                    onClick={() => setCurrentPage(prev => (prev * pageSize < totalItems ? prev + 1 : prev))}
-                    disabled={currentPage * pageSize >= totalItems}
-                    className="p-1 rounded-md text-slate-500 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                  </button>
-                </div>
-              </div>
+              <TablePagination
+                currentPage={currentPage}
+                totalItems={totalItems}
+                pageSize={pageSize}
+                onPageChange={setCurrentPage}
+                itemUnit="đơn"
+              />
             )}
           </div>
         </div>

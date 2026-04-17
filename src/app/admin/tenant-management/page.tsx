@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import ConfirmActionPopup from "@/src/components/ui/common/ConfirmActionPopup";
+import TablePagination from "@/src/components/ui/common/TablePagination";
 
 type TenantApiItem = {
       id: string,
@@ -405,37 +406,15 @@ export default function TenantManagementPage() {
         </div>
 
         {/* Pagination */}
-        <div className="px-4 py-3 border-t border-gray-200 flex items-center justify-center gap-1">
-          <button
-            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-            disabled={currentPage === 1}
-            className="p-1.5 hover:bg-gray-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ChevronLeft className="w-4 h-4 text-gray-600" />
-          </button>
-          
-          {Array.from({ length: Math.min(totalPages, 6) }, (_, i) => i + 1).map(page => (
-            <button
-              key={page}
-              onClick={() => setCurrentPage(page)}
-              className={`min-w-[32px] px-2 py-1.5 text-sm rounded transition-colors ${
-                currentPage === page
-                  ? 'bg-blue-500 text-white'
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              {page}
-            </button>
-          ))}
-          
-          <button
-            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-            disabled={currentPage === totalPages}
-            className="p-1.5 hover:bg-gray-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ChevronRight className="w-4 h-4 text-gray-600" />
-          </button>
-        </div>
+        {filteredTenants.length > 0 && (
+          <TablePagination
+            currentPage={currentPage}
+            totalItems={filteredTenants.length}
+            pageSize={itemsPerPage}
+            onPageChange={setCurrentPage}
+            itemUnit="bên thuê"
+          />
+        )}
       </div>
       <ConfirmActionPopup 
         isOpen={isConfirmPopupOpen}
