@@ -6,7 +6,7 @@ import { API } from "@/src/constants/api";
 
 const PDF_WEB_URL =
   "https://ysafyqmiutvhohvsthnt.supabase.co/storage/v1/object/public/term-and-policies/s2o-terms-and-policies.pdf";
-const PDF_DOWNLOAD_URL = "/documents/s2o-terms-and-policies.pdf";
+const PDF_DOWNLOAD_URL = "/documents/terms-and-policies.pdf";
 const ADMIN_EMAIL = "administrator@scan2order.id.vn";
 
 const SUBJECTS = [

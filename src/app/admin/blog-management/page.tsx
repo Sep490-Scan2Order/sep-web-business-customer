@@ -198,18 +198,28 @@ export default function BlogManagementPage() {
   const blocksToHtml = (): string => {
     return contentBlocks
       .map((block) => {
+        // Convert newlines to <br> tags while preserving content
+        const preserveLineBreaks = (text: string) => {
+          return text
+            .split('\n')
+            .map((line) => line.trim())
+            .filter((line) => line)
+            .join('<br />');
+        };
+
         if (block.type === "text") {
-          let text = block.content;
+          let text = preserveLineBreaks(block.content);
           if (block.style?.bold) text = `<strong>${text}</strong>`;
           if (block.style?.italic) text = `<em>${text}</em>`;
           const align = block.style?.alignment || "left";
-          return `<p style="text-align: ${align}">${text}</p>`;
+          return `<p style="text-align: ${align}; margin: 16px 0; line-height: 1.6;">${text}</p>`;
         } else if (block.type === "heading") {
           const level = block.style?.heading || "h2";
           const align = block.style?.alignment || "left";
-          return `<${level} style="text-align: ${align}">${block.content}</${level}>`;
+          const headingMargin = level === "h1" ? "32px 0 20px 0" : "24px 0 16px 0";
+          return `<${level} style="text-align: ${align}; margin: ${headingMargin}; line-height: 1.4;">${preserveLineBreaks(block.content)}</${level}>`;
         } else if (block.type === "image") {
-          return `<div class="image-placeholder" style="text-align: center; margin: 20px 0;"><img src="IMAGE_PLACEHOLDER_${block.id}" alt="Blog image" style="max-width: 100%; height: auto;" /></div>`;
+          return `<div class="image-placeholder" style="text-align: center; margin: 32px 0; border-radius: 8px; overflow: hidden;"><img src="IMAGE_PLACEHOLDER_${block.id}" alt="Blog image" style="max-width: 100%; height: auto; display: block;" /></div>`;
         }
         return "";
       })
