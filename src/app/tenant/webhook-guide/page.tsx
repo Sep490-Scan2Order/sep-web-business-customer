@@ -1,12 +1,17 @@
+"use client";
 import Link from "next/link";
 import { ChevronLeft, ExternalLink } from "lucide-react";
 import { TENANT_ROUTES } from "@/src/constants/routes";
+import Header from "@/src/components/ui/common/layout/Header";
+import ImageModal from "@/src/components/ui/common/ImageModal";
 
 const WEBHOOK_URL = "https://api.scan2order.io.vn/api/Webhooks/sepay";
 
 export default function TenantWebhookGuidePage() {
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+    <>
+      <Header />
+      <main className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
       <header className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">
@@ -30,12 +35,10 @@ export default function TenantWebhookGuidePage() {
           1) Giao diện webhook trên Sepay
         </h2>
         <div className="mt-4 overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <ImageModal
             src="https://ysafyqmiutvhohvsthnt.supabase.co/storage/v1/object/public/sepay_guide/webhook1.png"
             alt="Giao diện webhook trên Sepay"
             className="h-auto w-full object-contain"
-            loading="lazy"
           />
         </div>
       </section>
@@ -86,12 +89,10 @@ export default function TenantWebhookGuidePage() {
         </ol>
 
         <div className="mt-4 overflow-hidden rounded-lg border border-sky-200 bg-white">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <ImageModal
             src="https://ysafyqmiutvhohvsthnt.supabase.co/storage/v1/object/public/sepay_guide/webhook2.png"
             alt="Cấu hình webhook Sepay"
             className="h-auto w-full object-contain"
-            loading="lazy"
           />
         </div>
       </section>
@@ -105,15 +106,14 @@ export default function TenantWebhookGuidePage() {
           động như minh họa bên dưới.
         </p>
         <div className="mt-4 overflow-hidden rounded-lg border border-emerald-200 bg-white">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <ImageModal
             src="https://ysafyqmiutvhohvsthnt.supabase.co/storage/v1/object/public/sepay_guide/webhook3.png"
             alt="Hoàn thành cấu hình webhook"
             className="h-auto w-full object-contain"
-            loading="lazy"
           />
         </div>
       </section>
-    </main>
+      </main>
+    </>
   );
 }

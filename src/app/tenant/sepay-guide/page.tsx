@@ -1,6 +1,9 @@
+"use client";
 import Link from "next/link";
 import { ChevronLeft, ExternalLink } from "lucide-react";
 import { TENANT_ROUTES } from "@/src/constants/routes";
+import Header from "@/src/components/ui/common/layout/Header";
+import ImageModal from "@/src/components/ui/common/ImageModal";
 
 const sepayBankGuideSteps = [
   {
@@ -61,7 +64,9 @@ const sepayBankGuideSteps = [
 
 export default function SepayGuidePage() {
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+    <>
+      <Header />
+      <main className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
       <header className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-slate-900 sm:text-2xl">
@@ -100,12 +105,10 @@ export default function SepayGuidePage() {
               </p>
               {step.imageUrl ? (
                 <div className="mt-3 overflow-hidden rounded-lg border border-slate-200 bg-white">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <ImageModal
                     src={step.imageUrl}
                     alt={`Hướng dẫn Sepay bước ${index + 1}`}
                     className="h-auto w-full object-contain"
-                    loading="lazy"
                   />
                 </div>
               ) : (
@@ -135,6 +138,7 @@ export default function SepayGuidePage() {
           <ExternalLink className="h-4 w-4" />
         </Link>
       </section>
-    </main>
+      </main>
+    </>
   );
 }
