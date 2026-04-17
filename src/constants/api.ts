@@ -68,24 +68,6 @@ export const API = {
       }
       return url;
     },
-<<<<<<< HEAD
-    RESTAURANT: {
-        CREATE: "/Restaurant",
-        GET_ALL_RESTAURANT_BY_TENANT_ID: "/Restaurant/get-all-restaurant-by-tenant",
-        GET_BY_ID: (id: string) => `/Restaurant/${id}`,
-        UPDATE: (id: string) => `/Restaurant/${id}`,
-        DELETE: (id: string) => `/Restaurant/${id}`,
-        GET_RESTAURANT_DETAIL_BY_SLUG: (slug: string) => `/Restaurant/${slug}`,
-        GET_MENU: (restaurantId: number) => `/Restaurant/${restaurantId}/menu`,
-        GET_MENU_ALL: (restaurantId: number) => `/Restaurant/${restaurantId}/menu-all`,
-        CONFIG_MIN_CASH_AMOUNT: (restaurantId: number, minCashAmount: number) => `/Restaurant/config-min-cash-amount?restaurantId=${restaurantId}&minCashAmount=${minCashAmount}`,
-        REVENUE_SUMMARY: (id: number, startDate?: string, endDate?: string) => {
-            const params = new URLSearchParams();
-            if (startDate) params.set("startDate", startDate);
-            if (endDate) params.set("endDate", endDate);
-            return `/Restaurant/${id}/revenue-summary?${params.toString()}`;
-        },
-=======
     GET_BY_ID: (id: number) => `/SystemBlog/${id}`,
   },
   CATEGORY: {
@@ -184,11 +166,12 @@ export const API = {
       if (endDate) params.push(`endDate=${endDate}`);
       if (params.length) url += `?${params.join("&")}`;
       return url;
->>>>>>> f75e16eb2db6c9fbef46dd90cd5553a0584b5edd
     },
     VIEW_REVENUE_SUBSCRIPTIONS: (month: number = 12) =>
       `/Admin/subscription-revenue-trends?months=${month}`,
     VIEW_REVENUE_COMSSION_FEE: (month: number = 12) =>
+      `/Admin/commission-revenue-trends?months=${month}`,
+    VIEW_REVENUE_COMMISSION_FEE: (month: number = 12) =>
       `/Admin/commission-revenue-trends?months=${month}`,
     VIEW_REVENUE_SUBSCRIPTIONS_BY_PLAN: (month: number = 12) =>
       `/Admin/subscription-revenue-by-plan?months=${month}`,
