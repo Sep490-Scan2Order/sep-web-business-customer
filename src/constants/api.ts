@@ -45,11 +45,10 @@ export const API = {
         GET_MENU_ALL: (restaurantId: number) => `/Restaurant/${restaurantId}/menu-all`,
         CONFIG_MIN_CASH_AMOUNT: (restaurantId: number, minCashAmount: number) => `/Restaurant/config-min-cash-amount?restaurantId=${restaurantId}&minCashAmount=${minCashAmount}`,
         REVENUE_SUMMARY: (id: number, startDate?: string, endDate?: string) => {
-            let url = `/Restaurant/${id}/revenue-summary`;
-            if (startDate && endDate) {
-                url += `?startDate=${startDate}&endDate=${endDate}`;
-            }
-            return url;
+            const params = new URLSearchParams();
+            if (startDate) params.set("startDate", startDate);
+            if (endDate) params.set("endDate", endDate);
+            return `/Restaurant/${id}/revenue-summary?${params.toString()}`;
         },
     },
     BLOG: {
