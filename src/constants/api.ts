@@ -167,6 +167,12 @@ export const API = {
       if (params.length) url += `?${params.join("&")}`;
       return url;
     },
+    VIEW_REVENUE_SUBSCRIPTIONS: (month: number = 12) =>
+      `/Admin/subscription-revenue-trends?months=${month}`,
+    VIEW_REVENUE_COMSSION_FEE: (month: number = 12) =>
+      `/Admin/commission-revenue-trends?months=${month}`,
+    VIEW_REVENUE_SUBSCRIPTIONS_BY_PLAN: (month: number = 12) =>
+      `/Admin/subscription-revenue-by-plan?months=${month}`,
   },
   BRANCH_DISH_CONFIG: {
     UPDATE_IS_SELLING: (

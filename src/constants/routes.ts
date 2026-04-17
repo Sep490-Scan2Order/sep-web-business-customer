@@ -32,6 +32,7 @@ export const ADMIN_ROUTES = {
   RESTAURANT_MANAGEMENT: "/admin/restaurant-management",
   BILLING_SUBSCRIPTIONS: "/admin/billing-subscriptions",
   TEMPLATE_MANAGEMENT: "/admin/template-management",
+  REVENUE_MANAGEMENT: "/admin/revenue-management",
   // Settings
   AI_SETTINGS: "/admin/ai-settings",
   GLOBAL_SETTINGS: "/admin/global-settings",

@@ -890,3 +890,27 @@ export interface CommissionDetail {
   totalOrderAmount: number;
   commissionRate: number;
 }
+
+export interface RevenueResponse {
+  isSuccess: boolean;
+  message: string;
+  data: {
+    month: string;
+    revenue: number;
+  }[];
+  errors: null;
+  timestamp: string;
+}
+
+export interface SubscriptionRevenueByPlan {
+  isSuccess: boolean;
+  message: string;
+  data: {
+    planId: number;
+    planName: string;
+    revenue: number;
+    percentage: number;
+  }[];
+  errors: null;
+  timestamp: string;
+}

@@ -10,6 +10,8 @@ import {
   TopTenantItem,
   TenantDetailData,
   RevenueSummaryData,
+  RevenueResponse,
+  SubscriptionRevenueByPlan,
 } from "@/src/types/type";
 
 export const getSummaryMetrics = async (): Promise<AdminSummaryMetrics> => {
@@ -52,9 +54,9 @@ export const getPlanDistribution = async (): Promise<
 export const getTopPerformingRestaurants = async (
   top: number = 5,
 ): Promise<TopPerformingRestaurant[]> => {
-  const response = await apiClient.get<
-    ApiResponse<TopPerformingRestaurant[]>
-  >(API.ADMIN.TOP_PERFORMING_RESTAURANTS(top));
+  const response = await apiClient.get<ApiResponse<TopPerformingRestaurant[]>>(
+    API.ADMIN.TOP_PERFORMING_RESTAURANTS(top),
+  );
   const payload = response.data;
   if (!payload.isSuccess || !payload.data) {
     throw new Error(
@@ -121,5 +123,52 @@ export const getRestaurantRevenueSummary = async (
   if (!payload.isSuccess || !payload.data) {
     throw new Error(payload.message || "Failed to fetch revenue summary");
   }
+  return payload.data;
+};
+
+export const getSubscriptionRevenueTrends = async (
+  months: number = 12,
+): Promise<RevenueResponse["data"]> => {
+  const response = await apiClient.get<RevenueResponse>(
+    API.ADMIN.VIEW_REVENUE_SUBSCRIPTIONS(months),
+  );
+  const payload = response.data;
+
+  if (!payload.isSuccess || !payload.data) {
+    throw new Error(payload.message || "Failed to fetch subscription revenue");
+  }
+
+  return payload.data;
+};
+
+export const getCommissionRevenueTrends = async (
+  months: number = 12,
+): Promise<RevenueResponse["data"]> => {
+  const response = await apiClient.get<RevenueResponse>(
+    API.ADMIN.VIEW_REVENUE_COMSSION_FEE(months),
+  );
+  const payload = response.data;
+
+  if (!payload.isSuccess || !payload.data) {
+    throw new Error(payload.message || "Failed to fetch commission revenue");
+  }
+
+  return payload.data;
+};
+
+export const getSubscriptionRevenueByPlan = async (
+  months: number = 12,
+): Promise<SubscriptionRevenueByPlan["data"]> => {
+  const response = await apiClient.get<SubscriptionRevenueByPlan>(
+    API.ADMIN.VIEW_REVENUE_SUBSCRIPTIONS_BY_PLAN(months),
+  );
+  const payload = response.data;
+
+  if (!payload.isSuccess || !payload.data) {
+    throw new Error(
+      payload.message || "Failed to fetch subscription revenue by plan",
+    );
+  }
+
   return payload.data;
 };

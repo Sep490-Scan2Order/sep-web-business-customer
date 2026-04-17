@@ -1,7 +1,7 @@
-"use client"
-import React from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+"use client";
+import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import {
   ChevronsLeft,
@@ -19,66 +19,144 @@ import {
   Paperclip,
   Bell,
   LogOut,
-} from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { toast } from 'react-toastify'
-import { useAuth } from '@/src/hooks/useAuth'
-import { ROUTES } from '@/src/constants/routes'
+  HandCoins,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { useAuth } from "@/src/hooks/useAuth";
+import { ROUTES } from "@/src/constants/routes";
 
 type NavItem = {
-  label: string
-  href: string
-  icon: React.ComponentType<{ className?: string }>
-  hasChildren?: boolean
-  match?: 'exact' | 'prefix'
-}
+  label: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  hasChildren?: boolean;
+  match?: "exact" | "prefix";
+};
 
 const sections: { label: string; items: NavItem[] }[] = [
   {
-    label: 'Bảng điều khiển',
+    label: "Bảng điều khiển",
     items: [
-      { label: 'Tổng quan', href: "/admin/overview", icon: LayoutDashboard, match: 'prefix' },
-      { label: 'Phân tích kinh doanh', href: "/admin/business-insight", icon: TrendingUp, match: 'prefix' },
+      {
+        label: "Tổng quan",
+        href: "/admin/overview",
+        icon: LayoutDashboard,
+        match: "prefix",
+      },
+      {
+        label: "Phân tích kinh doanh",
+        href: "/admin/business-insight",
+        icon: TrendingUp,
+        match: "prefix",
+      },
     ],
   },
   {
-    label: 'Quản lý',
+    label: "Quản lý",
     items: [
-      { label: 'Quản lý người dùng', href: "/admin/user-management", icon: Users, hasChildren: true, match: 'prefix' },
-      { label: 'Quản lý bên thuê', href: "/admin/tenant-management", icon: Store, hasChildren: true, match: 'prefix' },
-      { label: 'Quản lý nhà hàng', href: "/admin/restaurant-management", icon: UtensilsCrossed, hasChildren: true, match: 'prefix' },
-      { label: 'Thanh toán & gói dịch vụ', href: "/admin/billing-subscriptions", icon: CreditCard, hasChildren: true, match: 'prefix' },
-      { label: 'Quản lý mẫu thực đơn', href: "/admin/template-management", icon: FileText, hasChildren: true, match: 'prefix' },
-      { label: 'Quản lý blog', href: "/admin/blog-management", icon: Paperclip, hasChildren: true, match: 'prefix' },
-      { label: 'Quản lý thông báo', href: "/admin/notification-management", icon: Bell, hasChildren: true, match: 'prefix' },
+      {
+        label: "Quản lý người dùng",
+        href: "/admin/user-management",
+        icon: Users,
+        hasChildren: true,
+        match: "prefix",
+      },
+      {
+        label: "Quản lý bên thuê",
+        href: "/admin/tenant-management",
+        icon: Store,
+        hasChildren: true,
+        match: "prefix",
+      },
+      {
+        label: "Quản lý nhà hàng",
+        href: "/admin/restaurant-management",
+        icon: UtensilsCrossed,
+        hasChildren: true,
+        match: "prefix",
+      },
+      {
+        label: "Thanh toán & gói dịch vụ",
+        href: "/admin/billing-subscriptions",
+        icon: CreditCard,
+        hasChildren: true,
+        match: "prefix",
+      },
+      {
+        label: "Quản lý mẫu thực đơn",
+        href: "/admin/template-management",
+        icon: FileText,
+        hasChildren: true,
+        match: "prefix",
+      },
+      {
+        label: "Quản lý blog",
+        href: "/admin/blog-management",
+        icon: Paperclip,
+        hasChildren: true,
+        match: "prefix",
+      },
+      {
+        label: "Quản lý thông báo",
+        href: "/admin/notification-management",
+        icon: Bell,
+        hasChildren: true,
+        match: "prefix",
+      },
+      {
+        label: `Quản lý doanh thu`,
+        href: "/admin/revenue-management",
+        icon: HandCoins,
+        hasChildren: true,
+        match: "prefix",
+      },
     ],
   },
   {
-    label: 'Cài đặt',
+    label: "Cài đặt",
     items: [
-      { label: 'Cài đặt AI', href: "/admin/ai-settings", icon: Bot, hasChildren: true, match: 'prefix' },
-      { label: 'Cài đặt hệ thống', href: "/admin/global-settings", icon: Settings, hasChildren: true, match: 'prefix' },
+      {
+        label: "Cài đặt AI",
+        href: "/admin/ai-settings",
+        icon: Bot,
+        hasChildren: true,
+        match: "prefix",
+      },
+      {
+        label: "Cài đặt hệ thống",
+        href: "/admin/global-settings",
+        icon: Settings,
+        hasChildren: true,
+        match: "prefix",
+      },
     ],
   },
-]
+];
 
 export default function AdminSidebar() {
- const pathname = usePathname() || ''
-  const [collapsed, setCollapsed] = React.useState(false)
-  const sidebarWidth = collapsed ? 'w-20' : 'w-72'
-  const router = useRouter()
-  const { logout } = useAuth()
+  const pathname = usePathname() || "";
+  const [collapsed, setCollapsed] = React.useState(false);
+  const sidebarWidth = collapsed ? "w-20" : "w-72";
+  const router = useRouter();
+  const { logout } = useAuth();
 
   const handleLogOut = async () => {
-    logout()
-    toast.success('Đăng xuất thành công')
-    router.push(ROUTES.PAGES.PUBLIC.ADMIN_LOGIN)
-  }
+    logout();
+    toast.success("Đăng xuất thành công");
+    router.push(ROUTES.PAGES.PUBLIC.ADMIN_LOGIN);
+  };
 
   return (
-    <aside className={`sticky top-0 flex h-screen ${sidebarWidth} shrink-0 flex-col border-r border-slate-200 bg-white px-4 py-5 transition-all`}>
-      <div className={`mb-6 flex items-center gap-3 ${collapsed ? 'justify-center' : 'px-2'}`}>
-        {!collapsed ? <div className="h-8 w-8 rounded-full bg-slate-200" /> : null}
+    <aside
+      className={`sticky top-0 flex h-screen ${sidebarWidth} shrink-0 flex-col border-r border-slate-200 bg-white px-4 py-5 transition-all`}
+    >
+      <div
+        className={`mb-6 flex items-center gap-3 ${collapsed ? "justify-center" : "px-2"}`}
+      >
+        {!collapsed ? (
+          <div className="h-8 w-8 rounded-full bg-slate-200" />
+        ) : null}
         {!collapsed ? (
           <div className="flex flex-1 items-center justify-between">
             <div>
@@ -99,7 +177,7 @@ export default function AdminSidebar() {
             type="button"
             className="flex items-center justify-center rounded-lg border border-slate-200 p-1 text-slate-600 hover:bg-slate-50"
             onClick={() => setCollapsed(false)}
-              aria-label="Mở rộng thanh bên"
+            aria-label="Mở rộng thanh bên"
           >
             <ChevronsRight className="h-4 w-4" />
           </button>
@@ -116,10 +194,11 @@ export default function AdminSidebar() {
             ) : null}
             <div className="space-y-1">
               {section.items.map((item) => {
-                const isActive = item.match === 'prefix'
-                  ? pathname.startsWith(item.href)
-                  : pathname === item.href
-                const ItemIcon = item.icon
+                const isActive =
+                  item.match === "prefix"
+                    ? pathname.startsWith(item.href)
+                    : pathname === item.href;
+                const ItemIcon = item.icon;
 
                 return (
                   <Link
@@ -127,20 +206,24 @@ export default function AdminSidebar() {
                     href={item.href}
                     title={collapsed ? item.label : undefined}
                     className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors ${
-                      collapsed ? 'justify-center px-2' : ''
+                      collapsed ? "justify-center px-2" : ""
                     } ${
                       isActive
-                        ? 'bg-slate-100 text-slate-900'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                        ? "bg-slate-100 text-slate-900"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                     }`}
                   >
-                    <ItemIcon className={`h-4 w-4 ${isActive ? 'text-slate-900' : 'text-slate-500'}`} />
-                    {!collapsed ? <span className="flex-1 text-left">{item.label}</span> : null}
+                    <ItemIcon
+                      className={`h-4 w-4 ${isActive ? "text-slate-900" : "text-slate-500"}`}
+                    />
+                    {!collapsed ? (
+                      <span className="flex-1 text-left">{item.label}</span>
+                    ) : null}
                     {!collapsed && item.hasChildren ? (
                       <ChevronRight className="h-4 w-4 text-slate-400" />
                     ) : null}
                   </Link>
-                )
+                );
               })}
             </div>
           </div>
@@ -148,15 +231,16 @@ export default function AdminSidebar() {
       </nav>
 
       <div
-        className={`mt-auto cursor-pointer flex items-center gap-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 hover:bg-red-100 ${collapsed ? 'justify-center' : ''}`}
+        className={`mt-auto cursor-pointer flex items-center gap-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 hover:bg-red-100 ${collapsed ? "justify-center" : ""}`}
         onClick={handleLogOut}
       >
         <button className="cursor-pointer flex items-center gap-2">
           <LogOut className="h-4 w-4" />
-          {!collapsed ? <span className="text-sm font-medium">Đăng xuất</span> : null}
+          {!collapsed ? (
+            <span className="text-sm font-medium">Đăng xuất</span>
+          ) : null}
         </button>
       </div>
-
     </aside>
-  )
+  );
 }
