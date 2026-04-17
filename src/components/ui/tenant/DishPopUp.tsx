@@ -1,24 +1,35 @@
-import { DishesDto, CategoryDto } from '@/src/types/type'
-import React, { useState, useEffect, useRef } from 'react'
-import { X, Plus, Edit2, Loader2 } from 'lucide-react'
+import { DishesDto, CategoryDto } from "@/src/types/type";
+import React, { useState, useEffect, useRef } from "react";
+import { X, Plus, Edit2, Loader2 } from "lucide-react";
 
 interface DishProps {
-  categories: CategoryDto[]
-  onClose: () => void
-  onSubmit: (categoryId: number,dishData: FormData) => void
-  onUpdate: (dishId: number, categoryId: number, dishData: FormData) => void
-  isLoading?: boolean
-  dishData: DishesDto | null
+  categories: CategoryDto[];
+  onClose: () => void;
+  onSubmit: (categoryId: number, dishData: FormData) => void;
+  onUpdate: (dishId: number, categoryId: number, dishData: FormData) => void;
+  isLoading?: boolean;
+  dishData: DishesDto | null;
 }
 
-export default function DishPopUp({ categories, onClose, onSubmit, onUpdate, isLoading, dishData }: DishProps) {
+export default function DishPopUp({
+  categories,
+  onClose,
+  onSubmit,
+  onUpdate,
+  isLoading,
+  dishData,
+}: DishProps) {
   const [dishName, setDishName] = useState(dishData?.dishName || "");
-  const [categoryId, setCategoryId] = useState<number>(dishData?.categoryId || (categories[0]?.id || 0));
+  const [categoryId, setCategoryId] = useState<number>(
+    dishData?.categoryId || categories[0]?.id || 0,
+  );
   const [price, setPrice] = useState<string>(dishData?.price?.toString() || "");
   const [description, setDescription] = useState(dishData?.description || "");
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(dishData?.imageUrl || null);
-  
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    dishData?.imageUrl || null,
+  );
+
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -38,40 +49,64 @@ export default function DishPopUp({ categories, onClose, onSubmit, onUpdate, isL
     }
   };
 
- const handleSubmit = () => {
+  const handleSubmit = () => {
+    const trimmedDishName = dishName.trim();
+    const trimmedDescription = description.trim();
+
+    if (
+      !trimmedDishName ||
+      !trimmedDescription ||
+      !price ||
+      parseFloat(price) <= 0 ||
+      !categoryId
+    ) {
+      return;
+    }
+
     const formData = new FormData();
-    formData.append('dishName', dishName);
-    formData.append('price', price);
-    formData.append('description', description);
-    
+    formData.append("dishName", trimmedDishName);
+    formData.append("price", price);
+    formData.append("description", trimmedDescription);
+
     if (imageFile) {
-      formData.append('ImageUrl', imageFile);
+      formData.append("ImageUrl", imageFile);
     }
 
     if (dishData?.id) {
       onUpdate(dishData.id, categoryId, formData);
     } else {
-      onSubmit(categoryId, formData); 
+      onSubmit(categoryId, formData);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && dishName.trim() && price && !isLoading) {
+    if (
+      e.key === "Enter" &&
+      dishName.trim() &&
+      description.trim() &&
+      price &&
+      !isLoading
+    ) {
       e.preventDefault();
       handleSubmit();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       onClose();
     }
   };
 
-  const isFormValid = dishName.trim() && price && parseFloat(price) > 0 && categoryId;
+  const isFormValid =
+    dishName.trim() &&
+    description.trim() &&
+    price &&
+    parseFloat(price) > 0 &&
+    categoryId;
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 overflow-y-auto"
       onClick={onClose}
     >
-      <div 
+      <div
         className="relative w-full max-w-2xl my-8 rounded-xl border border-slate-200 bg-white shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
@@ -82,10 +117,12 @@ export default function DishPopUp({ categories, onClose, onSubmit, onUpdate, isL
               {dishData ? "Cập nhật món ăn" : "Tạo món ăn mới"}
             </h2>
             <p className="text-sm text-slate-500">
-              {dishData ? "Chỉnh sửa thông tin món ăn" : "Thêm món ăn mới vào menu"}
+              {dishData
+                ? "Chỉnh sửa thông tin món ăn"
+                : "Thêm món ăn mới vào menu"}
             </p>
           </div>
-          
+
           <button
             onClick={onClose}
             className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
@@ -157,7 +194,7 @@ export default function DishPopUp({ categories, onClose, onSubmit, onUpdate, isL
               {/* Description */}
               <div>
                 <label className="text-sm font-medium text-slate-700 mb-2 block">
-                  Mô tả
+                  Mô tả <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   placeholder="Nhập mô tả món ăn..."
@@ -244,5 +281,5 @@ export default function DishPopUp({ categories, onClose, onSubmit, onUpdate, isL
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,38 +1,45 @@
-'use client'
+"use client";
 
-import React from 'react'
-import { toast } from 'react-toastify'
-import TenantInfoRequirement from '@/src/components/ui/tenant/TenantInfoRequirement'
-import RestaurantEmptyState from '@/src/components/ui/tenant/RestaurantEmptyState'
-import RestaurantList from '@/src/components/ui/tenant/RestaurantList'
-import type { TenantInfo } from '@/src/components/ui/tenant/TenantInfoRequirement'
-import { ApiResponse, CreateRestaurantRequest, Restaurant } from '@/src/types/type'
-import apiClient from '@/src/services/apiClient'
-import { API } from '@/src/constants/api'
+import React from "react";
+import { toast } from "react-toastify";
+import TenantInfoRequirement from "@/src/components/ui/tenant/TenantInfoRequirement";
+import RestaurantEmptyState from "@/src/components/ui/tenant/RestaurantEmptyState";
+import RestaurantList from "@/src/components/ui/tenant/RestaurantList";
+import type { TenantInfo } from "@/src/components/ui/tenant/TenantInfoRequirement";
+import {
+  ApiResponse,
+  CreateRestaurantRequest,
+  Restaurant,
+} from "@/src/types/type";
+import apiClient from "@/src/services/apiClient";
+import { API } from "@/src/constants/api";
 
-function logRestaurantCoordinateDebug(label: string, payload: CreateRestaurantRequest) {
-  if (process.env.NODE_ENV === 'production') {
-    return
+function logRestaurantCoordinateDebug(
+  label: string,
+  payload: CreateRestaurantRequest,
+) {
+  if (process.env.NODE_ENV === "production") {
+    return;
   }
 
   console.log(`[restaurant:${label}] coordinate payload`, {
     latitude: payload.latitude,
     longitude: payload.longitude,
-  })
+  });
 }
 
 function warnCoordinateMismatch(
-  action: 'create' | 'update',
+  action: "create" | "update",
   payload: CreateRestaurantRequest,
-  restaurant: Restaurant
+  restaurant: Restaurant,
 ) {
   if (payload.latitude === undefined || payload.longitude === undefined) {
-    return
+    return;
   }
 
-  const latDiff = Math.abs((restaurant.latitude ?? 0) - payload.latitude)
-  const lngDiff = Math.abs((restaurant.longitude ?? 0) - payload.longitude)
-  const mismatchThreshold = 0.000001
+  const latDiff = Math.abs((restaurant.latitude ?? 0) - payload.latitude);
+  const lngDiff = Math.abs((restaurant.longitude ?? 0) - payload.longitude);
+  const mismatchThreshold = 0.000001;
 
   if (latDiff > mismatchThreshold || lngDiff > mismatchThreshold) {
     console.warn(`[restaurant:${action}] Coordinate mismatch`, {
@@ -44,127 +51,179 @@ function warnCoordinateMismatch(
         latitude: restaurant.latitude,
         longitude: restaurant.longitude,
       },
-    })
+    });
 
-    toast.warn('Tọa độ API trả về khác với tọa độ đã gửi. Vui lòng kiểm tra backend.')
+    toast.warn(
+      "Tọa độ API trả về khác với tọa độ đã gửi. Vui lòng kiểm tra backend.",
+    );
   }
 }
 
 function buildRestaurantFormData(data: CreateRestaurantRequest): FormData {
-  const formData = new FormData()
+  const formData = new FormData();
 
   // Key names must match backend DTO properties exactly.
-  formData.append('RestaurantName', data.restaurantName)
-  if (data.address !== undefined) formData.append('Address', data.address)
-  if (data.latitude !== undefined) formData.append('Latitude', data.latitude.toString())
-  if (data.longitude !== undefined) formData.append('Longitude', data.longitude.toString())
-  if (data.image !== undefined) formData.append('Image', data.image)
-  if (data.phone !== undefined) formData.append('Phone', data.phone)
-  if (data.description !== undefined) formData.append('Description', data.description)
-  if (data.openTime !== undefined && data.openTime !== '') formData.append('OpenTime', data.openTime)
-  if (data.closeTime !== undefined && data.closeTime !== '') formData.append('CloseTime', data.closeTime)
+  formData.append("RestaurantName", data.restaurantName);
+  if (data.address !== undefined) formData.append("Address", data.address);
+  if (data.latitude !== undefined)
+    formData.append("Latitude", data.latitude.toString());
+  if (data.longitude !== undefined)
+    formData.append("Longitude", data.longitude.toString());
+  if (data.image !== undefined) formData.append("Image", data.image);
+  if (data.phone !== undefined) formData.append("Phone", data.phone);
+  if (data.description !== undefined)
+    formData.append("Description", data.description);
+  if (data.openTime !== undefined && data.openTime !== "")
+    formData.append("OpenTime", data.openTime);
+  if (data.closeTime !== undefined && data.closeTime !== "")
+    formData.append("CloseTime", data.closeTime);
 
-  return formData
+  return formData;
 }
 
 async function createRestaurant(
-  data: CreateRestaurantRequest
+  data: CreateRestaurantRequest,
 ): Promise<ApiResponse<Restaurant>> {
-  const formData = buildRestaurantFormData(data)
+  const formData = buildRestaurantFormData(data);
 
   const response = await apiClient.post<ApiResponse<Restaurant>>(
     API.RESTAURANT.CREATE,
     formData,
     {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
-    }
-  )
+    },
+  );
 
-  return response.data
+  return response.data;
 }
 
 async function updateRestaurant(
   id: string,
-  data: CreateRestaurantRequest
+  data: CreateRestaurantRequest,
 ): Promise<ApiResponse<Restaurant>> {
-  const formData = buildRestaurantFormData(data)
+  const formData = buildRestaurantFormData(data);
 
   const response = await apiClient.put<ApiResponse<Restaurant>>(
     API.RESTAURANT.UPDATE(id),
     formData,
     {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
-    }
-  )
+    },
+  );
 
-  return response.data
+  return response.data;
 }
 
 async function getAllRestaurants(): Promise<ApiResponse<Restaurant[]>> {
   const response = await apiClient.get<ApiResponse<Restaurant[]>>(
-    API.RESTAURANT.GET_ALL_RESTAURANT_BY_TENANT_ID
-  )
-  return response.data
+    API.RESTAURANT.GET_ALL_RESTAURANT_BY_TENANT_ID,
+  );
+  return response.data;
+}
+
+async function updateRestaurantActiveStatus(
+  id: number,
+  isActive: boolean,
+): Promise<ApiResponse<Restaurant>> {
+  const response = await apiClient.put<ApiResponse<Restaurant>>(
+    API.RESTAURANT.UPDATE_ISACTIVE(id, isActive),
+    null,
+  );
+
+  return response.data;
 }
 
 export default function RestaurantPage() {
-  const [showInfoModal, setShowInfoModal] = React.useState(false)
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [restaurants, setRestaurants] = React.useState<Restaurant[]>([])
-  const [restaurantImageVersions, setRestaurantImageVersions] = React.useState<Record<number, number>>({})
-  const [modalMode, setModalMode] = React.useState<'create' | 'edit'>('create')
-  const [editingRestaurantId, setEditingRestaurantId] = React.useState<string | null>(null)
+  const [showInfoModal, setShowInfoModal] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [restaurants, setRestaurants] = React.useState<Restaurant[]>([]);
+  const [restaurantImageVersions, setRestaurantImageVersions] = React.useState<
+    Record<number, number>
+  >({});
+  const [modalMode, setModalMode] = React.useState<"create" | "edit">("create");
+  const [editingRestaurantId, setEditingRestaurantId] = React.useState<
+    string | null
+  >(null);
 
   // Fetch restaurants on component mount
   React.useEffect(() => {
     const fetchRestaurants = async () => {
       try {
-        const response = await getAllRestaurants()
-        console.log('Fetched restaurants:', response)
+        const response = await getAllRestaurants();
+        console.log("Fetched restaurants:", response);
         if (response.isSuccess && response.data) {
-          setRestaurants(response.data)
-          setRestaurantImageVersions({})
+          setRestaurants(response.data);
+          setRestaurantImageVersions({});
         }
       } catch (error) {
-        console.error('Error fetching restaurants:', error)
-        toast.error('Không thể tải danh sách nhà hàng')
+        console.error("Error fetching restaurants:", error);
+        toast.error("Không thể tải danh sách nhà hàng");
       }
-    }
+    };
 
-    fetchRestaurants()
-  }, [])
+    fetchRestaurants();
+  }, []);
 
   const handleCreateClick = () => {
-    setModalMode('create')
-    setEditingRestaurantId(null)
-    setShowInfoModal(true)
-  }
+    setModalMode("create");
+    setEditingRestaurantId(null);
+    setShowInfoModal(true);
+  };
 
   const handleCloseModal = React.useCallback(() => {
-    setShowInfoModal(false)
-    setModalMode('create')
-    setEditingRestaurantId(null)
-  }, [])
+    setShowInfoModal(false);
+    setModalMode("create");
+    setEditingRestaurantId(null);
+  }, []);
 
   const handleEditClick = React.useCallback((restaurantId: string) => {
-    setModalMode('edit')
-    setEditingRestaurantId(restaurantId)
-    setShowInfoModal(true)
-  }, [])
+    setModalMode("edit");
+    setEditingRestaurantId(restaurantId);
+    setShowInfoModal(true);
+  }, []);
 
   const editingRestaurant = React.useMemo(() => {
     if (!editingRestaurantId) {
-      return null
+      return null;
     }
-    return restaurants.find((restaurant) => restaurant.id.toString() === editingRestaurantId) ?? null
-  }, [editingRestaurantId, restaurants])
+
+    return (
+      restaurants.find(
+        (restaurant) => String(restaurant.id ?? "") === editingRestaurantId,
+      ) ?? null
+    );
+  }, [editingRestaurantId, restaurants]);
+
+  const restaurantListItems = React.useMemo(
+    () =>
+      restaurants
+        .filter(
+          (restaurant) =>
+            typeof restaurant?.id === "number" &&
+            Number.isFinite(restaurant.id),
+        )
+        .map((restaurant) => ({
+          id: String(restaurant.id),
+          name: restaurant.restaurantName,
+          status: restaurant.isActive
+            ? "active"
+            : ("inactive" as "active" | "inactive"),
+          isActive: restaurant.isActive,
+          image: restaurant.image,
+          slug: restaurant.slug,
+          openTime: restaurant.openTime,
+          closeTime: restaurant.closeTime,
+          imageVersion: restaurantImageVersions[restaurant.id],
+        })),
+    [restaurants, restaurantImageVersions],
+  );
 
   const handleSubmit = async (info: TenantInfo) => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const payload: CreateRestaurantRequest = {
         restaurantName: info.restaurantName,
@@ -176,80 +235,137 @@ export default function RestaurantPage() {
         latitude: info.latitude,
         longitude: info.longitude,
         image: info.image,
-      }
+      };
 
-      if (modalMode === 'edit') {
+      if (modalMode === "edit") {
         if (!editingRestaurantId || !editingRestaurant) {
-          toast.error('Không xác định được nhà hàng cần cập nhật')
-          return
+          toast.error("Không xác định được nhà hàng cần cập nhật");
+          return;
         }
-        logRestaurantCoordinateDebug('update:before-submit', payload)
-        console.log('Updating restaurant with ID:', editingRestaurantId, 'Payload:', payload)
+        logRestaurantCoordinateDebug("update:before-submit", payload);
+        console.log(
+          "Updating restaurant with ID:",
+          editingRestaurantId,
+          "Payload:",
+          payload,
+        );
         const response = await updateRestaurant(editingRestaurantId, {
           ...payload,
           latitude: payload.latitude ?? editingRestaurant.latitude,
           longitude: payload.longitude ?? editingRestaurant.longitude,
-        })
-        console.log('Update response:', response)
+        });
+        console.log("Update response:", response);
         if (response.isSuccess && response.data) {
-          const updatedRestaurant = response.data
-          warnCoordinateMismatch('update', payload, updatedRestaurant)
-          toast.success(response.message || 'Cập nhật nhà hàng thành công!')
-          const imageRefreshVersion = Date.now()
+          const updatedRestaurant = response.data;
+          warnCoordinateMismatch("update", payload, updatedRestaurant);
+          toast.success(response.message || "Cập nhật nhà hàng thành công!");
+          const imageRefreshVersion = Date.now();
           setRestaurants((prev) =>
             prev.map((restaurant) =>
-              restaurant.id === updatedRestaurant.id ? updatedRestaurant : restaurant
-            )
-          )
+              restaurant.id === updatedRestaurant.id
+                ? updatedRestaurant
+                : restaurant,
+            ),
+          );
           setRestaurantImageVersions((prev) => ({
             ...prev,
             [updatedRestaurant.id]: imageRefreshVersion,
-          }))
-          handleCloseModal()
+          }));
+          handleCloseModal();
         } else {
-          toast.error(response.message || 'Cập nhật nhà hàng thất bại')
+          toast.error(response.message || "Cập nhật nhà hàng thất bại");
         }
-        return
+        return;
       }
 
-      logRestaurantCoordinateDebug('create:before-submit', payload)
-      const response = await createRestaurant(payload)
+      logRestaurantCoordinateDebug("create:before-submit", payload);
+      const response = await createRestaurant(payload);
 
       if (response.isSuccess && response.data) {
-        warnCoordinateMismatch('create', payload, response.data)
-        toast.success(response.message || 'Tạo nhà hàng thành công!')
+        warnCoordinateMismatch("create", payload, response.data);
+        toast.success(response.message || "Tạo nhà hàng thành công!");
 
-        setRestaurants((prev) => [...prev, response.data as Restaurant])
-        handleCloseModal()
+        setRestaurants((prev) => [...prev, response.data as Restaurant]);
+        handleCloseModal();
       } else {
-        toast.error(response.message || 'Tạo nhà hàng thất bại')
+        toast.error(response.message || "Tạo nhà hàng thất bại");
       }
     } catch (error) {
-      console.error('Error creating restaurant:', error)
-      toast.error(error instanceof Error ? error.message : 'Có lỗi xảy ra khi tạo nhà hàng')
+      console.error("Error creating restaurant:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Có lỗi xảy ra khi tạo nhà hàng",
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
+
+  const handleUpdateRestaurantStatus = React.useCallback(
+    async (restaurantId: string, nextIsActive: boolean) => {
+      const parsedId = Number(restaurantId);
+
+      if (!Number.isFinite(parsedId) || parsedId <= 0) {
+        toast.error("ID nhà hàng không hợp lệ");
+        return;
+      }
+
+      const response = await updateRestaurantActiveStatus(
+        parsedId,
+        nextIsActive,
+      );
+
+      if (!response.isSuccess) {
+        toast.error(
+          response.message || "Cập nhật trạng thái nhà hàng thất bại",
+        );
+        return;
+      }
+
+      setRestaurants((prev) =>
+        prev.map((restaurant) => {
+          if (restaurant.id !== parsedId) {
+            return restaurant;
+          }
+
+          if (response.data) {
+            return {
+              ...restaurant,
+              ...response.data,
+              id: restaurant.id,
+              isActive:
+                typeof response.data.isActive === "boolean"
+                  ? response.data.isActive
+                  : nextIsActive,
+            };
+          }
+
+          return {
+            ...restaurant,
+            isActive: nextIsActive,
+          };
+        }),
+      );
+
+      toast.success(
+        response.message ||
+          `${nextIsActive ? "Mở" : "Đóng"} nhà hàng thành công`,
+      );
+    },
+    [],
+  );
 
   return (
     <div>
-      {restaurants.length === 0 ? (
+      {restaurantListItems.length === 0 ? (
         <RestaurantEmptyState onCreateClick={handleCreateClick} />
       ) : (
         <RestaurantList
-          restaurants={restaurants.map((restaurant) => ({
-            id: restaurant.id.toString(),
-            name: restaurant.restaurantName,
-            status: restaurant.isActive ? 'active' : 'inactive',
-            image: restaurant.image,
-            slug: restaurant.slug,
-            openTime: restaurant.openTime,
-            closeTime: restaurant.closeTime,
-            imageVersion: restaurantImageVersions[restaurant.id],
-          }))}
+          restaurants={restaurantListItems}
           onCreateClick={handleCreateClick}
           onEditClick={handleEditClick}
+          onUpdateStatus={handleUpdateRestaurantStatus}
         />
       )}
 
@@ -276,5 +392,5 @@ export default function RestaurantPage() {
         }
       />
     </div>
-  )
+  );
 }

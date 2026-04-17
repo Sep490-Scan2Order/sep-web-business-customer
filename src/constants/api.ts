@@ -54,6 +54,8 @@ export const API = {
       }
       return url;
     },
+    UPDATE_ISACTIVE: (id: number, isActive: boolean) =>
+      `/Restaurant/${id}/active-status?isActive=${isActive}`,
   },
   BLOG: {
     CREATE: "/SystemBlog",
