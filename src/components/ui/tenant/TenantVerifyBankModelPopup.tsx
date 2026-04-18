@@ -5,7 +5,7 @@ import { useAuth } from '@/src/hooks/useAuth';
 import { BankInfo } from '@/src/types/type';
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
-import { Search, X, Check } from 'lucide-react';
+import { Search, X, Check, BookOpen, Link2, Settings2Icon } from 'lucide-react';
 
 interface BankVerifyFormData {
   cardNumber: string;
@@ -149,7 +149,35 @@ export default function TenantVerifyBankModelPopup({
       <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-lg">
         {/* Header */}
         <div className="sticky top-0 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4 z-10">
-          <h2 className="text-lg font-semibold text-slate-900">Xác thực tài khoản ngân hàng</h2>
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900">Xác thực tài khoản ngân hàng</h2>
+            <div className="mt-1 flex flex-wrap items-center gap-3 text-xs">
+              <a
+                href="/sepay-guide"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-800 hover:underline"
+              >
+                <BookOpen className="h-3.5 w-3.5" />
+                Hướng dẫn liên kết SePay
+              </a>
+              <a
+                href="/webhook-guide"
+                className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-800 hover:underline"
+              >
+                <Link2 className="h-3.5 w-3.5" />
+                Cách dùng webhook
+              </a>
+              <a
+                href="/config-guide"
+                className="inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-800 hover:underline"
+              >
+                <Settings2Icon className="h-3.5 w-3.5" />
+                Hướng dẫn cấu hình
+              </a>
+
+            </div>
+          </div>
           <button
             onClick={onClose}
             className="flex items-center justify-center rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"

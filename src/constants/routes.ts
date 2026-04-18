@@ -1,6 +1,7 @@
 export const ROUTES = {
   HOME: "/",
   WEBHOOK_GUIDE: "/webhook-guide",
+  CONFIG_GUIDE: "/config-guide",
   PAGES: {
     ROOT: "/pages",
 
@@ -55,7 +56,8 @@ export const TENANT_ROUTES = {
   BRANCH_DISH_MANAGEMENT: "/tenant/branch-dish-management",
   SHIFT_REPORTS: "/tenant/shift-reports",
   ORDERS: "/tenant/orders",
-  SEPAY_GUIDE: "/tenant/sepay-guide",
-  WEBHOOK_GUIDE: "/tenant/webhook-guide",
+  SEPAY_GUIDE: "/sepay-guide",
+  WEBHOOK_GUIDE: "/webhook-guide",
+  CONFIG_GUIDE: "/config-guide",
   TRANSACTION_HISTORY: "/tenant/history-transaction",
 };
