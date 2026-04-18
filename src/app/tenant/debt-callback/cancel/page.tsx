@@ -1,10 +1,10 @@
-'use client';
-import React, { useEffect, useState, Suspense, useRef } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { XCircle, Loader2, ArrowLeft, AlertTriangle } from 'lucide-react';
-import { AxiosError } from 'axios';
-import apiClient from '@/src/services/apiClient';
-import { API } from '@/src/constants/api';
+"use client";
+import React, { useEffect, useState, Suspense, useRef } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { XCircle, Loader2, ArrowLeft, AlertTriangle } from "lucide-react";
+import apiClient from "@/src/services/apiClient";
+import { API } from "@/src/constants/api";
+import { getApiErrorMessage } from "@/src/utils/utils";
 
 // Định nghĩa Type cho response trả về
 interface PaymentStatusData {
@@ -18,9 +18,11 @@ interface PaymentStatusData {
 function PaymentCancelContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  
+
   const [isLoading, setIsLoading] = useState(true);
-  const [paymentData, setPaymentData] = useState<PaymentStatusData | null>(null);
+  const [paymentData, setPaymentData] = useState<PaymentStatusData | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
 
   // Thêm useRef để đánh dấu xem đã xử lý giao dịch chưa
@@ -30,43 +32,48 @@ function PaymentCancelContent() {
     // Chốt chặn chống render nhiều lần
     if (hasProcessed.current) return;
 
-    const orderCodeParam = searchParams.get('orderCode');
+    const orderCodeParam = searchParams.get("orderCode");
 
     if (orderCodeParam) {
-      hasProcessed.current = true; 
+      hasProcessed.current = true;
       const orderCode = Number(orderCodeParam);
-      
+
       // Xóa orderCode khỏi URL
       const newUrl = new URL(window.location.href);
-      newUrl.searchParams.delete('orderCode');
-      window.history.replaceState({}, '', newUrl.toString());
+      newUrl.searchParams.delete("orderCode");
+      window.history.replaceState({}, "", newUrl.toString());
 
       const processCancelFlow = async () => {
         try {
           // 1. Gọi API cancel trước
           const cancelResponse = await apiClient.post(
-            API.SUBSCRIPTION.CANCEL_PAYMENT(orderCode)
+            API.SUBSCRIPTION.CANCEL_PAYMENT(orderCode),
           );
-          
+
           if (!cancelResponse.data.isSuccess) {
-            console.warn('Hủy thanh toán bị từ chối/không thành công từ server:', cancelResponse.data.message);
+            console.warn(
+              "Hủy thanh toán bị từ chối/không thành công từ server:",
+              cancelResponse.data.message,
+            );
           }
 
           // 2. Sau khi Cancel, gọi API lấy trạng thái mới nhất
           const statusResponse = await apiClient.get(
-            API.SUBSCRIPTION.GET_SUBSCRIPTION_PAYMENT_STATUS(orderCode)
+            API.SUBSCRIPTION.GET_SUBSCRIPTION_PAYMENT_STATUS(orderCode),
           );
 
           if (statusResponse.data.isSuccess) {
             setPaymentData(statusResponse.data.data);
           } else {
-            setError(statusResponse.data.message || "Không thể tải trạng thái đơn hàng bị hủy.");
+            setError(
+              statusResponse.data.message ||
+                "Không thể tải trạng thái đơn hàng bị hủy.",
+            );
           }
         } catch (err: unknown) {
-          const axiosError = err as AxiosError<{ message?: string }>;
           setError(
-            axiosError.response?.data?.message ||
-              'Có lỗi xảy ra khi giao tiếp với máy chủ.'
+            getApiErrorMessage(err) ||
+              "Có lỗi xảy ra khi giao tiếp với máy chủ.",
           );
         } finally {
           setIsLoading(false);
@@ -85,7 +92,9 @@ function PaymentCancelContent() {
     return (
       <div className="flex flex-col items-center justify-center space-y-4 py-20">
         <Loader2 className="h-12 w-12 animate-spin text-red-500" />
-        <p className="text-slate-600 font-medium">Đang tiến hành hủy giao dịch...</p>
+        <p className="text-slate-600 font-medium">
+          Đang tiến hành hủy giao dịch...
+        </p>
       </div>
     );
   }
@@ -97,10 +106,12 @@ function PaymentCancelContent() {
         <div className="rounded-full bg-red-100 p-4 mb-4">
           <XCircle className="h-12 w-12 text-red-600" />
         </div>
-        <h2 className="text-2xl font-bold text-slate-800 mb-2">Thao tác thất bại</h2>
+        <h2 className="text-2xl font-bold text-slate-800 mb-2">
+          Thao tác thất bại
+        </h2>
         <p className="text-slate-600 mb-8 max-w-md">{error}</p>
-        <button 
-          onClick={() => router.push('/tenant/debt-payment')}
+        <button
+          onClick={() => router.push("/tenant/debt-payment")}
           className="flex items-center gap-2 bg-slate-900 text-white px-6 py-2.5 rounded-xl hover:bg-slate-800 transition"
         >
           <ArrowLeft className="w-4 h-4" /> Quay lại trang thanh toán nợ
@@ -119,9 +130,10 @@ function PaymentCancelContent() {
       <h2 className="text-3xl font-bold text-slate-800 mb-2">
         Đã hủy thanh toán
       </h2>
-      
+
       <p className="text-slate-600 mb-8 max-w-md">
-        Giao dịch thanh toán nợ của bạn đã bị hủy bỏ. Sẽ không có khoản phí nào được tính.
+        Giao dịch thanh toán nợ của bạn đã bị hủy bỏ. Sẽ không có khoản phí nào
+        được tính.
       </p>
 
       {/* Thẻ hiển thị thông tin hóa đơn bị hủy */}
@@ -129,13 +141,15 @@ function PaymentCancelContent() {
         <h3 className="font-semibold text-slate-800 border-b border-slate-200 pb-3 mb-3">
           Thông tin giao dịch bị hủy
         </h3>
-        
+
         <div className="space-y-3 text-sm">
           <div className="flex justify-between">
             <span className="text-slate-500">Mã đơn hàng:</span>
-            <span className="font-medium text-slate-900 line-through decoration-slate-400">#{paymentData?.orderCode}</span>
+            <span className="font-medium text-slate-900 line-through decoration-slate-400">
+              #{paymentData?.orderCode}
+            </span>
           </div>
-          
+
           <div className="flex justify-between">
             <span className="text-slate-500">Trạng thái:</span>
             <span className="font-bold text-red-600">
@@ -146,21 +160,25 @@ function PaymentCancelContent() {
           <div className="flex justify-between">
             <span className="text-slate-500">Thời gian cập nhật:</span>
             <span className="font-medium text-slate-900">
-              {paymentData?.lastUpdatedAt ? new Date(paymentData.lastUpdatedAt).toLocaleString('vi-VN') : 'N/A'}
+              {paymentData?.lastUpdatedAt
+                ? new Date(paymentData.lastUpdatedAt).toLocaleString("vi-VN")
+                : "N/A"}
             </span>
           </div>
 
           <div className="flex justify-between pt-3 border-t border-slate-200 mt-3">
-            <span className="font-semibold text-slate-700">Giá trị đơn hàng:</span>
+            <span className="font-semibold text-slate-700">
+              Giá trị đơn hàng:
+            </span>
             <span className="font-bold text-lg text-slate-500">
-              {paymentData?.totalAmount.toLocaleString('vi-VN')} VND
+              {paymentData?.totalAmount.toLocaleString("vi-VN")} VND
             </span>
           </div>
         </div>
       </div>
 
-      <button 
-        onClick={() => router.push('/tenant/debt-payment')}
+      <button
+        onClick={() => router.push("/tenant/debt-payment")}
         className="flex items-center gap-2 bg-slate-800 text-white px-8 py-3 rounded-xl hover:bg-slate-900 transition shadow-lg shadow-slate-200 font-medium"
       >
         <ArrowLeft className="w-5 h-5" /> Trở về Thanh toán nợ
@@ -174,11 +192,13 @@ export default function CancelPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="mx-auto max-w-3xl px-6 py-12">
-        <Suspense fallback={
-          <div className="flex justify-center py-20">
-            <Loader2 className="h-10 w-10 animate-spin text-red-500" />
-          </div>
-        }>
+        <Suspense
+          fallback={
+            <div className="flex justify-center py-20">
+              <Loader2 className="h-10 w-10 animate-spin text-red-500" />
+            </div>
+          }
+        >
           <PaymentCancelContent />
         </Suspense>
       </div>

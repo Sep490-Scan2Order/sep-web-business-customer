@@ -21,12 +21,68 @@ type LoadingAwareRequestConfig = {
   [GLOBAL_LOADING_TRACKED_KEY]?: boolean;
 };
 
-const apiClient = axios.create({
+type ApiClientResponse<T = any> = {
+  status: number;
+  data: T;
+};
+
+type ApiClientConfig = LoadingAwareRequestConfig & {
+  baseURL?: string;
+  headers?: Record<string, string>;
+  method?: string;
+  url?: string;
+  data?: unknown;
+  params?: unknown;
+};
+
+type ApiClientLike = {
+  get<T = any>(
+    url: string,
+    config?: ApiClientConfig,
+  ): Promise<ApiClientResponse<T>>;
+  post<T = any, D = any>(
+    url: string,
+    data?: D,
+    config?: ApiClientConfig,
+  ): Promise<ApiClientResponse<T>>;
+  put<T = any, D = any>(
+    url: string,
+    data?: D,
+    config?: ApiClientConfig,
+  ): Promise<ApiClientResponse<T>>;
+  delete<T = any>(
+    url: string,
+    config?: ApiClientConfig,
+  ): Promise<ApiClientResponse<T>>;
+  request<T = any, D = any>(
+    config: ApiClientConfig & { data?: D },
+  ): Promise<ApiClientResponse<T>>;
+  interceptors: {
+    request: {
+      use(
+        onFulfilled: (
+          config: ApiClientConfig,
+        ) => ApiClientConfig | Promise<ApiClientConfig>,
+        onRejected?: (error: unknown) => unknown,
+      ): number;
+    };
+    response: {
+      use(
+        onFulfilled: (
+          response: ApiClientResponse<unknown> & { config: ApiClientConfig },
+        ) => ApiClientResponse<unknown> | Promise<ApiClientResponse<unknown>>,
+        onRejected?: (error: unknown) => unknown,
+      ): number;
+    };
+  };
+};
+
+const apiClient = (axios as any).create({
   baseURL: API.BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
-});
+}) as ApiClientLike;
 
 const getAccessToken = () => {
   // Lấy token từ zustand store thay vì localStorage
@@ -75,6 +131,7 @@ apiClient.interceptors.request.use(
         handleTokenExpiry();
         return Promise.reject(new Error("Token hết hạn"));
       }
+      config.headers ??= {};
       config.headers.Authorization = `Bearer ${token}`;
     }
 
@@ -87,8 +144,8 @@ apiClient.interceptors.request.use(
 
     return config;
   },
-  (error) => {
-    const loadingAwareConfig = error?.config as
+  (error: unknown) => {
+    const loadingAwareConfig = (error as any)?.config as
       | (LoadingAwareRequestConfig & { [key: string]: unknown })
       | undefined;
     if (loadingAwareConfig?.[GLOBAL_LOADING_TRACKED_KEY]) {
@@ -111,8 +168,8 @@ apiClient.interceptors.response.use(
     }
     return response;
   },
-  (error) => {
-    const loadingAwareConfig = error?.config as
+  (error: unknown) => {
+    const loadingAwareConfig = (error as any)?.config as
       | (LoadingAwareRequestConfig & { [key: string]: unknown })
       | undefined;
     if (loadingAwareConfig?.[GLOBAL_LOADING_TRACKED_KEY]) {
@@ -120,7 +177,7 @@ apiClient.interceptors.response.use(
       loadingAwareConfig[GLOBAL_LOADING_TRACKED_KEY] = false;
     }
 
-    if (error.response?.status === 401) {
+    if ((error as any)?.response?.status === 401) {
       handleTokenExpiry();
     }
     return Promise.reject(error);

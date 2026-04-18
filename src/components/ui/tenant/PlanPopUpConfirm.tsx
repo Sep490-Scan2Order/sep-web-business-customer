@@ -4,12 +4,12 @@ import {
   PreviewSubscriptionResponse,
   SubscriptionTenantInfo,
 } from "@/src/types/type";
-import { AxiosError } from "axios";
 import { Loader2, Calendar, ShoppingCart, X, CreditCard } from "lucide-react";
 import React, { useState } from "react";
 import apiClient from "@/src/services/apiClient";
 import { API } from "@/src/constants/api";
 import { toast } from "react-toastify";
+import { getApiErrorMessage } from "@/src/utils/utils";
 
 interface PlanProps {
   onClose: () => void;
@@ -54,10 +54,7 @@ export default function PlanPopUpConfirm({
         );
       }
     } catch (error: unknown) {
-      const axiosError = error as AxiosError<{ message?: string }>;
-      toast.error(
-        axiosError.response?.data?.message || "Có lỗi xảy ra khi xem trước",
-      );
+      toast.error(getApiErrorMessage(error) || "Có lỗi xảy ra khi xem trước");
     } finally {
       setIsLoading(false);
     }
@@ -78,10 +75,7 @@ export default function PlanPopUpConfirm({
         toast.error(response.data.message || "Tạo thanh toán thất bại");
       }
     } catch (error: unknown) {
-      const axiosError = error as AxiosError<{ message?: string }>;
-      toast.error(
-        axiosError.response?.data?.message || "Có lỗi xảy ra khi thanh toán",
-      );
+      toast.error(getApiErrorMessage(error) || "Có lỗi xảy ra khi thanh toán");
     } finally {
       setIsLoading(false);
     }
