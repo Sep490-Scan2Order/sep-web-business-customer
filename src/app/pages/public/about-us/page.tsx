@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { ROUTES } from "@/src/constants/routes";
 
+const APP_APKPURE_URL = "https://apkpure.com/p/com.scan2order";
+const APP_DOWNLOAD_URL = "https://ysafyqmiutvhohvsthnt.supabase.co/storage/v1/object/public/app/scan2order.apk";
+const APP_LOGO_URL = "https://ysafyqmiutvhohvsthnt.supabase.co/storage/v1/object/public/logo/logo_default.png";
+const APP_QR_CODE_URL = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(APP_APKPURE_URL)}`;
+
 const CORE_VALUES = [
   {
     title: "Trải nghiệm mượt mà",
@@ -70,6 +75,90 @@ export default function AboutUsPage() {
                     <li className="flex items-center gap-2">● Tự động hóa thanh toán và quản lý</li>
                   </ul>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Ứng dụng di động */}
+      <section className="max-w-6xl mx-auto px-6 py-16">
+        <div className="overflow-hidden rounded-[2rem] border border-[rgb(var(--color-primary)/0.12)] bg-[linear-gradient(135deg,rgba(255,255,255,1),rgba(248,250,252,1))] shadow-[0_24px_80px_rgba(15,23,42,0.08)]">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-0">
+            <div className="p-8 md:p-12 lg:p-14">
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[rgb(var(--color-primary))]">
+                Ứng dụng cho nhân viên
+              </p>
+              <h2 className="mt-3 text-3xl md:text-4xl font-extrabold leading-tight text-gray-900">
+                Hỗ trợ đặt món, giao món và xác nhận đơn nhanh chóng
+              </h2>
+              <p className="mt-4 max-w-2xl text-sm md:text-base leading-relaxed text-gray-600">
+                Ứng dụng Scan2Order dành cho nhân viên vận hành tại quầy và tại bàn, giúp hỗ trợ ghi nhận món, chuyển món đến bếp,
+                giao món cho khách và xác nhận đơn rõ ràng, hạn chế nhầm lẫn trong giờ cao điểm.
+              </p>
+
+              <div className="mt-8 flex flex-col sm:flex-row gap-4">
+                <a
+                  href={APP_APKPURE_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center rounded-xl bg-[rgb(var(--color-accent-dark))] px-6 py-3.5 text-white font-semibold shadow-lg shadow-[rgb(var(--color-primary)/0.18)] transition-colors hover:bg-[rgb(var(--color-primary))]"
+                >
+                  Tải trên APKPure
+                </a>
+                <a
+                  href={APP_DOWNLOAD_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center rounded-xl border border-[rgb(var(--color-primary)/0.2)] bg-white px-6 py-3.5 font-semibold text-[rgb(var(--color-primary))] transition-colors hover:bg-[rgb(var(--color-secondary))]"
+                >
+                  Tải APK trực tiếp
+                </a>
+              </div>
+
+              <div className="mt-8 grid gap-4 sm:grid-cols-3">
+                {[
+                  { title: "Đặt món hỗ trợ", desc: "Nhập món nhanh, giảm thao tác thủ công" },
+                  { title: "Giao món rõ ràng", desc: "Theo dõi trạng thái món trong từng bước" },
+                  { title: "Xác nhận đơn chuẩn", desc: "Hạn chế sai sót khi bàn giao cho khách" },
+                ].map((item) => (
+                  <div key={item.title} className="rounded-2xl bg-white/90 p-4 border border-[rgb(var(--color-primary)/0.08)]">
+                    <p className="font-semibold text-gray-900">{item.title}</p>
+                    <p className="mt-1 text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="relative flex items-center justify-center bg-[rgb(var(--color-secondary))] p-8 md:p-12 lg:p-14">
+              <div className="w-full max-w-sm rounded-[2rem] bg-white p-6 md:p-8 shadow-[0_18px_50px_rgba(15,23,42,0.12)] border border-[rgb(var(--color-primary)/0.08)]">
+                <div className="text-center">
+                  <p className="text-xs font-bold uppercase tracking-[0.3em] text-[rgb(var(--color-primary))]">
+                    Quét QR để tải app
+                  </p>
+                  <h3 className="mt-2 text-xl font-bold text-gray-900">Scan2Order</h3>
+                </div>
+
+                <div className="relative mx-auto mt-6 w-full max-w-[320px]">
+                  <img
+                    src={APP_QR_CODE_URL}
+                    alt="QR code tải ứng dụng Scan2Order"
+                    className="h-auto w-full rounded-3xl border border-gray-100 bg-white p-3"
+                  />
+                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                    <div className="rounded-2xl bg-white p-2 shadow-[0_12px_30px_rgba(15,23,42,0.18)] ring-4 ring-white">
+                      <img
+                        src={APP_LOGO_URL}
+                        alt="Logo Scan2Order"
+                        className="h-16 w-16 rounded-xl object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <p className="mt-5 text-center text-sm text-gray-500 leading-relaxed">
+                  QR code này dẫn đến trang APKPure của ứng dụng để nhân viên cài đặt nhanh chóng.
+                </p>
               </div>
             </div>
           </div>
