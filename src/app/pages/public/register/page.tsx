@@ -4,15 +4,36 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Eye, EyeOff, Building2, Mail, Phone, Lock, CheckCircle2, Send } from "lucide-react";
+import {
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  Building2,
+  Mail,
+  Phone,
+  Lock,
+  CheckCircle2,
+  Send,
+} from "lucide-react";
 import { toast } from "react-toastify";
 import bgImage from "@/src/images/homepage/unnamed.jpg";
 import logoDefault from "@/src/images/logo/logo_no_background.png";
 import { ROUTES } from "@/src/constants/routes";
 import { API } from "@/src/constants/api";
 import apiClient from "@/src/services/apiClient";
-import { ApiResponse, DistrictSummary, OtpResponse, ProvinceSummary, RegisterTenantRequest, TenantDto } from "@/src/types/type";
-import { getApiErrorMessage, PASSWORD_POLICY_MESSAGE, PASSWORD_POLICY_REGEX } from "@/src/utils/utils";
+import {
+  ApiResponse,
+  DistrictSummary,
+  OtpResponse,
+  ProvinceSummary,
+  RegisterTenantRequest,
+  TenantDto,
+} from "@/src/types/type";
+import {
+  getApiErrorMessage,
+  PASSWORD_POLICY_MESSAGE,
+  PASSWORD_POLICY_REGEX,
+} from "@/src/utils/utils";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -35,15 +56,24 @@ export default function RegisterPage() {
 
   const sendRegisterOtp = async (email: string): Promise<OtpResponse> => {
     const response = await apiClient.post<OtpResponse>(
-      `${API.OTP.SEND_REGISTER}?email=${encodeURIComponent(email)}`
+      `${API.OTP.SEND_REGISTER}?email=${encodeURIComponent(email)}`,
+      undefined,
+      {
+        skipGlobalLoading: true,
+      },
     );
     return response.data;
   };
 
-  const register = async (data: RegisterTenantRequest): Promise<ApiResponse<TenantDto>> => {
+  const register = async (
+    data: RegisterTenantRequest,
+  ): Promise<ApiResponse<TenantDto>> => {
     const response = await apiClient.post<ApiResponse<TenantDto>>(
       API.TENANT.REGISTER,
-      data
+      data,
+      {
+        skipGlobalLoading: true,
+      },
     );
     return response.data;
   };
@@ -83,7 +113,13 @@ export default function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.phone || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (
+      !formData.name ||
+      !formData.phone ||
+      !formData.email ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
       toast.error("Vui lòng điền đầy đủ thông tin");
       return;
     }
@@ -149,7 +185,10 @@ export default function RegisterPage() {
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           {/* Phần đầu trang */}
           <div className="flex items-center justify-between">
-            <Link href={ROUTES.HOME} className="flex items-center gap-3 transition-transform hover:scale-105">
+            <Link
+              href={ROUTES.HOME}
+              className="flex items-center gap-3 transition-transform hover:scale-105"
+            >
               <Image
                 src={logoDefault}
                 alt="Scan To Order"
@@ -159,10 +198,11 @@ export default function RegisterPage() {
               />
               <div className="text-white">
                 <p className="text-lg font-bold">Scan To Order</p>
-                <p className="text-xs text-white/70">Giải pháp nhà hàng thông minh</p>
+                <p className="text-xs text-white/70">
+                  Giải pháp nhà hàng thông minh
+                </p>
               </div>
             </Link>
-
           </div>
 
           {/* Nội dung chính */}
@@ -174,14 +214,15 @@ export default function RegisterPage() {
                   Bắt đầu miễn phí
                 </p>
                 <h1 className="mt-6 text-4xl font-bold leading-tight lg:text-5xl">
-                  Tạo tài khoản<br />
+                  Tạo tài khoản
+                  <br />
                   <span className="bg-gradient-to-r from-[rgb(var(--color-accent))] to-[rgb(var(--color-accent-dark))] bg-clip-text text-transparent">
                     Scan To Order
                   </span>
                 </h1>
                 <p className="mt-4 max-w-lg text-base text-white/80 leading-relaxed">
-                  Quản lý nhà hàng thông minh với công nghệ hiện đại. Tối ưu vận hành, 
-                  nâng cao trải nghiệm khách hàng và tăng doanh thu.
+                  Quản lý nhà hàng thông minh với công nghệ hiện đại. Tối ưu vận
+                  hành, nâng cao trải nghiệm khách hàng và tăng doanh thu.
                 </p>
               </div>
 
@@ -191,9 +232,12 @@ export default function RegisterPage() {
                   "Quản lý menu và đơn hàng tự động",
                   "Thanh toán nhanh chóng, an toàn",
                   "Báo cáo chi tiết và phân tích dữ liệu",
-                  "Hỗ trợ 24/7 và cập nhật miễn phí"
+                  "Hỗ trợ 24/7 và cập nhật miễn phí",
                 ].map((feature, index) => (
-                  <div key={index} className="flex items-center gap-3 text-white/80">
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 text-white/80"
+                  >
                     <CheckCircle2 className="h-5 w-5 text-[rgb(var(--color-accent))] flex-shrink-0" />
                     <span className="text-sm">{feature}</span>
                   </div>
@@ -205,7 +249,9 @@ export default function RegisterPage() {
             <div className="w-full max-w-xl lg:justify-self-end">
               <div className="rounded-2xl border border-white/10 bg-black/40 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
                 <div className="text-center">
-                  <h2 className="text-2xl font-bold text-white sm:text-3xl">Đăng ký ngay</h2>
+                  <h2 className="text-2xl font-bold text-white sm:text-3xl">
+                    Đăng ký ngay
+                  </h2>
                   <p className="mt-2 text-sm text-white/70">
                     Đã có tài khoản?{" "}
                     <Link
@@ -260,7 +306,11 @@ export default function RegisterPage() {
                           className="group/btn relative flex items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-[rgb(var(--color-accent))] to-[rgb(var(--color-accent-dark))] px-5 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-[rgb(var(--color-accent))]/50 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-lg whitespace-nowrap"
                         >
                           <Send className="h-4 w-4 transition-transform group-hover/btn:translate-x-0.5" />
-                          {sendingOtp ? "Đang gửi..." : otpSent ? "Gửi lại" : "Gửi OTP"}
+                          {sendingOtp
+                            ? "Đang gửi..."
+                            : otpSent
+                              ? "Gửi lại"
+                              : "Gửi OTP"}
                           {otpSent && !sendingOtp && (
                             <CheckCircle2 className="h-4 w-4 text-white" />
                           )}
@@ -284,7 +334,7 @@ export default function RegisterPage() {
                         disabled={!otpSent}
                         className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/40 backdrop-blur-sm transition-all focus:border-[rgb(var(--color-accent))] focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-accent))]/20 disabled:cursor-not-allowed disabled:opacity-50"
                       />
-                      
+
                       {otpSent && (
                         <p className="mt-1.5 flex items-center gap-1.5 text-xs text-green-400">
                           <CheckCircle2 className="h-3 w-3" />
@@ -383,14 +433,20 @@ export default function RegisterPage() {
                     />
                     <span className="text-xs leading-relaxed text-white/70">
                       Tôi đồng ý với{" "}
-                      <Link href="#" className="font-medium text-[rgb(var(--color-accent))] hover:underline">
+                      <Link
+                        href="#"
+                        className="font-medium text-[rgb(var(--color-accent))] hover:underline"
+                      >
                         Điều khoản dịch vụ
-                      </Link>
-                      {" "}và{" "}
-                      <Link href="#" className="font-medium text-[rgb(var(--color-accent))] hover:underline">
+                      </Link>{" "}
+                      và{" "}
+                      <Link
+                        href="#"
+                        className="font-medium text-[rgb(var(--color-accent))] hover:underline"
+                      >
                         Chính sách bảo mật
-                      </Link>
-                      {" "}của Scan To Order
+                      </Link>{" "}
+                      của Scan To Order
                     </span>
                   </label>
 
@@ -403,9 +459,24 @@ export default function RegisterPage() {
                     <span className="relative z-10 flex items-center justify-center gap-2">
                       {loading ? (
                         <>
-                          <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          <svg
+                            className="h-5 w-5 animate-spin"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                              fill="none"
+                            />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            />
                           </svg>
                           Đang xử lý...
                         </>
@@ -422,7 +493,8 @@ export default function RegisterPage() {
 
                 {/* Chân trang */}
                 <p className="mt-6 text-center text-xs text-white/50">
-                  Bằng việc đăng ký, bạn đồng ý nhận email marketing từ Scan To Order
+                  Bằng việc đăng ký, bạn đồng ý nhận email marketing từ Scan To
+                  Order
                 </p>
               </div>
             </div>

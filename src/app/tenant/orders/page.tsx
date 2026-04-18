@@ -2,21 +2,30 @@
 
 import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { 
-  ArrowLeft, Calendar, FileText, Search, Store, Eye, Receipt 
+import {
+  ArrowLeft,
+  Calendar,
+  FileText,
+  Search,
+  Store,
+  Eye,
+  Receipt,
 } from "lucide-react";
 import { API } from "@/src/constants/api";
 import { useAuth } from "@/src/hooks/useAuth";
 import apiClient from "@/src/services/apiClient";
 import { toast } from "react-toastify";
-import { 
-  Restaurant, 
+import {
+  Restaurant,
   TenantOrderResponseDto,
-  PagedTenantOrderResponseDto 
+  PagedTenantOrderResponseDto,
 } from "@/src/types/type";
 import TablePagination from "@/src/components/ui/common/TablePagination";
 
-const ORDER_STATUS_MAP: Record<number, { text: string; bg: string; textCol: string }> = {
+const ORDER_STATUS_MAP: Record<
+  number,
+  { text: string; bg: string; textCol: string }
+> = {
   0: { text: "Chờ thanh toán", bg: "bg-yellow-50", textCol: "text-yellow-700" },
   1: { text: "Đang chờ bếp", bg: "bg-blue-50", textCol: "text-blue-700" },
   2: { text: "Đang chế biến", bg: "bg-indigo-50", textCol: "text-indigo-700" },
@@ -41,36 +50,46 @@ function TenantOrdersContent() {
   const searchParams = useSearchParams();
   const { user } = useAuth();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
-  
+  const [isRestaurantLoading, setIsRestaurantLoading] = useState<boolean>(true);
+  const [selectedRestaurant, setSelectedRestaurant] =
+    useState<Restaurant | null>(null);
+
   const [orders, setOrders] = useState<TenantOrderResponseDto[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  
+
   const [fromDate, setFromDate] = useState<string>("");
   const [toDate, setToDate] = useState<string>("");
   const [keyword, setKeyword] = useState<string>("");
   const [status, setStatus] = useState<number | "">("");
   const [typeOrder, setTypeOrder] = useState<number | "">("");
   const [refundType, setRefundType] = useState<number | "">("");
-  
+
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
   const pageSize = 10;
-  
+
   const [showModal, setShowModal] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<TenantOrderResponseDto | null>(null);
+  const [selectedOrder, setSelectedOrder] =
+    useState<TenantOrderResponseDto | null>(null);
 
   useEffect(() => {
     const fetchRestaurants = async () => {
-      if (!user?.id) return;
+      if (!user?.id) {
+        setIsRestaurantLoading(false);
+        return;
+      }
 
       try {
-        const response = await apiClient.get(API.RESTAURANT.GET_ALL_RESTAURANT_BY_TENANT_ID);
+        const response = await apiClient.get(
+          API.RESTAURANT.GET_ALL_RESTAURANT_BY_TENANT_ID,
+        );
         if (response.data.isSuccess && response.data.data) {
           setRestaurants(response.data.data);
         }
       } catch (error: any) {
         toast.error("Có lỗi xảy ra khi tải danh sách nhà hàng");
+      } finally {
+        setIsRestaurantLoading(false);
       }
     };
     fetchRestaurants();
@@ -88,7 +107,7 @@ function TenantOrdersContent() {
     const td = searchParams.get("toDate");
 
     if (rid) {
-      const rest = restaurants.find(r => r.id === Number(rid));
+      const rest = restaurants.find((r) => r.id === Number(rid));
       if (rest) setSelectedRestaurant(rest);
     }
     if (to !== null) setTypeOrder(Number(to));
@@ -101,22 +120,22 @@ function TenantOrdersContent() {
   useEffect(() => {
     const fetchOrders = async () => {
       if (!selectedRestaurant?.id) return;
-      
+
       setLoading(true);
       try {
         const statusParam = status !== "" ? Number(status) : undefined;
         const response = await apiClient.get<any>(
           API.ORDER.GET_TENANT_ORDERS(
-            selectedRestaurant.id, 
-            currentPage, 
-            pageSize, 
-            keyword || undefined, 
-            statusParam, 
-            fromDate || undefined, 
+            selectedRestaurant.id,
+            currentPage,
+            pageSize,
+            keyword || undefined,
+            statusParam,
+            fromDate || undefined,
             toDate || undefined,
             typeOrder !== "" ? Number(typeOrder) : undefined,
-            refundType !== "" ? Number(refundType) : undefined
-          )
+            refundType !== "" ? Number(refundType) : undefined,
+          ),
         );
 
         if (response.data.isSuccess && response.data.data) {
@@ -135,15 +154,25 @@ function TenantOrdersContent() {
         setLoading(false);
       }
     };
-    
+
     // Add debounce for search keyword
     const timeoutId = setTimeout(() => {
-        if (selectedRestaurant) {
-            fetchOrders();
-        }
+      if (selectedRestaurant) {
+        fetchOrders();
+      }
     }, 500);
     return () => clearTimeout(timeoutId);
-  }, [selectedRestaurant, currentPage, pageSize, keyword, status, fromDate, toDate, typeOrder, refundType]);
+  }, [
+    selectedRestaurant,
+    currentPage,
+    pageSize,
+    keyword,
+    status,
+    fromDate,
+    toDate,
+    typeOrder,
+    refundType,
+  ]);
 
   const handleUpdateClick = (order: TenantOrderResponseDto) => {
     setSelectedOrder(order);
@@ -151,16 +180,25 @@ function TenantOrdersContent() {
   };
 
   const getStatusDisplay = (statusCode: number) => {
-    const mapping = ORDER_STATUS_MAP[statusCode] || { text: "Không rõ", bg: "bg-slate-50", textCol: "text-slate-700" };
+    const mapping = ORDER_STATUS_MAP[statusCode] || {
+      text: "Không rõ",
+      bg: "bg-slate-50",
+      textCol: "text-slate-700",
+    };
     return (
-        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${mapping.bg} ${mapping.textCol}`}>
-            {mapping.text}
-        </span>
+      <span
+        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${mapping.bg} ${mapping.textCol}`}
+      >
+        {mapping.text}
+      </span>
     );
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
   };
 
   return (
@@ -177,7 +215,23 @@ function TenantOrdersContent() {
             </div>
           </div>
 
-          {restaurants.length > 0 ? (
+          {isRestaurantLoading ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div
+                  key={`orders-restaurant-skeleton-${index}`}
+                  className="overflow-hidden rounded-xl border border-slate-200 bg-white"
+                >
+                  <div className="aspect-video animate-pulse bg-slate-200" />
+                  <div className="space-y-2 p-4">
+                    <div className="h-4 w-3/4 animate-pulse rounded bg-slate-200" />
+                    <div className="h-3 w-5/6 animate-pulse rounded bg-slate-100" />
+                    <div className="h-3 w-2/3 animate-pulse rounded bg-slate-100" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : restaurants.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {restaurants.map((rest) => (
                 <div
@@ -309,11 +363,15 @@ function TenantOrdersContent() {
                 <div className="flex flex-wrap items-center gap-3 border-t border-slate-100 pt-3">
                   {/* Status Dropdown */}
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] uppercase font-bold text-slate-400 px-1">Trạng thái</label>
+                    <label className="text-[10px] uppercase font-bold text-slate-400 px-1">
+                      Trạng thái
+                    </label>
                     <select
                       value={status}
                       onChange={(e) => {
-                        setStatus(e.target.value === "" ? "" : Number(e.target.value));
+                        setStatus(
+                          e.target.value === "" ? "" : Number(e.target.value),
+                        );
                         setCurrentPage(1);
                       }}
                       className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-400 text-slate-600 cursor-pointer min-w-[150px]"
@@ -330,11 +388,14 @@ function TenantOrdersContent() {
 
                   {/* Order Type Dropdown */}
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] uppercase font-bold text-slate-400 px-1">Loại đơn</label>
+                    <label className="text-[10px] uppercase font-bold text-slate-400 px-1">
+                      Loại đơn
+                    </label>
                     <select
                       value={typeOrder}
                       onChange={(e) => {
-                        const val = e.target.value === "" ? "" : Number(e.target.value);
+                        const val =
+                          e.target.value === "" ? "" : Number(e.target.value);
                         setTypeOrder(val);
                         if (val !== 1) setRefundType("");
                         setCurrentPage(1);
@@ -350,11 +411,15 @@ function TenantOrdersContent() {
                   {/* Refund Type (Conditional) */}
                   {typeOrder === 1 && (
                     <div className="flex flex-col gap-1 animate-in slide-in-from-left-2 duration-200">
-                      <label className="text-[10px] uppercase font-bold text-rose-400 px-1">Lý do hoàn</label>
+                      <label className="text-[10px] uppercase font-bold text-rose-400 px-1">
+                        Lý do hoàn
+                      </label>
                       <select
                         value={refundType}
                         onChange={(e) => {
-                          setRefundType(e.target.value === "" ? "" : Number(e.target.value));
+                          setRefundType(
+                            e.target.value === "" ? "" : Number(e.target.value),
+                          );
                           setCurrentPage(1);
                         }}
                         className="rounded-xl border border-rose-200 bg-white px-3 py-2 text-sm outline-none focus:border-rose-400 text-rose-700 cursor-pointer min-w-[150px]"
@@ -384,7 +449,7 @@ function TenantOrdersContent() {
                       Xóa lọc
                     </button>
                   </div>
-                  
+
                   {/* Results Count */}
                   <div className="ml-auto text-xs text-slate-400 font-medium italic">
                     Tìm thấy {totalItems} đơn hàng
@@ -406,66 +471,96 @@ function TenantOrdersContent() {
                     <th className="px-6 py-4 font-medium">Giờ Lập</th>
                     <th className="px-6 py-4 font-medium">Loại / Thanh toán</th>
                     <th className="px-6 py-4 font-medium">Trạng Thái</th>
-                    <th className="px-6 py-4 text-center font-medium">Chi Tiết</th>
+                    <th className="px-6 py-4 text-center font-medium">
+                      Chi Tiết
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {loading ? (
-                    <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center">
-                        <div className="flex flex-col items-center justify-center">
-                          <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-indigo-600"></div>
-                          <p className="mt-4 text-sm font-medium text-slate-600">Đang tải dữ liệu...</p>
-                        </div>
-                      </td>
-                    </tr>
+                    Array.from({ length: 8 }).map((_, rowIndex) => (
+                      <tr key={`orders-loading-row-${rowIndex}`}>
+                        <td className="px-6 py-4">
+                          <div className="h-6 w-24 animate-pulse rounded bg-slate-200" />
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="h-4 w-28 animate-pulse rounded bg-slate-200" />
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="h-4 w-24 animate-pulse rounded bg-slate-200" />
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="h-4 w-36 animate-pulse rounded bg-slate-100" />
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="h-4 w-28 animate-pulse rounded bg-slate-100" />
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="h-5 w-24 animate-pulse rounded-full bg-slate-200" />
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="mx-auto h-8 w-8 animate-pulse rounded bg-slate-200" />
+                        </td>
+                      </tr>
+                    ))
                   ) : orders && orders.length > 0 ? (
                     orders.map((order) => (
-                      <tr key={order.id} className="transition-colors hover:bg-slate-50/70">
+                      <tr
+                        key={order.id}
+                        className="transition-colors hover:bg-slate-50/70"
+                      >
                         <td className="px-6 py-4">
-                            <span className="font-semibold text-slate-900 border border-slate-200 bg-slate-50 px-2 py-1 rounded-md">
-                                {order.orderCode}
+                          <span className="font-semibold text-slate-900 border border-slate-200 bg-slate-50 px-2 py-1 rounded-md">
+                            {order.orderCode}
+                          </span>
+                          {order.isPreOrder && (
+                            <span className="ml-2 inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700">
+                              Đặt trước
                             </span>
-                            {order.isPreOrder && (
-                                <span className="ml-2 inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700">
-                                Đặt trước
+                          )}
+                          {order.typeOrder === 1 && (
+                            <div className="mt-1 flex flex-col gap-1 items-start">
+                              <span className="inline-flex items-center rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-medium text-rose-700 border border-rose-200">
+                                Hoàn tiền
+                              </span>
+                              {order.originalOrderCode && (
+                                <span className="text-[9px] text-slate-500 italic">
+                                  Đơn gốc: #{order.originalOrderCode}
                                 </span>
-                            )}
-                            {order.typeOrder === 1 && (
-                                <div className="mt-1 flex flex-col gap-1 items-start">
-                                    <span className="inline-flex items-center rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-medium text-rose-700 border border-rose-200">
-                                    Hoàn tiền
-                                    </span>
-                                    {order.originalOrderCode && (
-                                        <span className="text-[9px] text-slate-500 italic">
-                                            Đơn gốc: #{order.originalOrderCode}
-                                        </span>
-                                    )}
-                                </div>
-                            )}
+                              )}
+                            </div>
+                          )}
                         </td>
                         <td className="px-6 py-4 font-medium text-slate-700">
-                            {order.numberPhone}
+                          {order.numberPhone}
                         </td>
                         <td className="px-6 py-4">
-                            <span className="font-medium text-emerald-600">
-                                {formatCurrency(order.typeOrder === 0 ? (order.totalAmount - order.promotionDiscount) : order.finalAmount)}
-                            </span>
-                            {order.promotionDiscount > 0 && (
-                                <span className="block text-xs line-through text-slate-400">
-                                    {formatCurrency(order.totalAmount)}
-                                </span>
+                          <span className="font-medium text-emerald-600">
+                            {formatCurrency(
+                              order.typeOrder === 0
+                                ? order.totalAmount - order.promotionDiscount
+                                : order.finalAmount,
                             )}
+                          </span>
+                          {order.promotionDiscount > 0 && (
+                            <span className="block text-xs line-through text-slate-400">
+                              {formatCurrency(order.totalAmount)}
+                            </span>
+                          )}
                         </td>
                         <td className="px-6 py-4 text-slate-500">
-                            {new Date(order.createdAt).toLocaleString('vi-VN')}
+                          {new Date(order.createdAt).toLocaleString("vi-VN")}
                         </td>
                         <td className="px-6 py-4">
-                            <div className="font-medium text-slate-700">{order.type}</div>
-                          <div className="text-xs text-slate-400">{PAYMENT_TYPE_MAP[order.typeOrder] || "Không có"}</div>
+                          <div className="font-medium text-slate-700">
+                            {order.type}
+                          </div>
+                          <div className="text-xs text-slate-400">
+                            {PAYMENT_TYPE_MAP[order.typeOrder] || "Không có"}
+                          </div>
                         </td>
                         <td className="px-6 py-4">
-                            {getStatusDisplay(order.status)}
+                          {getStatusDisplay(order.status)}
                         </td>
                         <td className="px-6 py-4 text-center">
                           <button
@@ -485,8 +580,12 @@ function TenantOrdersContent() {
                           <div className="rounded-full bg-slate-100 p-3">
                             <Receipt className="h-6 w-6 text-slate-400" />
                           </div>
-                          <p className="mt-2 text-sm font-medium text-slate-900">Không tìm thấy đơn hàng</p>
-                          <p className="mt-1 text-xs text-slate-500">Chưa có dữ liệu với bộ lọc này.</p>
+                          <p className="mt-2 text-sm font-medium text-slate-900">
+                            Không tìm thấy đơn hàng
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500">
+                            Chưa có dữ liệu với bộ lọc này.
+                          </p>
                         </div>
                       </td>
                     </tr>
@@ -514,27 +613,43 @@ function TenantOrdersContent() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 transition-opacity">
           <div className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-xl max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-              <h3 className="text-lg font-semibold text-slate-900">Chi tiết Đơn hàng #{selectedOrder.orderCode}</h3>
+              <h3 className="text-lg font-semibold text-slate-900">
+                Chi tiết Đơn hàng #{selectedOrder.orderCode}
+              </h3>
               <button
                 onClick={() => setShowModal(false)}
                 className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
               >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
-            
+
             <div className="px-6 py-4 overflow-y-auto">
               {/* Order Info Grid */}
               <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
                 <div>
                   <p className="text-slate-500 mb-1">Khách hàng</p>
-                  <p className="font-medium text-slate-900">{selectedOrder.numberPhone}</p>
+                  <p className="font-medium text-slate-900">
+                    {selectedOrder.numberPhone}
+                  </p>
                 </div>
                 <div>
                   <p className="text-slate-500 mb-1">Thời gian đặt</p>
-                  <p className="font-medium text-slate-900">{new Date(selectedOrder.createdAt).toLocaleString('vi-VN')}</p>
+                  <p className="font-medium text-slate-900">
+                    {new Date(selectedOrder.createdAt).toLocaleString("vi-VN")}
+                  </p>
                 </div>
                 <div>
                   <p className="text-slate-500 mb-1">Trạng thái</p>
@@ -542,128 +657,193 @@ function TenantOrdersContent() {
                 </div>
                 <div>
                   <p className="text-slate-500 mb-1">Hình thức</p>
-                  <p className="font-medium text-slate-900">{selectedOrder.type} - {PAYMENT_TYPE_MAP[selectedOrder.typeOrder] || "Không có"}</p>
+                  <p className="font-medium text-slate-900">
+                    {selectedOrder.type} -{" "}
+                    {PAYMENT_TYPE_MAP[selectedOrder.typeOrder] || "Không có"}
+                  </p>
                 </div>
                 {selectedOrder.isPreOrder && (
-                    <div className="col-span-2">
-                        <p className="text-slate-500 mb-1">Giờ đặt trước (Yêu cầu / Xác nhận)</p>
-                        <p className="font-medium text-purple-700 bg-purple-50 inline-block px-2 py-1 rounded">
-                      {selectedOrder.requestedPickupAt ? new Date(selectedOrder.requestedPickupAt).toLocaleString('vi-VN') : 'Không có'} 
-                            {' --> '}
-                            {selectedOrder.confirmedPickupAt ? new Date(selectedOrder.confirmedPickupAt).toLocaleString('vi-VN') : 'Chưa xác nhận'}
-                        </p>
-                    </div>
-                )}
-                {selectedOrder.typeOrder === 1 && selectedOrder.originalOrderCode && (
-                  <div>
-                    <p className="text-slate-500 mb-1 font-semibold text-rose-600">Đơn gốc</p>
-                    <p className="font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded inline-block">#{selectedOrder.originalOrderCode}</p>
+                  <div className="col-span-2">
+                    <p className="text-slate-500 mb-1">
+                      Giờ đặt trước (Yêu cầu / Xác nhận)
+                    </p>
+                    <p className="font-medium text-purple-700 bg-purple-50 inline-block px-2 py-1 rounded">
+                      {selectedOrder.requestedPickupAt
+                        ? new Date(
+                            selectedOrder.requestedPickupAt,
+                          ).toLocaleString("vi-VN")
+                        : "Không có"}
+                      {" --> "}
+                      {selectedOrder.confirmedPickupAt
+                        ? new Date(
+                            selectedOrder.confirmedPickupAt,
+                          ).toLocaleString("vi-VN")
+                        : "Chưa xác nhận"}
+                    </p>
                   </div>
                 )}
+                {selectedOrder.typeOrder === 1 &&
+                  selectedOrder.originalOrderCode && (
+                    <div>
+                      <p className="text-slate-500 mb-1 font-semibold text-rose-600">
+                        Đơn gốc
+                      </p>
+                      <p className="font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded inline-block">
+                        #{selectedOrder.originalOrderCode}
+                      </p>
+                    </div>
+                  )}
                 {selectedOrder.responsibleStaffName && (
                   <div>
                     <p className="text-slate-500 mb-1">Nhân viên xử lý</p>
-                    <p className="font-medium text-slate-900">{selectedOrder.responsibleStaffName}</p>
+                    <p className="font-medium text-slate-900">
+                      {selectedOrder.responsibleStaffName}
+                    </p>
                   </div>
                 )}
-                {selectedOrder.refundType !== undefined && selectedOrder.refundType !== null && (
-                  <div>
-                    <p className="text-slate-500 mb-1 text-xs">Loại/Lý do hoàn</p>
-                    <p className="font-medium text-slate-900 truncate">{REFUND_TYPE_MAP[selectedOrder.refundType] || "N/A"}</p>
-                  </div>
-                )}
-                {selectedOrder.paymentProofUrl && (
-                    <div className="col-span-2">
-                        <p className="text-slate-500 mb-2">Minh chứng chuyển khoản (Ảnh)</p>
-                        <a href={selectedOrder.paymentProofUrl} target="_blank" rel="noopener noreferrer" className="block w-full max-h-48 overflow-hidden rounded-lg border border-slate-200 hover:border-indigo-400 transition-colors">
-                            <img src={selectedOrder.paymentProofUrl} alt="Payment Proof" className="w-full h-full object-cover" />
-                        </a>
-                        <p className="text-[10px] text-slate-400 mt-1 italic">* Click vào ảnh để xem kích thước lớn</p>
+                {selectedOrder.refundType !== undefined &&
+                  selectedOrder.refundType !== null && (
+                    <div>
+                      <p className="text-slate-500 mb-1 text-xs">
+                        Loại/Lý do hoàn
+                      </p>
+                      <p className="font-medium text-slate-900 truncate">
+                        {REFUND_TYPE_MAP[selectedOrder.refundType] || "N/A"}
+                      </p>
                     </div>
+                  )}
+                {selectedOrder.paymentProofUrl && (
+                  <div className="col-span-2">
+                    <p className="text-slate-500 mb-2">
+                      Minh chứng chuyển khoản (Ảnh)
+                    </p>
+                    <a
+                      href={selectedOrder.paymentProofUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full max-h-48 overflow-hidden rounded-lg border border-slate-200 hover:border-indigo-400 transition-colors"
+                    >
+                      <img
+                        src={selectedOrder.paymentProofUrl}
+                        alt="Payment Proof"
+                        className="w-full h-full object-cover"
+                      />
+                    </a>
+                    <p className="text-[10px] text-slate-400 mt-1 italic">
+                      * Click vào ảnh để xem kích thước lớn
+                    </p>
+                  </div>
                 )}
                 {selectedOrder.note && (
-                    <div className="col-span-2">
-                        <p className="text-slate-500 mb-1">Ghi chú</p>
-                        <p className="text-slate-700 italic bg-amber-50 p-2 rounded border border-amber-100 text-xs">
-                          {selectedOrder.note}
-                        </p>
-                    </div>
+                  <div className="col-span-2">
+                    <p className="text-slate-500 mb-1">Ghi chú</p>
+                    <p className="text-slate-700 italic bg-amber-50 p-2 rounded border border-amber-100 text-xs">
+                      {selectedOrder.note}
+                    </p>
+                  </div>
                 )}
               </div>
 
               {/* Order Items Table */}
               <div className="border border-slate-200 rounded-lg overflow-hidden my-6">
                 <table className="w-full text-left text-sm text-slate-600">
-                    <thead className="bg-slate-50 text-xs text-slate-500">
-                        <tr>
-                            <th className="px-4 py-2 font-medium">Tên Món</th>
-                            <th className="px-4 py-2 font-medium text-center">SL</th>
-                            <th className="px-4 py-2 font-medium text-right">Đơn giá</th>
-                            <th className="px-4 py-2 font-medium text-right">Thành tiền</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                        {selectedOrder.orderDetails?.map((item, index) => (
-                            <tr key={index}>
-                                <td className="px-4 py-3 font-medium text-slate-800">
-                                  {item.dishName}
-                                  {item.refundedQuantity > 0 && (
-                                    <div className="text-[10px] text-rose-500 font-normal">
-                                      (Đã hoàn {item.refundedQuantity})
-                                    </div>
-                                  )}
-                                </td>
-                                <td className="px-4 py-3 text-center">
-                                  <div className={item.refundedQuantity >= item.quantity ? "line-through text-slate-400" : ""}>
-                                    {item.quantity}
-                                  </div>
-                                </td>
-                                <td className="px-4 py-3 text-right">
-                                    {item.promotionAmount > 0 ? (
-                                        <div className="flex flex-col items-end">
-                                            <span className="text-emerald-600">{formatCurrency(item.discountedPrice)}</span>
-                                            <span className="text-[10px] line-through text-slate-400">{formatCurrency(item.originalPrice)}</span>
-                                        </div>
-                                    ) : (
-                                        <span>{formatCurrency(item.discountedPrice)}</span>
-                                    )}
-                                </td>
-                                <td className="px-4 py-3 text-right font-medium text-slate-900">{formatCurrency(item.subTotal)}</td>
-                            </tr>
-                        ))}
-                    </tbody>
+                  <thead className="bg-slate-50 text-xs text-slate-500">
+                    <tr>
+                      <th className="px-4 py-2 font-medium">Tên Món</th>
+                      <th className="px-4 py-2 font-medium text-center">SL</th>
+                      <th className="px-4 py-2 font-medium text-right">
+                        Đơn giá
+                      </th>
+                      <th className="px-4 py-2 font-medium text-right">
+                        Thành tiền
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {selectedOrder.orderDetails?.map((item, index) => (
+                      <tr key={index}>
+                        <td className="px-4 py-3 font-medium text-slate-800">
+                          {item.dishName}
+                          {item.refundedQuantity > 0 && (
+                            <div className="text-[10px] text-rose-500 font-normal">
+                              (Đã hoàn {item.refundedQuantity})
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <div
+                            className={
+                              item.refundedQuantity >= item.quantity
+                                ? "line-through text-slate-400"
+                                : ""
+                            }
+                          >
+                            {item.quantity}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          {item.promotionAmount > 0 ? (
+                            <div className="flex flex-col items-end">
+                              <span className="text-emerald-600">
+                                {formatCurrency(item.discountedPrice)}
+                              </span>
+                              <span className="text-[10px] line-through text-slate-400">
+                                {formatCurrency(item.originalPrice)}
+                              </span>
+                            </div>
+                          ) : (
+                            <span>{formatCurrency(item.discountedPrice)}</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right font-medium text-slate-900">
+                          {formatCurrency(item.subTotal)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
                 </table>
               </div>
-              
+
               <div className="mt-6 flex justify-end">
                 <div className="w-64 space-y-2 text-sm">
-                    <div className="flex justify-between text-slate-500">
-                        <span>Tạm tính</span>
-                        <span className="font-medium">{formatCurrency(selectedOrder.totalAmount)}</span>
+                  <div className="flex justify-between text-slate-500">
+                    <span>Tạm tính</span>
+                    <span className="font-medium">
+                      {formatCurrency(selectedOrder.totalAmount)}
+                    </span>
+                  </div>
+                  {selectedOrder.promotionDiscount > 0 && (
+                    <div className="flex justify-between text-rose-500">
+                      <span>Khuyến mãi</span>
+                      <span className="font-medium">
+                        -{formatCurrency(selectedOrder.promotionDiscount)}
+                      </span>
                     </div>
-                    {selectedOrder.promotionDiscount > 0 && (
-                        <div className="flex justify-between text-rose-500">
-                            <span>Khuyến mãi</span>
-                            <span className="font-medium">-{formatCurrency(selectedOrder.promotionDiscount)}</span>
-                        </div>
-                    )}
-                    <div className="flex justify-between pt-2 border-t border-slate-200 text-base">
-                        <span className="font-semibold text-slate-900">Tổng cộng</span>
-                        <span className="font-bold text-emerald-600">
-                            {formatCurrency(selectedOrder.typeOrder === 0 ? (selectedOrder.totalAmount - selectedOrder.promotionDiscount) : selectedOrder.finalAmount)}
-                        </span>
-                    </div>
+                  )}
+                  <div className="flex justify-between pt-2 border-t border-slate-200 text-base">
+                    <span className="font-semibold text-slate-900">
+                      Tổng cộng
+                    </span>
+                    <span className="font-bold text-emerald-600">
+                      {formatCurrency(
+                        selectedOrder.typeOrder === 0
+                          ? selectedOrder.totalAmount -
+                              selectedOrder.promotionDiscount
+                          : selectedOrder.finalAmount,
+                      )}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-            
+
             <div className="border-t border-slate-100 bg-slate-50 px-6 py-4 flex justify-end">
-                <button
+              <button
                 onClick={() => setShowModal(false)}
                 className="rounded-lg bg-white border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 cursor-pointer"
-                >
+              >
                 Đóng
-                </button>
+              </button>
             </div>
           </div>
         </div>
@@ -674,11 +854,13 @@ function TenantOrdersContent() {
 
 export default function TenantOrdersPage() {
   return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-indigo-600"></div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-indigo-600"></div>
+        </div>
+      }
+    >
       <TenantOrdersContent />
     </Suspense>
   );

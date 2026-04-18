@@ -63,6 +63,7 @@ export default function TenantHeader() {
       const response = await notificationService.countNotifyTenantsByStatus(
         tenantInfo.id,
         0,
+        { skipGlobalLoading: true },
       );
 
       if (response.data?.isSuccess) {
@@ -79,6 +80,7 @@ export default function TenantHeader() {
       const response = await notificationService.getNotifyTenantDetails(
         detailPage,
         DETAIL_PAGE_SIZE,
+        { skipGlobalLoading: true },
       );
 
       if (response.data?.isSuccess && response.data.data) {
@@ -204,16 +206,7 @@ export default function TenantHeader() {
           </div>
         </div>
 
-        <div className="flex flex-1 items-center gap-3">
-          <div className="flex w-full max-w-md items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
-            <IconSearch />
-            <input
-              type="search"
-              placeholder="Tìm kiếm..."
-              className="w-full bg-transparent outline-none placeholder:text-slate-400"
-            />
-          </div>
-        </div>
+        <div className="flex flex-1 items-center gap-3"></div>
 
         <div className="flex items-center gap-2">
           <button

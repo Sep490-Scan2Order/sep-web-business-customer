@@ -13,6 +13,7 @@ export default function PlanPage() {
   const [subscriptionTenantInfo, setSubscriptionTenantInfo] = useState<
     SubscriptionTenantInfo[]
   >([]);
+  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
 
   // State cho Modal
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -44,6 +45,8 @@ export default function PlanPage() {
         if (planRes.data.isSuccess) setActivePlans(planRes.data.data);
       } catch {
         toast.error("Không thể tải thông tin hệ thống");
+      } finally {
+        setIsInitialLoading(false);
       }
     };
     fetchData();
@@ -257,103 +260,153 @@ export default function PlanPage() {
               </tr>
             </thead>
             <tbody>
-              {filterSubscriptionInfo.map((info, index) => (
-                <tr
-                  key={info.restaurantId}
-                  className="border-b border-gray-200 hover:bg-slate-50 transition-colors"
-                >
-                  <td className="px-4 py-3">
-                    <input
-                      type="checkbox"
-                      className="cursor-pointer rounded border-gray-300"
-                      checked={selectedIds.has(info.restaurantId)}
-                      onChange={(e) =>
-                        handleRestaurantInfoCheckboxChange(
-                          info.restaurantId,
-                          e.target.checked,
-                        )
-                      }
-                    />
-                  </td>
-                  <td className="px-4 py-2 text-sm text-gray-600">
-                    {index + 1}
-                  </td>
-                  <td className="px-4 py-2 text-sm text-gray-600">
-                    {info.restaurantName}
-                  </td>
-                  <td
-                    className="px-4 py-2 text-sm text-gray-600 truncate max-w-[200px]"
-                    title={info.address}
+              {isInitialLoading ? (
+                Array.from({ length: 8 }).map((_, rowIndex) => (
+                  <tr
+                    key={`plan-loading-row-${rowIndex}`}
+                    className="border-b border-gray-200"
                   >
-                    {info.address}
-                  </td>
-                  <td className="px-4 py-2 text-sm text-gray-600">
-                    {info.currentPlanName ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
-                        <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>{" "}
-                        {info.currentPlanName}
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
-                        <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>{" "}
-                        Chưa đăng ký
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-2 text-sm text-gray-600">
-                    {info.startDate
-                      ? new Date(info.startDate).toLocaleDateString("vi-VN")
-                      : "Không có"}
-                  </td>
-                  <td className="px-4 py-2 text-sm text-gray-600">
-                    {info.endDate
-                      ? new Date(info.endDate).toLocaleDateString("vi-VN")
-                      : "Không có"}
-                  </td>
-                  <td className="px-4 py-2 text-sm text-gray-600">
-                    {info.isActive ? (
-                      <span className="text-xs font-medium text-green-800">
-                        Hoạt động
-                      </span>
-                    ) : (
-                      <span className="text-xs font-medium text-red-800">
-                        Tạm ngưng
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-2 text-sm text-gray-600">
-                    <div className="flex items-center justify-center gap-2">
-                      <button
-                        className=" cursor-pointer inline-flex items-center rounded-md border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100"
-                        onClick={() =>
-                          handleActionChangePlan(
-                            [info],
-                            info.currentPlanId ? "UPGRADE" : "CHANGE",
-                          )
-                        }
-                      >
-                        {info.currentPlanId ? "Nâng cấp" : "Đăng ký"}
-                      </button>
-                      <button
-                        disabled={!info.currentPlanId}
-                        onClick={() =>
-                          handleActionChangePlan([info], "DOWNGRADE")
-                        }
-                        className="cursor-pointer inline-flex items-center rounded-md border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs font-medium text-orange-700 disabled:opacity-50 hover:bg-orange-100"
-                      >
-                        Hạ cấp
-                      </button>
-                      <button
-                        disabled={!info.currentPlanId}
-                        onClick={() => handleActionRenew([info])}
-                        className="cursor-pointer inline-flex items-center rounded-md border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 disabled:opacity-50 hover:bg-green-100"
-                      >
-                        Gia hạn
-                      </button>
-                    </div>
+                    <td className="px-4 py-3">
+                      <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="h-3 w-6 animate-pulse rounded bg-gray-200" />
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="h-4 w-28 animate-pulse rounded bg-gray-200" />
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="h-4 w-40 animate-pulse rounded bg-gray-100" />
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="h-5 w-24 animate-pulse rounded-full bg-gray-200" />
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="h-4 w-24 animate-pulse rounded bg-gray-100" />
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="h-4 w-24 animate-pulse rounded bg-gray-100" />
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="h-4 w-16 animate-pulse rounded bg-gray-200" />
+                    </td>
+                    <td className="px-4 py-2">
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="h-8 w-20 animate-pulse rounded bg-gray-200" />
+                        <div className="h-8 w-16 animate-pulse rounded bg-gray-200" />
+                        <div className="h-8 w-16 animate-pulse rounded bg-gray-200" />
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : filterSubscriptionInfo.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={9}
+                    className="px-4 py-10 text-center text-sm text-gray-500"
+                  >
+                    Không có nhà hàng phù hợp.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filterSubscriptionInfo.map((info, index) => (
+                  <tr
+                    key={info.restaurantId}
+                    className="border-b border-gray-200 hover:bg-slate-50 transition-colors"
+                  >
+                    <td className="px-4 py-3">
+                      <input
+                        type="checkbox"
+                        className="cursor-pointer rounded border-gray-300"
+                        checked={selectedIds.has(info.restaurantId)}
+                        onChange={(e) =>
+                          handleRestaurantInfoCheckboxChange(
+                            info.restaurantId,
+                            e.target.checked,
+                          )
+                        }
+                      />
+                    </td>
+                    <td className="px-4 py-2 text-sm text-gray-600">
+                      {index + 1}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-gray-600">
+                      {info.restaurantName}
+                    </td>
+                    <td
+                      className="px-4 py-2 text-sm text-gray-600 truncate max-w-50"
+                      title={info.address}
+                    >
+                      {info.address}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-gray-600">
+                      {info.currentPlanName ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                          <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>{" "}
+                          {info.currentPlanName}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
+                          <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>{" "}
+                          Chưa đăng ký
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-gray-600">
+                      {info.startDate
+                        ? new Date(info.startDate).toLocaleDateString("vi-VN")
+                        : "Không có"}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-gray-600">
+                      {info.endDate
+                        ? new Date(info.endDate).toLocaleDateString("vi-VN")
+                        : "Không có"}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-gray-600">
+                      {info.isActive ? (
+                        <span className="text-xs font-medium text-green-800">
+                          Hoạt động
+                        </span>
+                      ) : (
+                        <span className="text-xs font-medium text-red-800">
+                          Tạm ngưng
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-gray-600">
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          className=" cursor-pointer inline-flex items-center rounded-md border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100"
+                          onClick={() =>
+                            handleActionChangePlan(
+                              [info],
+                              info.currentPlanId ? "UPGRADE" : "CHANGE",
+                            )
+                          }
+                        >
+                          {info.currentPlanId ? "Nâng cấp" : "Đăng ký"}
+                        </button>
+                        <button
+                          disabled={!info.currentPlanId}
+                          onClick={() =>
+                            handleActionChangePlan([info], "DOWNGRADE")
+                          }
+                          className="cursor-pointer inline-flex items-center rounded-md border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs font-medium text-orange-700 disabled:opacity-50 hover:bg-orange-100"
+                        >
+                          Hạ cấp
+                        </button>
+                        <button
+                          disabled={!info.currentPlanId}
+                          onClick={() => handleActionRenew([info])}
+                          className="cursor-pointer inline-flex items-center rounded-md border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 disabled:opacity-50 hover:bg-green-100"
+                        >
+                          Gia hạn
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

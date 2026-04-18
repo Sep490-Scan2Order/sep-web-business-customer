@@ -1,14 +1,14 @@
-"use client"
+"use client";
 import { useEffect, useState, useRef } from "react";
 import { API } from "@/src/constants/api";
 import apiClient from "@/src/services/apiClient";
-import { 
-  Plus, 
-  SlidersHorizontal, 
-  ArrowUpDown, 
-  Search, 
-  HandCoins, 
-  Copy, 
+import {
+  Plus,
+  SlidersHorizontal,
+  ArrowUpDown,
+  Search,
+  HandCoins,
+  Copy,
   MoreHorizontal,
   ChevronLeft,
   ChevronRight,
@@ -16,43 +16,43 @@ import {
   LockOpen,
   Edit,
   Trash2,
-  Eye
+  Eye,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import ConfirmActionPopup from "@/src/components/ui/common/ConfirmActionPopup";
 import TablePagination from "@/src/components/ui/common/TablePagination";
 
 type TenantApiItem = {
-      id: string,
-      name: string,
-      accountId: string,
-      email: string,
-      phone: string,
-      avatar: string | null,
-      role: string,
-      verified: boolean,
-      isActive: boolean,
-      taxNumber: string | null,
-      bankId: string | null,
-      cardNumber: string | null,
-      bankName: string | null,
-      bankLogo: string | null,
-      isVerifyBank: boolean,
-      isVerifyTax: boolean,
-      debtStartedAt: Date | null ,
-      subscriptionExpiryDate: Date | null,
-      lastWarningSentAt: Date | null,
-      totalDebtAmount: number,
-      isSuspended: boolean,
-      suspendedAt: Date | null,
+  id: string;
+  name: string;
+  accountId: string;
+  email: string;
+  phone: string;
+  avatar: string | null;
+  role: string;
+  verified: boolean;
+  isActive: boolean;
+  taxNumber: string | null;
+  bankId: string | null;
+  cardNumber: string | null;
+  bankName: string | null;
+  bankLogo: string | null;
+  isVerifyBank: boolean;
+  isVerifyTax: boolean;
+  debtStartedAt: Date | null;
+  subscriptionExpiryDate: Date | null;
+  lastWarningSentAt: Date | null;
+  totalDebtAmount: number;
+  isSuspended: boolean;
+  suspendedAt: Date | null;
 };
 
 type TenantApiResponse = {
-    isSuccess: boolean;
-    message: string;
-    data: TenantApiItem[];
-    errors: unknown[];
-    timestamp: string;
+  isSuccess: boolean;
+  message: string;
+  data: TenantApiItem[];
+  errors: unknown[];
+  timestamp: string;
 };
 
 export default function TenantManagementPage() {
@@ -67,17 +67,23 @@ export default function TenantManagementPage() {
   const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
   const [confirmTitle, setConfirmTitle] = useState("Xác nhận hành động");
-  const [confirmMessage, setConfirmMessage] = useState("Bạn có chắc chắn muốn thực hiện hành động này không?");
+  const [confirmMessage, setConfirmMessage] = useState(
+    "Bạn có chắc chắn muốn thực hiện hành động này không?",
+  );
   const [confirmText, setConfirmText] = useState("Xác nhận");
-  const [confirmVariant, setConfirmVariant] = useState<"default" | "danger">("default");
+  const [confirmVariant, setConfirmVariant] = useState<"default" | "danger">(
+    "default",
+  );
 
   useEffect(() => {
     const fetchTenants = async () => {
       try {
-        const response = await apiClient.get<TenantApiResponse>(API.TENANT.GET_ALL);
+        const response = await apiClient.get<TenantApiResponse>(
+          API.TENANT.GET_ALL,
+        );
         if (response.status === 200 && response.data.isSuccess) {
           setTenants(response.data.data);
-        } 
+        }
       } catch (error) {
         console.error("Error fetching tenants:", error);
         setTenants([]);
@@ -87,54 +93,69 @@ export default function TenantManagementPage() {
     };
 
     fetchTenants();
-  },[]);
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setOpenDropdownId(null);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   //Suspend Tenant
   const toggleTenantStatus = async (tenantId: string) => {
-  const currentTenant = tenants.find(t => t.id === tenantId);
-  if (!currentTenant) return;
+    const currentTenant = tenants.find((t) => t.id === tenantId);
+    if (!currentTenant) return;
 
-  const newStatus = !currentTenant.isSuspended;
+    const newStatus = !currentTenant.isSuspended;
 
-  try {
-    const response = await apiClient.put(API.TENANT.IS_SUSPENDED(tenantId, newStatus));
-
-    if (response.status === 200) {
-      setTenants(prevTenants =>
-        prevTenants.map(tenant =>
-          tenant.id === tenantId ? { ...tenant, isSuspended: newStatus } : tenant
-        )
+    try {
+      const response = await apiClient.put(
+        API.TENANT.IS_SUSPENDED(tenantId, newStatus),
       );
 
-      toast.success(newStatus ? "Đã đình chỉ hoạt động nhà hàng" : "Đã kích hoạt lại nhà hàng");
-      setOpenDropdownId(null);
+      if (response.status === 200) {
+        setTenants((prevTenants) =>
+          prevTenants.map((tenant) =>
+            tenant.id === tenantId
+              ? { ...tenant, isSuspended: newStatus }
+              : tenant,
+          ),
+        );
+
+        toast.success(
+          newStatus
+            ? "Đã đình chỉ hoạt động nhà hàng"
+            : "Đã kích hoạt lại nhà hàng",
+        );
+        setOpenDropdownId(null);
+      }
+    } catch (error) {
+      console.error("Error toggling tenant status:", error);
+      toast.error("Thao tác thất bại, vui lòng thử lại");
     }
-  } catch (error) {
-    console.error("Error toggling tenant status:", error);
-    toast.error("Thao tác thất bại, vui lòng thử lại");
-  }
-};
+  };
 
   const openConfirmSuspendPopup = (tenant: TenantApiItem) => {
     const willSuspend = !tenant.isSuspended;
 
-    setConfirmTitle(willSuspend ? "Xác nhận đình chỉ bên thuê" : "Xác nhận kích hoạt lại bên thuê");
+    setConfirmTitle(
+      willSuspend
+        ? "Xác nhận đình chỉ bên thuê"
+        : "Xác nhận kích hoạt lại bên thuê",
+    );
     setConfirmMessage(
       willSuspend
         ? `Bạn có chắc chắn muốn đình chỉ hoạt động của ${tenant.name}?`
-        : `Bạn có chắc chắn muốn kích hoạt lại hoạt động của ${tenant.name}?`
+        : `Bạn có chắc chắn muốn kích hoạt lại hoạt động của ${tenant.name}?`,
     );
     setConfirmText(willSuspend ? "Đình chỉ" : "Kích hoạt lại");
     setConfirmVariant(willSuspend ? "danger" : "default");
@@ -156,17 +177,21 @@ export default function TenantManagementPage() {
   };
 
   // Filter tenants based on search
-  const filteredTenants = tenants.filter(tenant => 
-    tenant.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    tenant.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    tenant.accountId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    tenant.phone.includes(searchQuery)
+  const filteredTenants = tenants.filter(
+    (tenant) =>
+      tenant.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tenant.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tenant.accountId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tenant.phone.includes(searchQuery),
   );
 
   // Pagination
   const totalPages = Math.ceil(filteredTenants.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedTenants = filteredTenants.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedTenants = filteredTenants.slice(
+    startIndex,
+    startIndex + itemsPerPage,
+  );
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -174,7 +199,7 @@ export default function TenantManagementPage() {
 
   // Handle individual checkbox
   const handleTenantCheckboxChange = (tenantId: string, checked: boolean) => {
-    setSelectedIds(prev => {
+    setSelectedIds((prev) => {
       const newSet = new Set(prev);
       if (checked) {
         newSet.add(tenantId);
@@ -188,7 +213,7 @@ export default function TenantManagementPage() {
   // Handle "Select All" checkbox
   const checkAllCheckBox = (checked: boolean) => {
     if (checked) {
-      const allIds = new Set(paginatedTenants.map(tenant => tenant.id));
+      const allIds = new Set(paginatedTenants.map((tenant) => tenant.id));
       setSelectedIds(allIds);
     } else {
       setSelectedIds(new Set());
@@ -196,11 +221,14 @@ export default function TenantManagementPage() {
   };
 
   // Check if all current page items are selected
-  const isAllSelected = paginatedTenants.length > 0 && 
-    paginatedTenants.every(tenant => selectedIds.has(tenant.id));
+  const isAllSelected =
+    paginatedTenants.length > 0 &&
+    paginatedTenants.every((tenant) => selectedIds.has(tenant.id));
 
   // Check if some (but not all) items are selected
-  const isSomeSelected = paginatedTenants.some(tenant => selectedIds.has(tenant.id)) && !isAllSelected;
+  const isSomeSelected =
+    paginatedTenants.some((tenant) => selectedIds.has(tenant.id)) &&
+    !isAllSelected;
 
   const formatMoney = (amount: number) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -214,7 +242,9 @@ export default function TenantManagementPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200">
         <div className="px-6 py-4">
-          <h1 className="text-xl font-semibold text-gray-900">Quản lý bên thuê</h1>
+          <h1 className="text-xl font-semibold text-gray-900">
+            Quản lý bên thuê
+          </h1>
         </div>
 
         {/* Toolbar */}
@@ -252,47 +282,96 @@ export default function TenantManagementPage() {
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
                 <th className="w-12 px-4 py-3">
-                  <input 
-                    type="checkbox" 
-                    className="rounded border-gray-300" 
+                  <input
+                    type="checkbox"
+                    className="rounded border-gray-300"
                     checked={isAllSelected}
                     ref={(el) => {
                       if (el) el.indeterminate = isSomeSelected;
                     }}
-                    onChange={(e) => checkAllCheckBox(e.target.checked)} 
+                    onChange={(e) => checkAllCheckBox(e.target.checked)}
                   />
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Họ tên</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số điện thoại</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tổng số nợ</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  ID
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Họ tên
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Email
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Số điện thoại
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Tổng số nợ
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Trạng thái
+                </th>
                 <th className="w-12 px-4 py-3"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {isLoading ? (
-                <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
-                    Đang tải...
-                  </td>
-                </tr>
+                Array.from({ length: 8 }).map((_, rowIndex) => (
+                  <tr key={`tenant-loading-row-${rowIndex}`}>
+                    <td className="px-4 py-3">
+                      <div className="h-4 w-4 animate-pulse rounded bg-gray-200" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="h-3 w-20 animate-pulse rounded bg-gray-200" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200" />
+                        <div className="h-3 w-28 animate-pulse rounded bg-gray-200" />
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="h-3 w-36 animate-pulse rounded bg-gray-100" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="h-3 w-24 animate-pulse rounded bg-gray-100" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="h-3 w-20 animate-pulse rounded bg-gray-200" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="h-6 w-20 animate-pulse rounded-full bg-gray-200" />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="ml-auto h-8 w-8 animate-pulse rounded bg-gray-200" />
+                    </td>
+                  </tr>
+                ))
               ) : paginatedTenants.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
+                  <td
+                    colSpan={8}
+                    className="px-4 py-8 text-center text-gray-500"
+                  >
                     Không tìm thấy bên thuê
                   </td>
                 </tr>
               ) : (
                 paginatedTenants.map((tenant) => (
-                  <tr key={tenant.id} className="hover:bg-gray-50 transition-colors">
+                  <tr
+                    key={tenant.id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
                     <td className="px-4 py-3">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         className="rounded border-gray-300"
                         checked={selectedIds.has(tenant.id)}
-                        onChange={(e) => handleTenantCheckboxChange(tenant.id, e.target.checked)} 
+                        onChange={(e) =>
+                          handleTenantCheckboxChange(
+                            tenant.id,
+                            e.target.checked,
+                          )
+                        }
                       />
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900">
@@ -303,7 +382,9 @@ export default function TenantManagementPage() {
                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-medium">
                           {tenant.name?.charAt(0).toUpperCase()}
                         </div>
-                        <span className="text-sm font-medium text-gray-900">{tenant.name}</span>
+                        <span className="text-sm font-medium text-gray-900">
+                          {tenant.name}
+                        </span>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">
@@ -311,8 +392,10 @@ export default function TenantManagementPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-900">{tenant.phone || "—"}</span>
-                        <button 
+                        <span className="text-sm text-gray-900">
+                          {tenant.phone || "—"}
+                        </span>
+                        <button
                           onClick={() => copyToClipboard(tenant.phone || "")}
                           disabled={!tenant.phone}
                           className="p-1 hover:bg-gray-100 rounded transition-colors"
@@ -341,8 +424,11 @@ export default function TenantManagementPage() {
                       )}
                     </td>
                     <td className="px-4 py-3">
-                      <div className="relative" ref={openDropdownId === tenant.id ? dropdownRef : null}>
-                        <button 
+                      <div
+                        className="relative"
+                        ref={openDropdownId === tenant.id ? dropdownRef : null}
+                      >
+                        <button
                           onClick={() => toggleDropdown(tenant.id)}
                           className="cursor-pointer p-1 hover:bg-gray-100 rounded transition-colors"
                         >
@@ -381,8 +467,14 @@ export default function TenantManagementPage() {
                                   : "text-red-600 hover:bg-red-50"
                               }`}
                             >
-                              {tenant.isSuspended ? <LockOpen className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
-                              {tenant.isSuspended ? "Kích hoạt lại bên thuê" : "Đình chỉ bên thuê"}
+                              {tenant.isSuspended ? (
+                                <LockOpen className="w-4 h-4" />
+                              ) : (
+                                <Ban className="w-4 h-4" />
+                              )}
+                              {tenant.isSuspended
+                                ? "Kích hoạt lại bên thuê"
+                                : "Đình chỉ bên thuê"}
                             </button>
                             <button
                               onClick={() => {
@@ -416,7 +508,7 @@ export default function TenantManagementPage() {
           />
         )}
       </div>
-      <ConfirmActionPopup 
+      <ConfirmActionPopup
         isOpen={isConfirmPopupOpen}
         title={confirmTitle}
         message={confirmMessage}
@@ -426,5 +518,5 @@ export default function TenantManagementPage() {
         onClose={closeConfirmPopup}
       />
     </div>
-  )
+  );
 }

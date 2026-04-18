@@ -4,7 +4,15 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Eye, EyeOff, Mail, Lock, CheckCircle2, ShieldCheck } from "lucide-react";
+import {
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  CheckCircle2,
+  ShieldCheck,
+} from "lucide-react";
 import { toast } from "react-toastify";
 import bgImage from "@/src/images/homepage/unnamed.jpg";
 import logoDefault from "@/src/images/logo/logo_no_background.png";
@@ -47,27 +55,30 @@ export default function LoginPage() {
         {
           email: formData.email,
           password: formData.password,
-        }
+        },
+        {
+          skipGlobalLoading: true,
+        },
       );
 
       if (response.data?.isSuccess && response.data.data) {
         const { accessToken, refreshToken, userInfo } = response.data.data;
-        
+
         // Lưu đầy đủ userInfo để dùng cho các trang cần dữ liệu tenant
         const user = {
           ...userInfo,
           email: userInfo.email || formData.email,
           avatar: userInfo.avatar || undefined,
         };
-        
+
         // Lưu token và user vào store (sẽ tự động lưu accessToken vào localStorage)
         setAuth(user, accessToken);
-        
+
         // Lưu refreshToken riêng vào localStorage
         if (typeof window !== "undefined") {
           localStorage.setItem("refreshToken", refreshToken);
         }
-        
+
         console.log("Login successful:", user);
         toast.success("Đăng nhập thành công");
         router.push(ROUTES.HOME);
@@ -75,9 +86,13 @@ export default function LoginPage() {
         toast.error(response.data?.message || "Đăng nhập thất bại");
       }
     } catch (error: unknown) {
-      const backendMessage = (error as { response?: { data?: { message?: string } } }).response?.data?.message;
+      const backendMessage = (
+        error as { response?: { data?: { message?: string } } }
+      ).response?.data?.message;
       toast.error(
-        backendMessage || (error as { message?: string }).message || "Có lỗi xảy ra khi đăng nhập"
+        backendMessage ||
+          (error as { message?: string }).message ||
+          "Có lỗi xảy ra khi đăng nhập",
       );
     } finally {
       setLoading(false);
@@ -99,7 +114,10 @@ export default function LoginPage() {
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           {/* Phần đầu trang */}
           <div className="flex items-center justify-between">
-            <Link href={ROUTES.HOME} className="flex items-center gap-3 transition-transform hover:scale-105">
+            <Link
+              href={ROUTES.HOME}
+              className="flex items-center gap-3 transition-transform hover:scale-105"
+            >
               <Image
                 src={logoDefault}
                 alt="Scan To Order"
@@ -109,7 +127,9 @@ export default function LoginPage() {
               />
               <div className="text-white">
                 <p className="text-lg font-bold">Scan To Order</p>
-                <p className="text-xs text-white/70">Giải pháp nhà hàng thông minh</p>
+                <p className="text-xs text-white/70">
+                  Giải pháp nhà hàng thông minh
+                </p>
               </div>
             </Link>
 
@@ -131,14 +151,16 @@ export default function LoginPage() {
                   Chào mừng trở lại
                 </p>
                 <h1 className="mt-6 text-4xl font-bold leading-tight lg:text-5xl">
-                  Đăng nhập vào<br />
+                  Đăng nhập vào
+                  <br />
                   <span className="bg-gradient-to-r from-[rgb(var(--color-accent))] to-[rgb(var(--color-accent-dark))] bg-clip-text text-transparent">
                     Scan To Order
                   </span>
                 </h1>
                 <p className="mt-4 max-w-lg text-base text-white/80 leading-relaxed">
-                  Hơn 300+ nhà hàng đang sử dụng và tin tưởng. Tối ưu vận hành, 
-                  tăng trải nghiệm khách hàng và phát triển doanh nghiệp của bạn.
+                  Hơn 300+ nhà hàng đang sử dụng và tin tưởng. Tối ưu vận hành,
+                  tăng trải nghiệm khách hàng và phát triển doanh nghiệp của
+                  bạn.
                 </p>
               </div>
 
@@ -147,10 +169,12 @@ export default function LoginPage() {
                 {[
                   { label: "Nhà hàng", value: "300+" },
                   { label: "Đơn hàng/ngày", value: "10K+" },
-                  { label: "Hài lòng", value: "98%" }
+                  { label: "Hài lòng", value: "98%" },
                 ].map((stat, index) => (
                   <div key={index} className="space-y-1">
-                    <p className="text-3xl font-bold text-[rgb(var(--color-accent))]">{stat.value}</p>
+                    <p className="text-3xl font-bold text-[rgb(var(--color-accent))]">
+                      {stat.value}
+                    </p>
                     <p className="text-sm text-white/70">{stat.label}</p>
                   </div>
                 ))}
@@ -160,10 +184,16 @@ export default function LoginPage() {
               <div className="hidden lg:block space-y-3 pt-4">
                 {[
                   { icon: ShieldCheck, text: "Bảo mật dữ liệu tuyệt đối" },
-                  { icon: CheckCircle2, text: "Đăng nhập an toàn và nhanh chóng" },
-                  { icon: CheckCircle2, text: "Hỗ trợ đa nền tảng" }
+                  {
+                    icon: CheckCircle2,
+                    text: "Đăng nhập an toàn và nhanh chóng",
+                  },
+                  { icon: CheckCircle2, text: "Hỗ trợ đa nền tảng" },
                 ].map((feature, index) => (
-                  <div key={index} className="flex items-center gap-3 text-white/80">
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 text-white/80"
+                  >
                     <feature.icon className="h-5 w-5 text-[rgb(var(--color-accent))] flex-shrink-0" />
                     <span className="text-sm">{feature.text}</span>
                   </div>
@@ -175,7 +205,9 @@ export default function LoginPage() {
             <div className="w-full max-w-md lg:justify-self-end">
               <div className="rounded-2xl border border-white/10 bg-black/40 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
                 <div className="text-center">
-                  <h2 className="text-2xl font-bold text-white sm:text-3xl">Đăng nhập</h2>
+                  <h2 className="text-2xl font-bold text-white sm:text-3xl">
+                    Đăng nhập
+                  </h2>
                   <p className="mt-2 text-sm text-white/70">
                     Chưa có tài khoản?{" "}
                     <Link
@@ -243,7 +275,9 @@ export default function LoginPage() {
                         onChange={(e) => setRememberMe(e.target.checked)}
                         className="h-4 w-4 cursor-pointer rounded border-white/30 bg-white/10 text-[rgb(var(--color-accent))] transition-all focus:ring-2 focus:ring-[rgb(var(--color-accent))]/20 focus:ring-offset-0"
                       />
-                      <span className="text-xs text-white/70">Ghi nhớ đăng nhập</span>
+                      <span className="text-xs text-white/70">
+                        Ghi nhớ đăng nhập
+                      </span>
                     </label>
                     <Link
                       href={ROUTES.PAGES.PUBLIC.FORGOT_PASSWORD}
@@ -262,9 +296,24 @@ export default function LoginPage() {
                     <span className="relative z-10 flex items-center justify-center gap-2">
                       {loading ? (
                         <>
-                          <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          <svg
+                            className="h-5 w-5 animate-spin"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                              fill="none"
+                            />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            />
                           </svg>
                           Đang xử lý...
                         </>
@@ -326,11 +375,17 @@ export default function LoginPage() {
                 {/* Chân trang */}
                 <p className="mt-6 text-center text-xs text-white/50">
                   Bằng việc đăng nhập, bạn đồng ý với{" "}
-                  <Link href="#" className="text-[rgb(var(--color-accent))] hover:underline">
+                  <Link
+                    href="#"
+                    className="text-[rgb(var(--color-accent))] hover:underline"
+                  >
                     Điều khoản dịch vụ
-                  </Link>
-                  {" "}và{" "}
-                  <Link href="#" className="text-[rgb(var(--color-accent))] hover:underline">
+                  </Link>{" "}
+                  và{" "}
+                  <Link
+                    href="#"
+                    className="text-[rgb(var(--color-accent))] hover:underline"
+                  >
                     Chính sách bảo mật
                   </Link>
                 </p>

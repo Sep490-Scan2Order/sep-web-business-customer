@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Inter } from "next/font/google"; 
+import { Inter } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 import "./nprogress.css";
 import NavigationProgress from "@/src/components/NavigationProgress";
 import { AuthInitializer } from "@/src/components/AuthInitializer";
+import GlobalLoadingProvider from "@/src/components/providers/GlobalLoadingProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -31,10 +32,9 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <NavigationProgress />
         </Suspense>
-        <ToastContainer  aria-label="Toast notifications"/>
-      <main>
-        {children}
-      </main>
+        <GlobalLoadingProvider />
+        <ToastContainer aria-label="Toast notifications" />
+        <main>{children}</main>
       </body>
     </html>
   );

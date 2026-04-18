@@ -9,6 +9,17 @@ import {
   Restaurant,
   UpdateRestaurantLocationRequest,
 } from "@/src/types/type";
+import {
+  startGlobalLoading,
+  stopGlobalLoading,
+} from "@/src/store/globalLoadingStore";
+
+const GLOBAL_LOADING_TRACKED_KEY = "__globalLoadingTracked";
+
+type LoadingAwareRequestConfig = {
+  skipGlobalLoading?: boolean;
+  [GLOBAL_LOADING_TRACKED_KEY]?: boolean;
+};
 
 const apiClient = axios.create({
   baseURL: API.BASE_URL,
@@ -32,18 +43,18 @@ let isHandlingExpiry = false;
 const handleTokenExpiry = () => {
   if (isHandlingExpiry) return;
   // Chỉ chạy phía client
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
 
   isHandlingExpiry = true;
 
   const { token, logout, user } = useAuthStore.getState();
   if (token) {
     logout();
-    toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', {
-      position: 'top-right',
+    toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.", {
+      position: "top-right",
       autoClose: 4000,
     });
-    const isAdmin = user?.role?.toLowerCase() === 'administrator';
+    const isAdmin = user?.role?.toLowerCase() === "administrator";
     window.location.href = isAdmin
       ? ROUTES.PAGES.PUBLIC.ADMIN_LOGIN
       : ROUTES.PAGES.PUBLIC.LOGIN;
@@ -55,23 +66,60 @@ const handleTokenExpiry = () => {
   }, 5000);
 };
 
-apiClient.interceptors.request.use((config) => {
-  const token = getAccessToken();
-  if (token) {
-    // Kiểm tra hết hạn trước khi gửi request — tránh 401 không cần thiết
-    if (isTokenExpired(token)) {
-      handleTokenExpiry();
-      return Promise.reject(new Error('Token hết hạn'));
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = getAccessToken();
+    if (token) {
+      // Kiểm tra hết hạn trước khi gửi request — tránh 401 không cần thiết
+      if (isTokenExpired(token)) {
+        handleTokenExpiry();
+        return Promise.reject(new Error("Token hết hạn"));
+      }
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+
+    const loadingAwareConfig = config as typeof config &
+      LoadingAwareRequestConfig;
+    if (!loadingAwareConfig.skipGlobalLoading) {
+      startGlobalLoading();
+      loadingAwareConfig[GLOBAL_LOADING_TRACKED_KEY] = true;
+    }
+
+    return config;
+  },
+  (error) => {
+    const loadingAwareConfig = error?.config as
+      | (LoadingAwareRequestConfig & { [key: string]: unknown })
+      | undefined;
+    if (loadingAwareConfig?.[GLOBAL_LOADING_TRACKED_KEY]) {
+      stopGlobalLoading();
+      loadingAwareConfig[GLOBAL_LOADING_TRACKED_KEY] = false;
+    }
+
+    return Promise.reject(error);
+  },
+);
 
 // Bắt 401 từ server (token không hợp lệ hoặc hết hạn theo phía BE)
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const loadingAwareConfig = response.config as typeof response.config &
+      LoadingAwareRequestConfig;
+    if (loadingAwareConfig[GLOBAL_LOADING_TRACKED_KEY]) {
+      stopGlobalLoading();
+      loadingAwareConfig[GLOBAL_LOADING_TRACKED_KEY] = false;
+    }
+    return response;
+  },
   (error) => {
+    const loadingAwareConfig = error?.config as
+      | (LoadingAwareRequestConfig & { [key: string]: unknown })
+      | undefined;
+    if (loadingAwareConfig?.[GLOBAL_LOADING_TRACKED_KEY]) {
+      stopGlobalLoading();
+      loadingAwareConfig[GLOBAL_LOADING_TRACKED_KEY] = false;
+    }
+
     if (error.response?.status === 401) {
       handleTokenExpiry();
     }
@@ -80,7 +128,7 @@ apiClient.interceptors.response.use(
 );
 
 export const updateRestaurantLocation = async (
-  payload: UpdateRestaurantLocationRequest
+  payload: UpdateRestaurantLocationRequest,
 ): Promise<ApiResponse<Restaurant>> => {
   const formData = new FormData();
   formData.append("RestaurantName", payload.restaurantName);
@@ -97,7 +145,7 @@ export const updateRestaurantLocation = async (
       headers: {
         "Content-Type": "multipart/form-data",
       },
-    }
+    },
   );
 
   return response.data;

@@ -5,10 +5,7 @@ import apiClient from "@/src/services/apiClient";
 import { API } from "@/src/constants/api";
 import { ApiResponse } from "@/src/types/type";
 import { toast } from "react-toastify";
-import {
-  MenuTemplateCategory,
-  CanvasConfig,
-} from "@/src/types/menuTemplate";
+import { MenuTemplateCategory, CanvasConfig } from "@/src/types/menuTemplate";
 import { MenuTemplatePreview } from "@/src/components/ui/common/menu/MenuTemplatePreview";
 
 interface MenuTemplate {
@@ -219,13 +216,13 @@ const initialSections: MenuSection[] = [
 
 const getAllMenuTemplates = async (): Promise<ApiResponse<MenuTemplate[]>> => {
   const response = await apiClient.get<ApiResponse<MenuTemplate[]>>(
-    API.MENU_TEMPLATE.GET_ALL
+    API.MENU_TEMPLATE.GET_ALL,
   );
   return response.data;
 };
 
 const createMenuTemplate = async (
-  payload: FormData
+  payload: FormData,
 ): Promise<ApiResponse<MenuTemplate>> => {
   const response = await apiClient.post<ApiResponse<MenuTemplate>>(
     API.MENU_TEMPLATE.CREATE,
@@ -234,33 +231,33 @@ const createMenuTemplate = async (
       headers: {
         "Content-Type": "multipart/form-data",
       },
-    }
+    },
   );
   return response.data;
 };
 
 const getMenuTemplateById = async (
-  id: number
+  id: number,
 ): Promise<ApiResponse<MenuTemplate>> => {
   const response = await apiClient.get<ApiResponse<MenuTemplate>>(
-    API.MENU_TEMPLATE.GET_BY_ID(id)
+    API.MENU_TEMPLATE.GET_BY_ID(id),
   );
   return response.data;
 };
 
 const generateHolidayTemplateAi = async (
-  holidayName: string
+  holidayName: string,
 ): Promise<ApiResponse<AiHolidayResponse>> => {
   const response = await apiClient.post<ApiResponse<AiHolidayResponse>>(
     API.MENU_TEMPLATE.GENERATE_HOLIDAY_AI,
-    { holidayName }
+    { holidayName },
   );
   return response.data;
 };
 
 const mergeLayoutConfig = (
   currentLayout: TemplateLayoutConfig,
-  layoutPatch: Partial<TemplateLayoutConfig> | null
+  layoutPatch: Partial<TemplateLayoutConfig> | null,
 ): TemplateLayoutConfig => {
   if (!layoutPatch) return currentLayout;
   const currentCanvas = currentLayout.canvas ?? {};
@@ -394,10 +391,11 @@ const mergeLayoutConfig = (
                 layoutPatch.dataMapping?.dishes?.groupBy ??
                 currentLayout.dataMapping?.dishes?.groupBy ??
                 "categoryName",
-              displayFields:
-                layoutPatch.dataMapping?.dishes?.displayFields ??
-                currentLayout.dataMapping?.dishes?.displayFields ??
-                ["dishName", "price"],
+              displayFields: layoutPatch.dataMapping?.dishes?.displayFields ??
+                currentLayout.dataMapping?.dishes?.displayFields ?? [
+                  "dishName",
+                  "price",
+                ],
               ...currentDishesMapping,
               ...patchDishesMapping,
             }
@@ -412,8 +410,9 @@ export default function TemplateManagementPage() {
   // ─── List / Edit states ───────────────────────────────────────────────
   const [templates, setTemplates] = useState<MenuTemplate[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedTemplate, setSelectedTemplate] =
-    useState<MenuTemplate | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<MenuTemplate | null>(
+    null,
+  );
   const [selectedLayout, setSelectedLayout] =
     useState<TemplateLayoutConfig | null>(null);
   const [loadingDetailId, setLoadingDetailId] = useState<number | null>(null);
@@ -433,12 +432,12 @@ export default function TemplateManagementPage() {
   const [themeColor, setThemeColor] = useState("#3B82F6");
   const [fontFamily, setFontFamily] = useState("Arial");
   const [backgroundMode, setBackgroundMode] = useState<"color" | "image">(
-    "color"
+    "color",
   );
   const [backgroundColor, setBackgroundColor] = useState("#FFFFFF");
   const [backgroundImageUrl, setBackgroundImageUrl] = useState("");
   const [backgroundImageFile, setBackgroundImageFile] = useState<File | null>(
-    null
+    null,
   );
   const [backgroundImagePreviewUrl, setBackgroundImagePreviewUrl] =
     useState("");
@@ -496,7 +495,7 @@ export default function TemplateManagementPage() {
 
   const withApiBackground = (
     layout: TemplateLayoutConfig | null,
-    bgImageUrl?: string
+    bgImageUrl?: string,
   ): TemplateLayoutConfig | null => {
     if (!layout) return null;
     const canvas = layout.canvas;
@@ -533,11 +532,11 @@ export default function TemplateManagementPage() {
       setEditFontFamily(detail.fontFamily || "Arial");
       setEditIsActive(detail.isActive ?? true);
       setEditBackgroundMode(
-        canvas?.backgroundMode === "image" ? "image" : "color"
+        canvas?.backgroundMode === "image" ? "image" : "color",
       );
       setEditBackgroundColor(canvas?.backgroundColor || "#FFFFFF");
       setEditBackgroundImageUrl(
-        canvas?.backgroundImageUrl || detail.backgroundImageUrl || ""
+        canvas?.backgroundImageUrl || detail.backgroundImageUrl || "",
       );
     } catch (e) {
       console.error(e);
@@ -606,7 +605,7 @@ export default function TemplateManagementPage() {
 
       const res = await apiClient.put<ApiResponse<MenuTemplate>>(
         API.MENU_TEMPLATE.UPDATE(selectedTemplate.id),
-        payload
+        payload,
       );
       const result = res.data;
       if (!result.isSuccess || !result.data) {
@@ -618,7 +617,7 @@ export default function TemplateManagementPage() {
       setSelectedTemplate(updated);
       setSelectedLayout(parseLayout(updated.layoutConfigJson));
       setTemplates((prev) =>
-        prev.map((t) => (t.id === updated.id ? updated : t))
+        prev.map((t) => (t.id === updated.id ? updated : t)),
       );
       toast.success("Đã lưu mẫu giao diện");
     } catch (e) {
@@ -631,7 +630,7 @@ export default function TemplateManagementPage() {
 
   const selectedCanvas = useMemo(
     () => selectedLayout?.canvas,
-    [selectedLayout]
+    [selectedLayout],
   );
 
   // ─── Create form helpers ──────────────────────────────────────────────
@@ -666,7 +665,7 @@ export default function TemplateManagementPage() {
       if (aiData.layoutConfigJson?.trim()) {
         try {
           parsedPatch = JSON.parse(
-            aiData.layoutConfigJson
+            aiData.layoutConfigJson,
           ) as Partial<TemplateLayoutConfig>;
         } catch {
           toast.error("layoutConfigJson từ AI không hợp lệ");
@@ -721,7 +720,7 @@ export default function TemplateManagementPage() {
 
   const updateCategoryName = (sectionId: string, name: string) => {
     setSections((prev) =>
-      prev.map((s) => (s.id === sectionId ? { ...s, name } : s))
+      prev.map((s) => (s.id === sectionId ? { ...s, name } : s)),
     );
   };
 
@@ -730,8 +729,8 @@ export default function TemplateManagementPage() {
       prev.map((s) =>
         s.id === sectionId
           ? { ...s, dishes: [...s.dishes, `Món ${s.dishes.length + 1}`] }
-          : s
-      )
+          : s,
+      ),
     );
   };
 
@@ -744,14 +743,14 @@ export default function TemplateManagementPage() {
           return s;
         }
         return { ...s, dishes: s.dishes.filter((_, i) => i !== dishIndex) };
-      })
+      }),
     );
   };
 
   const updateDishName = (
     sectionId: string,
     dishIndex: number,
-    value: string
+    value: string,
   ) => {
     setSections((prev) =>
       prev.map((s) => {
@@ -760,7 +759,7 @@ export default function TemplateManagementPage() {
           ...s,
           dishes: s.dishes.map((d, i) => (i === dishIndex ? value : d)),
         };
-      })
+      }),
     );
   };
 
@@ -821,7 +820,10 @@ export default function TemplateManagementPage() {
           },
         },
       };
-      const mergedLayoutConfig = mergeLayoutConfig(baseLayoutConfig, aiLayoutPatch);
+      const mergedLayoutConfig = mergeLayoutConfig(
+        baseLayoutConfig,
+        aiLayoutPatch,
+      );
       const layoutConfigJson = JSON.stringify(mergedLayoutConfig);
 
       const formData = new FormData();
@@ -868,7 +870,7 @@ export default function TemplateManagementPage() {
           promotionLabel: "-15%",
           isSoldOut: false,
         })),
-      })
+      }),
     );
 
     const previewCanvas: CanvasConfig = {
@@ -898,8 +900,8 @@ export default function TemplateManagementPage() {
             Tạo mẫu thực đơn
           </h1>
           <p className="mt-2 text-slate-600">
-            Thiết kế bố cục và phong cách cho thực đơn. Tenant sẽ áp dụng mẫu này
-            và đổ dữ liệu thật của họ vào.
+            Thiết kế bố cục và phong cách cho thực đơn. Tenant sẽ áp dụng mẫu
+            này và đổ dữ liệu thật của họ vào.
           </p>
         </div>
 
@@ -909,7 +911,8 @@ export default function TemplateManagementPage() {
               Tạo mẫu bằng AI
             </h2>
             <p className="mb-3 text-sm text-slate-600">
-              Chọn mẫu nhanh hoặc nhập ngày lễ hoặc nội dung mong muốn, AI sẽ tạo ra bố cục cho mẫu giao diện.
+              Chọn mẫu nhanh hoặc nhập ngày lễ hoặc nội dung mong muốn, AI sẽ
+              tạo ra bố cục cho mẫu giao diện.
             </p>
             <div className="mb-3 flex flex-wrap gap-2">
               {["Giáng Sinh", "8/3", "Khai trương", "Tết", "Halloween"].map(
@@ -926,7 +929,7 @@ export default function TemplateManagementPage() {
                   >
                     {preset}
                   </button>
-                )
+                ),
               )}
             </div>
             <div className="flex flex-col gap-2 md:flex-row">
@@ -1086,7 +1089,6 @@ export default function TemplateManagementPage() {
               <p className="font-semibold">
                 ℹ️ Phần này CHỈ dùng để xem trước giao diện
               </p>
-              
             </div>
 
             <div className="mb-4 flex items-center justify-between">
@@ -1147,7 +1149,7 @@ export default function TemplateManagementPage() {
                             updateDishName(
                               section.id,
                               dishIndex,
-                              e.target.value
+                              e.target.value,
                             )
                           }
                           className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -1226,8 +1228,7 @@ export default function TemplateManagementPage() {
             Quản lý mẫu giao diện
           </h1>
           <p className="mt-1 text-sm text-slate-600">
-            Chọn mẫu, xem trước trên mobile và chỉnh màu sắc / font /
-            nền.
+            Chọn mẫu, xem trước trên mobile và chỉnh màu sắc / font / nền.
           </p>
         </div>
         <button
@@ -1239,8 +1240,58 @@ export default function TemplateManagementPage() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-8 text-slate-500">
-          Đang tải danh sách mẫu giao diện...
+        <div className="mt-2 grid gap-6 lg:grid-cols-[260px_minmax(0,2.2fr)_minmax(0,1.1fr)]">
+          <aside className="rounded-xl border border-slate-200 bg-white p-3">
+            <div className="mb-3 h-4 w-28 animate-pulse rounded bg-slate-200" />
+            <div className="space-y-2">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div
+                  key={`template-sidebar-skeleton-${index}`}
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2"
+                >
+                  <div className="mb-1 h-6 w-full animate-pulse rounded border border-slate-200 bg-slate-200" />
+                  <div className="h-4 w-3/4 animate-pulse rounded bg-slate-200" />
+                  <div className="mt-2 h-3 w-1/2 animate-pulse rounded bg-slate-100" />
+                </div>
+              ))}
+            </div>
+          </aside>
+
+          <main className="flex items-stretch justify-center rounded-2xl border border-slate-200 bg-white p-6">
+            <div className="flex w-full items-center justify-center">
+              <div className="relative flex h-[780px] w-[420px] items-center justify-center rounded-[40px] border border-slate-200 bg-slate-900/5 px-4 py-6">
+                <div className="relative h-full w-full overflow-hidden rounded-[32px] border border-slate-300 bg-slate-100 shadow-lg">
+                  <div className="absolute inset-x-1 top-2 mx-auto h-1.5 w-24 rounded-full bg-slate-300" />
+                  <div className="mt-5 h-[700px] w-full space-y-4 p-4">
+                    <div className="h-10 w-full animate-pulse rounded-xl bg-slate-200" />
+                    <div className="h-12 w-2/3 animate-pulse rounded-xl bg-slate-200" />
+                    <div className="h-28 w-full animate-pulse rounded-2xl bg-slate-100" />
+                    <div className="h-28 w-full animate-pulse rounded-2xl bg-slate-100" />
+                    <div className="h-28 w-full animate-pulse rounded-2xl bg-slate-100" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+
+          <section className="rounded-xl border border-slate-200 bg-white p-4">
+            <div className="mb-3 h-4 w-36 animate-pulse rounded bg-slate-200" />
+            <div className="space-y-4">
+              <div>
+                <div className="mb-1 h-3 w-20 animate-pulse rounded bg-slate-100" />
+                <div className="h-10 w-full animate-pulse rounded-lg bg-slate-200" />
+              </div>
+              <div>
+                <div className="mb-1 h-3 w-20 animate-pulse rounded bg-slate-100" />
+                <div className="h-10 w-full animate-pulse rounded-lg bg-slate-200" />
+              </div>
+              <div>
+                <div className="mb-1 h-3 w-20 animate-pulse rounded bg-slate-100" />
+                <div className="h-10 w-full animate-pulse rounded-lg bg-slate-200" />
+              </div>
+              <div className="h-10 w-full animate-pulse rounded-lg bg-slate-200" />
+            </div>
+          </section>
         </div>
       ) : templates.length === 0 ? (
         <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 py-8 text-center">
@@ -1455,7 +1506,7 @@ export default function TemplateManagementPage() {
                             value={editBackgroundColor}
                             onChange={(e) =>
                               setEditBackgroundColor(
-                                e.target.value || "#FFFFFF"
+                                e.target.value || "#FFFFFF",
                               )
                             }
                             className="h-8 w-8 cursor-pointer rounded border border-slate-200 bg-white"
@@ -1465,7 +1516,7 @@ export default function TemplateManagementPage() {
                             value={editBackgroundColor}
                             onChange={(e) =>
                               setEditBackgroundColor(
-                                e.target.value.trim() || "#FFFFFF"
+                                e.target.value.trim() || "#FFFFFF",
                               )
                             }
                             className="flex-1 rounded-md border border-slate-200 px-2 py-1.5 text-xs text-slate-900"

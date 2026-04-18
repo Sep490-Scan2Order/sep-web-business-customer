@@ -134,7 +134,8 @@ export default function PlanPopUpInfo({
                             : "flex items-center gap-2 text-slate-400 line-through"
                         }
                       >
-                        - Hỗ trợ ưu tiên gợi ý món ăn theo chiến lược nhà hàng
+                        <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+                        Hỗ trợ ưu tiên gợi ý món ăn theo chiến lược nhà hàng
                       </li>
 
                       <li

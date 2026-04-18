@@ -140,6 +140,7 @@ async function updateRestaurantActiveStatus(
 export default function RestaurantPage() {
   const [showInfoModal, setShowInfoModal] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isInitialLoading, setIsInitialLoading] = React.useState(true);
   const [restaurants, setRestaurants] = React.useState<Restaurant[]>([]);
   const [restaurantImageVersions, setRestaurantImageVersions] = React.useState<
     Record<number, number>
@@ -162,6 +163,8 @@ export default function RestaurantPage() {
       } catch (error) {
         console.error("Error fetching restaurants:", error);
         toast.error("Không thể tải danh sách nhà hàng");
+      } finally {
+        setIsInitialLoading(false);
       }
     };
 
@@ -358,7 +361,35 @@ export default function RestaurantPage() {
 
   return (
     <div>
-      {restaurantListItems.length === 0 ? (
+      {isInitialLoading ? (
+        <div className="p-6">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <div className="h-3 w-28 animate-pulse rounded bg-slate-200" />
+              <div className="mt-2 h-6 w-40 animate-pulse rounded bg-slate-200" />
+            </div>
+            <div className="h-10 w-36 animate-pulse rounded-xl bg-slate-200" />
+          </div>
+
+          <div className="mb-6 h-10 w-full animate-pulse rounded-xl bg-slate-100" />
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div
+                key={`restaurant-skeleton-${index}`}
+                className="overflow-hidden rounded-xl border border-slate-200 bg-white"
+              >
+                <div className="aspect-video animate-pulse bg-slate-200" />
+                <div className="space-y-3 p-4">
+                  <div className="h-4 w-3/4 animate-pulse rounded bg-slate-200" />
+                  <div className="h-5 w-24 animate-pulse rounded-full bg-slate-200" />
+                  <div className="h-3 w-2/3 animate-pulse rounded bg-slate-100" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : restaurantListItems.length === 0 ? (
         <RestaurantEmptyState onCreateClick={handleCreateClick} />
       ) : (
         <RestaurantList

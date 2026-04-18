@@ -1,31 +1,51 @@
-import React, { useState } from 'react'
-import { Restaurant } from '@/src/types/type'
-import { Search, Store, MapPin, Phone } from 'lucide-react';
+import React, { useState } from "react";
+import { Restaurant } from "@/src/types/type";
+import { Search, Store, MapPin, Phone } from "lucide-react";
 
 interface RestaurantListProps {
   restaurants: Restaurant[];
   onRestaurantClick?: (restaurant: Restaurant) => void;
+  isLoading?: boolean;
 }
 
-export default function RestaurantListV2({ restaurants, onRestaurantClick }: RestaurantListProps) {
+export default function RestaurantListV2({
+  restaurants,
+  onRestaurantClick,
+  isLoading = false,
+}: RestaurantListProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  
-  const filteredRestaurants = restaurants.filter((restaurant) =>
-    restaurant.restaurantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    restaurant.address.toLowerCase().includes(searchTerm.toLowerCase())
+
+  const filteredRestaurants = restaurants.filter(
+    (restaurant) =>
+      restaurant.restaurantName
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      restaurant.address.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const getStatusBadge = (restaurant: Restaurant) => {
     if (!restaurant.isActive) {
-      return { bg: 'bg-slate-100', text: 'text-slate-600', label: 'Không hoạt động' };
+      return {
+        bg: "bg-slate-100",
+        text: "text-slate-600",
+        label: "Không hoạt động",
+      };
     }
     if (!restaurant.isOpened) {
-      return { bg: 'bg-amber-50', text: 'text-amber-600', label: 'Đóng cửa' };
+      return { bg: "bg-amber-50", text: "text-amber-600", label: "Đóng cửa" };
     }
     if (!restaurant.isReceivingOrders) {
-      return { bg: 'bg-orange-50', text: 'text-orange-600', label: 'Không nhận đơn' };
+      return {
+        bg: "bg-orange-50",
+        text: "text-orange-600",
+        label: "Không nhận đơn",
+      };
     }
-    return { bg: 'bg-emerald-50', text: 'text-emerald-600', label: 'Hoạt động' };
+    return {
+      bg: "bg-emerald-50",
+      text: "text-emerald-600",
+      label: "Hoạt động",
+    };
   };
 
   return (
@@ -33,8 +53,12 @@ export default function RestaurantListV2({ restaurants, onRestaurantClick }: Res
       {/* Header Section */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">Quản lý món theo chi nhánh</div>
-          <div className="text-lg font-semibold text-slate-900">Quản lý Chuỗi Món Ăn</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Quản lý món theo chi nhánh
+          </div>
+          <div className="text-lg font-semibold text-slate-900">
+            Quản lý Chuỗi Món Ăn
+          </div>
         </div>
       </div>
 
@@ -53,7 +77,24 @@ export default function RestaurantListV2({ restaurants, onRestaurantClick }: Res
       </div>
 
       {/* Restaurants Grid */}
-      {filteredRestaurants.length > 0 ? (
+      {isLoading ? (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div
+              key={`branch-restaurant-skeleton-${index}`}
+              className="overflow-hidden rounded-xl border border-slate-200 bg-white"
+            >
+              <div className="aspect-video animate-pulse bg-slate-200" />
+              <div className="space-y-3 p-4">
+                <div className="h-4 w-2/3 animate-pulse rounded bg-slate-200" />
+                <div className="h-5 w-28 animate-pulse rounded-full bg-slate-200" />
+                <div className="h-3 w-full animate-pulse rounded bg-slate-100" />
+                <div className="h-3 w-3/4 animate-pulse rounded bg-slate-100" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : filteredRestaurants.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredRestaurants.map((restaurant) => {
             const status = getStatusBadge(restaurant);
@@ -62,7 +103,7 @@ export default function RestaurantListV2({ restaurants, onRestaurantClick }: Res
                 key={restaurant.id}
                 onClick={() => onRestaurantClick?.(restaurant)}
                 className={`group relative overflow-hidden rounded-xl border border-slate-200 bg-white transition-all hover:shadow-lg hover:border-slate-300 ${
-                  onRestaurantClick ? 'cursor-pointer' : ''
+                  onRestaurantClick ? "cursor-pointer" : ""
                 }`}
               >
                 {/* Image */}
@@ -89,7 +130,9 @@ export default function RestaurantListV2({ restaurants, onRestaurantClick }: Res
 
                   {/* Status Badge */}
                   <div className="mb-3">
-                    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${status.bg} ${status.text}`}>
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${status.bg} ${status.text}`}
+                    >
                       <span className="h-1.5 w-1.5 rounded-full bg-current" />
                       {status.label}
                     </span>
@@ -104,7 +147,7 @@ export default function RestaurantListV2({ restaurants, onRestaurantClick }: Res
 
                   {/* Address */}
                   <div className="flex items-start gap-2 mb-2">
-                    <MapPin className="h-3.5 w-3.5 text-slate-400 flex-shrink-0 mt-0.5" />
+                    <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0 mt-0.5" />
                     <span className="text-xs text-slate-600 line-clamp-2">
                       {restaurant.address}
                     </span>
@@ -113,7 +156,7 @@ export default function RestaurantListV2({ restaurants, onRestaurantClick }: Res
                   {/* Phone */}
                   {restaurant.phone && (
                     <div className="flex items-start gap-2 mb-3">
-                      <Phone className="h-3.5 w-3.5 text-slate-400 flex-shrink-0 mt-0.5" />
+                      <Phone className="h-3.5 w-3.5 text-slate-400 shrink-0 mt-0.5" />
                       <span className="text-xs text-slate-600">
                         {restaurant.phone}
                       </span>
@@ -141,5 +184,5 @@ export default function RestaurantListV2({ restaurants, onRestaurantClick }: Res
         </div>
       )}
     </div>
-  )
+  );
 }

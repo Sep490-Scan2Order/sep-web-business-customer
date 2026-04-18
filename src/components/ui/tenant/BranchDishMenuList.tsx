@@ -1,9 +1,16 @@
-'use client';
+"use client";
 
-import React, { useMemo, useState } from 'react';
-import { MenuCategoryDto, Restaurant } from '@/src/types/type';
-import { ArrowLeft, Loader2, Lock, Search, Unlock, UtensilsCrossed } from 'lucide-react';
-import ConfirmActionPopup from '@/src/components/ui/common/ConfirmActionPopup';
+import React, { useMemo, useState } from "react";
+import { MenuCategoryDto, Restaurant } from "@/src/types/type";
+import {
+  ArrowLeft,
+  Loader2,
+  Lock,
+  Search,
+  Unlock,
+  UtensilsCrossed,
+} from "lucide-react";
+import ConfirmActionPopup from "@/src/components/ui/common/ConfirmActionPopup";
 
 interface BranchDishMenuListProps {
   restaurant: Restaurant | null;
@@ -11,7 +18,11 @@ interface BranchDishMenuListProps {
   isLoading: boolean;
   togglingDishIds: Set<number>;
   onBack: () => void;
-  onToggleDish: (restaurantId: number, dishId: number, isSelling: boolean) => void | Promise<void>;
+  onToggleDish: (
+    restaurantId: number,
+    dishId: number,
+    isSelling: boolean,
+  ) => void | Promise<void>;
   onSyncDishes: () => void | Promise<void>;
 }
 
@@ -23,9 +34,9 @@ interface PendingToggleAction {
 }
 
 const formatPrice = (price: number) =>
-  new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
+  new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
   }).format(price);
 
 export default function BranchDishMenuList({
@@ -37,8 +48,9 @@ export default function BranchDishMenuList({
   onToggleDish,
   onSyncDishes,
 }: BranchDishMenuListProps) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [pendingToggleAction, setPendingToggleAction] = useState<PendingToggleAction | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [pendingToggleAction, setPendingToggleAction] =
+    useState<PendingToggleAction | null>(null);
 
   const filteredCategories = useMemo(() => {
     const normalizedKeyword = searchTerm.trim().toLowerCase();
@@ -52,7 +64,7 @@ export default function BranchDishMenuList({
         const filteredDishes = category.dishes.filter(
           (dish) =>
             dish.dishName.toLowerCase().includes(normalizedKeyword) ||
-            dish.description?.toLowerCase().includes(normalizedKeyword)
+            dish.description?.toLowerCase().includes(normalizedKeyword),
         );
 
         const categoryMatched = category.categoryName
@@ -72,8 +84,9 @@ export default function BranchDishMenuList({
   }, [categories, searchTerm]);
 
   const totalDishCount = useMemo(
-    () => categories.reduce((count, category) => count + category.dishes.length, 0),
-    [categories]
+    () =>
+      categories.reduce((count, category) => count + category.dishes.length, 0),
+    [categories],
   );
 
   const confirmLoading = pendingToggleAction
@@ -110,20 +123,34 @@ export default function BranchDishMenuList({
             Quản lý món theo chi nhánh
           </div>
           <h1 className="text-lg font-semibold text-slate-900">
-            {restaurant?.restaurantName ?? 'Nhà hàng'}
+            {restaurant?.restaurantName ?? "Nhà hàng"}
           </h1>
-          <p className="text-xs text-slate-500">{restaurant?.address ?? 'Đang tải địa chỉ...'}</p>
+          <p className="text-xs text-slate-500">
+            {restaurant?.address ?? "Đang tải địa chỉ..."}
+          </p>
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="rounded-xl border border-slate-200 bg-white p-4">
           <p className="text-xs text-slate-500">Tổng danh mục</p>
-          <p className="text-2xl font-bold text-slate-900">{categories.length}</p>
+          <p className="text-2xl font-bold text-slate-900">
+            {isLoading ? (
+              <span className="inline-block h-8 w-12 animate-pulse rounded bg-slate-200" />
+            ) : (
+              categories.length
+            )}
+          </p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-4">
           <p className="text-xs text-slate-500">Tổng món trong menu</p>
-          <p className="text-2xl font-bold text-slate-900">{totalDishCount}</p>
+          <p className="text-2xl font-bold text-slate-900">
+            {isLoading ? (
+              <span className="inline-block h-8 w-16 animate-pulse rounded bg-slate-200" />
+            ) : (
+              totalDishCount
+            )}
+          </p>
         </div>
       </div>
 
@@ -139,24 +166,57 @@ export default function BranchDishMenuList({
       </div>
 
       {isLoading ? (
-        <div className="flex min-h-[260px] items-center justify-center rounded-xl border border-slate-200 bg-white">
-          <div className="flex items-center gap-2 text-slate-500">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Đang tải menu nhà hàng...
-          </div>
+        <div className="space-y-4">
+          {Array.from({ length: 2 }).map((_, categoryIndex) => (
+            <section
+              key={`branch-category-skeleton-${categoryIndex}`}
+              className="rounded-xl border border-slate-200 bg-white p-4"
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <div className="h-5 w-32 animate-pulse rounded bg-slate-200" />
+                <div className="h-6 w-16 animate-pulse rounded-full bg-slate-200" />
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {Array.from({ length: 6 }).map((__, dishIndex) => (
+                  <div
+                    key={`branch-dish-skeleton-${categoryIndex}-${dishIndex}`}
+                    className="rounded-lg border border-slate-200 p-3"
+                  >
+                    <div className="flex gap-3">
+                      <div className="h-16 w-16 animate-pulse rounded-lg bg-slate-200" />
+
+                      <div className="min-w-0 flex-1 space-y-2">
+                        <div className="h-4 w-3/4 animate-pulse rounded bg-slate-200" />
+                        <div className="h-3 w-full animate-pulse rounded bg-slate-100" />
+                        <div className="h-4 w-24 animate-pulse rounded bg-slate-200" />
+                      </div>
+                    </div>
+
+                    <div className="mt-3 flex items-center justify-between gap-2">
+                      <div className="h-5 w-16 animate-pulse rounded-full bg-slate-200" />
+                      <div className="h-8 w-20 animate-pulse rounded-lg bg-slate-200" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
         </div>
       ) : filteredCategories.length === 0 ? (
-        <div className="flex min-h-[260px] flex-col items-center justify-center rounded-xl border border-slate-200 bg-white">
+        <div className="flex min-h-65 flex-col items-center justify-center rounded-xl border border-slate-200 bg-white">
           <div className="rounded-full bg-slate-100 p-3">
             <UtensilsCrossed className="h-7 w-7 text-slate-400" />
           </div>
           <p className="mt-3 text-sm font-medium text-slate-800">
-            {searchTerm ? 'Không có món phù hợp từ khóa' : 'Nhà hàng chưa có dữ liệu menu'}
+            {searchTerm
+              ? "Không có món phù hợp từ khóa"
+              : "Nhà hàng chưa có dữ liệu menu"}
           </p>
           <p className="mt-1 text-xs text-slate-500">
             {searchTerm
-              ? 'Thử đổi từ khóa để xem thêm món'
-              : 'Bạn có thể tạo menu ở trang Menu Template trước'}
+              ? "Thử đổi từ khóa để xem thêm món"
+              : "Bạn có thể tạo menu ở trang Menu Template trước"}
           </p>
           <button
             onClick={onSyncDishes}
@@ -168,9 +228,14 @@ export default function BranchDishMenuList({
       ) : (
         <div className="space-y-4">
           {filteredCategories.map((category) => (
-            <section key={category.categoryId} className="rounded-xl border border-slate-200 bg-white p-4">
+            <section
+              key={category.categoryId}
+              className="rounded-xl border border-slate-200 bg-white p-4"
+            >
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-base font-semibold text-slate-900">{category.categoryName}</h2>
+                <h2 className="text-base font-semibold text-slate-900">
+                  {category.categoryName}
+                </h2>
                 <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
                   {category.dishes.length} món
                 </span>
@@ -182,7 +247,10 @@ export default function BranchDishMenuList({
                   const isLocked = !dish.isSelling;
 
                   return (
-                    <div key={dish.dishId} className="rounded-lg border border-slate-200 p-3">
+                    <div
+                      key={dish.dishId}
+                      className="rounded-lg border border-slate-200 p-3"
+                    >
                       <div className="flex gap-3">
                         {dish.imageUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
@@ -198,9 +266,15 @@ export default function BranchDishMenuList({
                         )}
 
                         <div className="min-w-0 flex-1">
-                          <h3 className="truncate text-sm font-semibold text-slate-900">{dish.dishName}</h3>
-                          <p className="mt-0.5 text-xs text-slate-500 line-clamp-2">{dish.description}</p>
-                          <p className="mt-1 text-sm font-semibold text-slate-900">{formatPrice(dish.price)}</p>
+                          <h3 className="truncate text-sm font-semibold text-slate-900">
+                            {dish.dishName}
+                          </h3>
+                          <p className="mt-0.5 text-xs text-slate-500 line-clamp-2">
+                            {dish.description}
+                          </p>
+                          <p className="mt-1 text-sm font-semibold text-slate-900">
+                            {formatPrice(dish.price)}
+                          </p>
                         </div>
                       </div>
 
@@ -208,11 +282,11 @@ export default function BranchDishMenuList({
                         <span
                           className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
                             isLocked
-                              ? 'bg-rose-50 text-rose-700'
-                              : 'bg-emerald-50 text-emerald-700'
+                              ? "bg-rose-50 text-rose-700"
+                              : "bg-emerald-50 text-emerald-700"
                           }`}
                         >
-                          {isLocked ? 'Ngừng bán' : 'Mở bán'}
+                          {isLocked ? "Ngừng bán" : "Mở bán"}
                         </span>
 
                         <button
@@ -231,8 +305,8 @@ export default function BranchDishMenuList({
                           disabled={isToggling || !restaurant?.id}
                           className={`cursor-pointer inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-colors ${
                             isLocked
-                              ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                              : 'bg-rose-600 text-white hover:bg-rose-700'
+                              ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                              : "bg-rose-600 text-white hover:bg-rose-700"
                           } disabled:cursor-not-allowed disabled:opacity-60`}
                         >
                           {isToggling ? (
@@ -242,7 +316,7 @@ export default function BranchDishMenuList({
                           ) : (
                             <Lock className="h-3.5 w-3.5" />
                           )}
-                          {isLocked ? 'Mở bán' : 'Ngừng bán'}
+                          {isLocked ? "Mở bán" : "Ngừng bán"}
                         </button>
                       </div>
                     </div>
@@ -259,12 +333,16 @@ export default function BranchDishMenuList({
         title="Xác nhận thao tác"
         message={
           pendingToggleAction
-            ? `Bạn có chắc muốn ${pendingToggleAction.nextIsSelling ? 'mở' : 'ngừng'} bán món ${pendingToggleAction.dishName}?`
-            : 'Bạn có chắc muốn thực hiện hành động này không?'
+            ? `Bạn có chắc muốn ${pendingToggleAction.nextIsSelling ? "mở" : "ngừng"} bán món ${pendingToggleAction.dishName}?`
+            : "Bạn có chắc muốn thực hiện hành động này không?"
         }
-        confirmText={pendingToggleAction?.nextIsSelling ? 'Mở bán' : 'Ngừng bán'}
+        confirmText={
+          pendingToggleAction?.nextIsSelling ? "Mở bán" : "Ngừng bán"
+        }
         cancelText="Hủy"
-        confirmVariant={pendingToggleAction?.nextIsSelling ? 'default' : 'danger'}
+        confirmVariant={
+          pendingToggleAction?.nextIsSelling ? "default" : "danger"
+        }
         isLoading={confirmLoading}
         onClose={() => setPendingToggleAction(null)}
         onConfirm={handleConfirmToggle}

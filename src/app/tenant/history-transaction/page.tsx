@@ -5,7 +5,6 @@ import {
   CalendarRange,
   CircleDollarSign,
   Filter,
-  Loader2,
   ReceiptText,
   RotateCcw,
 } from "lucide-react";
@@ -166,7 +165,11 @@ export default function TransactionHistoryPage() {
                 Tổng giao dịch
               </p>
               <p className="mt-2 text-2xl font-semibold text-slate-900">
-                {filteredTransactions.length}
+                {isLoading ? (
+                  <span className="inline-block h-8 w-14 animate-pulse rounded bg-slate-200" />
+                ) : (
+                  filteredTransactions.length
+                )}
               </p>
             </div>
 
@@ -175,7 +178,11 @@ export default function TransactionHistoryPage() {
                 Tổng tiền thành công
               </p>
               <p className="mt-2 text-2xl font-semibold text-emerald-700">
-                {formatCurrency(totalAmount)}
+                {isLoading ? (
+                  <span className="inline-block h-8 w-40 animate-pulse rounded bg-slate-200" />
+                ) : (
+                  formatCurrency(totalAmount)
+                )}
               </p>
             </div>
 
@@ -184,11 +191,13 @@ export default function TransactionHistoryPage() {
                 Thành công
               </p>
               <p className="mt-2 text-2xl font-semibold text-slate-900">
-                {
+                {isLoading ? (
+                  <span className="inline-block h-8 w-14 animate-pulse rounded bg-slate-200" />
+                ) : (
                   filteredTransactions.filter(
                     (item) => item.status === "Success",
                   ).length
-                }
+                )}
               </p>
             </div>
           </div>
@@ -291,14 +300,28 @@ export default function TransactionHistoryPage() {
 
                 <tbody className="divide-y divide-slate-100">
                   {isLoading ? (
-                    <tr>
-                      <td colSpan={6} className="px-4 py-12 text-center">
-                        <div className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Đang tải lịch sử giao dịch...
-                        </div>
-                      </td>
-                    </tr>
+                    Array.from({ length: 8 }).map((_, rowIndex) => (
+                      <tr key={`transaction-skeleton-row-${rowIndex}`}>
+                        <td className="px-4 py-3">
+                          <div className="h-4 w-24 animate-pulse rounded bg-slate-200" />
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-4 w-36 animate-pulse rounded bg-slate-200" />
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-5 w-24 animate-pulse rounded-full bg-slate-200" />
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-5 w-20 animate-pulse rounded-full bg-slate-200" />
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-4 w-28 animate-pulse rounded bg-slate-200" />
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="h-4 w-64 animate-pulse rounded bg-slate-100" />
+                        </td>
+                      </tr>
+                    ))
                   ) : filteredTransactions.length === 0 ? (
                     <tr>
                       <td

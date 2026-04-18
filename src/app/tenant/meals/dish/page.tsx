@@ -17,6 +17,7 @@ export default function DishPage() {
   const { user } = useAuth();
   const [dishes, setDishes] = useState<DishesDto[]>([]);
   const [categories, setCategories] = useState<CategoryDto[]>([]);
+  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const [showDishModal, setShowDishModal] = useState(false);
   const [showComboModal, setShowComboModal] = useState(false);
@@ -28,13 +29,16 @@ export default function DishPage() {
   const [selectedCombo, setSelectedCombo] = useState<ComboDto | null>(null);
   const [comboItems, setComboItems] = useState<ComboDto[]>([]);
   const [selectedDish, setSelectedDish] = useState<DishesDto | null>(null);
-  const [pendingDeleteDish, setPendingDeleteDish] = useState<DishesDto | null>(null);
+  const [pendingDeleteDish, setPendingDeleteDish] = useState<DishesDto | null>(
+    null,
+  );
   const hasSelectableDish = dishes.some((dish) => dish.type !== 1);
 
   useEffect(() => {
     const fetchData = async () => {
       if (!user?.id) {
         toast.error("Không tìm thấy tenantId để tải danh mục");
+        setIsInitialLoading(false);
         return;
       }
 
@@ -42,7 +46,7 @@ export default function DishPage() {
         // Fetch categories and dishes in parallel
         const [categoriesResponse, dishesResponse] = await Promise.all([
           apiClient.get(API.CATEGORY.GET_ALL_BY_TENANT_ID(user.id)),
-          apiClient.get(API.DISHES.GET_ALL_BY_TENANT_ID(user.id))
+          apiClient.get(API.DISHES.GET_ALL_BY_TENANT_ID(user.id)),
         ]);
 
         if (categoriesResponse.data.isSuccess && categoriesResponse.data.data) {
@@ -62,7 +66,7 @@ export default function DishPage() {
             "Có lỗi xảy ra khi tải dữ liệu",
         );
       } finally {
-        setLoading(false);
+        setIsInitialLoading(false);
       }
     };
     fetchData();
@@ -165,7 +169,10 @@ export default function DishPage() {
 
     try {
       const response = await apiClient.delete(
-        API.DISHES.DELETE_DISH(pendingDeleteDish.categoryId, pendingDeleteDish.id),
+        API.DISHES.DELETE_DISH(
+          pendingDeleteDish.categoryId,
+          pendingDeleteDish.id,
+        ),
       );
 
       if (!response.data?.isSuccess) {
@@ -173,7 +180,9 @@ export default function DishPage() {
         return;
       }
 
-      setDishes((prev) => prev.filter((dish) => dish.id !== pendingDeleteDish.id));
+      setDishes((prev) =>
+        prev.filter((dish) => dish.id !== pendingDeleteDish.id),
+      );
       setPendingDeleteDish(null);
       setShowDishModal(false);
       toast.success(response.data?.message || "Xóa món ăn thành công");
@@ -191,19 +200,18 @@ export default function DishPage() {
     }
   };
 
-  const handleCreateDish = async (categoryId: number,formData: FormData) => {
+  const handleCreateDish = async (categoryId: number, formData: FormData) => {
     setLoading(true);
     console.log("Dữ liệu gửi đi:", Object.fromEntries(formData.entries()));
     try {
-      
       const response = await apiClient.post(
         API.DISHES.CREATE(categoryId),
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
 
       if (response.data.isSuccess) {
@@ -227,7 +235,11 @@ export default function DishPage() {
     }
   };
 
-  const handleUpdateDish = async (dishId: number, categoryId: number, formData: FormData) => {
+  const handleUpdateDish = async (
+    dishId: number,
+    categoryId: number,
+    formData: FormData,
+  ) => {
     setLoading(true);
     try {
       const response = await apiClient.put(
@@ -235,14 +247,14 @@ export default function DishPage() {
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
 
       if (response.data.isSuccess) {
         setDishes((prev) =>
-          prev.map((dish) => (dish.id === dishId ? response.data.data : dish))
+          prev.map((dish) => (dish.id === dishId ? response.data.data : dish)),
         );
         toast.success("Cập nhật món ăn thành công");
         setShowDishModal(false);
@@ -317,18 +329,24 @@ export default function DishPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const importResponse = await apiClient.post(API.DISHES.IMPORT_DISHES, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
+      const importResponse = await apiClient.post(
+        API.DISHES.IMPORT_DISHES,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         },
-      });
+      );
 
       if (!importResponse.data?.isSuccess) {
         toast.error(importResponse.data?.message || "Không thể import món ăn");
         return;
       }
 
-      const dishesResponse = await apiClient.get(API.DISHES.GET_ALL_BY_TENANT_ID(user.id));
+      const dishesResponse = await apiClient.get(
+        API.DISHES.GET_ALL_BY_TENANT_ID(user.id),
+      );
       if (dishesResponse.data?.isSuccess && dishesResponse.data?.data) {
         setDishes(dishesResponse.data.data);
       }
@@ -351,8 +369,41 @@ export default function DishPage() {
 
   return (
     <div>
-      {dishes.length === 0 ? (
-        <div className="flex min-h-[600px] items-center justify-center">
+      {isInitialLoading ? (
+        <div className="p-6">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <div className="h-3 w-28 animate-pulse rounded bg-slate-200" />
+              <div className="mt-2 h-6 w-32 animate-pulse rounded bg-slate-200" />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-10 w-32 animate-pulse rounded-xl bg-slate-200" />
+              <div className="h-10 w-28 animate-pulse rounded-xl bg-slate-200" />
+              <div className="h-10 w-48 animate-pulse rounded-xl bg-slate-200" />
+            </div>
+          </div>
+
+          <div className="mb-6 h-10 w-full animate-pulse rounded-xl bg-slate-100" />
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div
+                key={`dish-skeleton-${index}`}
+                className="overflow-hidden rounded-xl border border-slate-200 bg-white"
+              >
+                <div className="aspect-video animate-pulse bg-slate-200" />
+                <div className="space-y-3 p-4">
+                  <div className="h-4 w-2/3 animate-pulse rounded bg-slate-200" />
+                  <div className="h-3 w-full animate-pulse rounded bg-slate-100" />
+                  <div className="h-4 w-24 animate-pulse rounded bg-slate-200" />
+                  <div className="h-5 w-20 animate-pulse rounded-full bg-slate-100" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : dishes.length === 0 ? (
+        <div className="flex min-h-150 items-center justify-center">
           <div className="flex flex-col items-center gap-6">
             <div className="rounded-3xl border-2 border-dashed border-slate-300 bg-slate-50 p-16">
               <Plus className="h-16 w-16 text-slate-400" strokeWidth={1.5} />
