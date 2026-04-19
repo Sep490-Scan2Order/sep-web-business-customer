@@ -32,6 +32,7 @@ export default function DishPopUp({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isCreateMode = !dishData;
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -58,7 +59,8 @@ export default function DishPopUp({
       !trimmedDescription ||
       !price ||
       parseFloat(price) <= 0 ||
-      !categoryId
+      !categoryId ||
+      (isCreateMode && !imageFile)
     ) {
       return;
     }
@@ -85,6 +87,7 @@ export default function DishPopUp({
       dishName.trim() &&
       description.trim() &&
       price &&
+      (!isCreateMode || imageFile) &&
       !isLoading
     ) {
       e.preventDefault();
@@ -99,7 +102,8 @@ export default function DishPopUp({
     description.trim() &&
     price &&
     parseFloat(price) > 0 &&
-    categoryId;
+    categoryId &&
+    (!isCreateMode || imageFile);
 
   return (
     <div
@@ -212,7 +216,10 @@ export default function DishPopUp({
               {/* Image Upload Button */}
               <div>
                 <label className="text-sm font-medium text-slate-700 mb-2 block">
-                  Hình ảnh
+                  Hình ảnh{" "}
+                  {isCreateMode ? (
+                    <span className="text-red-500">*</span>
+                  ) : null}
                 </label>
                 <input
                   ref={fileInputRef}
