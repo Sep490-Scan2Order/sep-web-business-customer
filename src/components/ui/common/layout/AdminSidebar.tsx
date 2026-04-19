@@ -56,23 +56,9 @@ const sections: { label: string; items: NavItem[] }[] = [
     label: "Quản lý",
     items: [
       {
-        label: "Quản lý người dùng",
-        href: "/admin/user-management",
-        icon: Users,
-        hasChildren: true,
-        match: "prefix",
-      },
-      {
         label: "Quản lý bên thuê",
         href: "/admin/tenant-management",
         icon: Store,
-        hasChildren: true,
-        match: "prefix",
-      },
-      {
-        label: "Quản lý nhà hàng",
-        href: "/admin/restaurant-management",
-        icon: UtensilsCrossed,
         hasChildren: true,
         match: "prefix",
       },
@@ -116,13 +102,6 @@ const sections: { label: string; items: NavItem[] }[] = [
   {
     label: "Cài đặt",
     items: [
-      {
-        label: "Cài đặt AI",
-        href: "/admin/ai-settings",
-        icon: Bot,
-        hasChildren: true,
-        match: "prefix",
-      },
       {
         label: "Cài đặt hệ thống",
         href: "/admin/global-settings",
