@@ -3,7 +3,6 @@ import { Restaurant } from "./RestaurantList";
 import { StaffDto } from "@/src/types/type";
 import { Edit2, Loader2, Plus, X } from "lucide-react";
 
-
 interface StaffProps {
   restaurants: Restaurant[];
   onClose: () => void;
@@ -27,20 +26,25 @@ export default function StaffPopUp({
 }: StaffProps) {
   const [name, setName] = useState(staffData?.name || "");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState(staffData?.phone || "");
   const [restaurantId, setRestaurantId] = useState<number>(
     Number(staffData?.restaurantId) || Number(restaurants[0]?.id) || 0,
   );
+  const [isActive, setIsActive] = useState<boolean>(
+    staffData?.isActive ?? true,
+  );
   // Role enum: Staff = 3, Cashier = 4 (from backend Role.cs)
   const [role, setRole] = useState<number>(
-    staffData?.role === "Cashier" ? 4 : 3
+    staffData?.role === "Cashier" ? 4 : 3,
   );
+  const isCreateMode = !staffData?.id;
 
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
   const handleSubmit = () => {
     const formData = new FormData();
     formData.append("name", name);
@@ -48,6 +52,7 @@ export default function StaffPopUp({
     formData.append("phone", phone);
     formData.append("restaurantId", restaurantId.toString());
     formData.append("role", role.toString());
+    formData.append("isActive", isActive.toString());
 
     if (staffData?.id) {
       onUpdate(staffData.id, restaurantId, formData);
@@ -60,8 +65,8 @@ export default function StaffPopUp({
     if (
       e.key === "Enter" &&
       name.trim() &&
-      email.trim() &&
       phone.trim() &&
+      (isCreateMode ? email.trim() : true) &&
       !isLoading
     ) {
       e.preventDefault();
@@ -72,7 +77,7 @@ export default function StaffPopUp({
   };
 
   const isFormValid =
-    name.trim() && email.trim() && phone.trim();
+    name.trim() && phone.trim() && (isCreateMode ? email.trim() : true);
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 overflow-y-auto"
@@ -153,11 +158,13 @@ export default function StaffPopUp({
                 </label>
                 <input
                   type="email"
-                  placeholder="Nhập email..."
+                  placeholder={
+                    isCreateMode ? "Nhập email..." : "Email không thể cập nhật"
+                  }
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  disabled={isLoading}
+                  disabled={isLoading || !isCreateMode}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-slate-300 focus:bg-white disabled:cursor-not-allowed disabled:opacity-50"
                 />
               </div>
@@ -193,8 +200,24 @@ export default function StaffPopUp({
                   <option value={4}>Thu ngân</option>
                 </select>
               </div>
-            </div>
 
+              {!isCreateMode && (
+                <div>
+                  <label className="text-sm font-medium text-slate-700 mb-2 block">
+                    Trạng thái <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={isActive ? "true" : "false"}
+                    onChange={(e) => setIsActive(e.target.value === "true")}
+                    disabled={isLoading}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none focus:border-slate-300 focus:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="true">Hoạt động</option>
+                    <option value="false">Không hoạt động</option>
+                  </select>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

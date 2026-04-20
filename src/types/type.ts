@@ -370,6 +370,7 @@ export interface StaffDto {
   restaurantId: number;
   restaurantName: string;
   name: string;
+  phone?: string;
   role: string;
   avatar: string;
   isActive: boolean;

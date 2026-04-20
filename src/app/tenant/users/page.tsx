@@ -9,6 +9,22 @@ import { Plus, ArrowLeft, Store } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
+function normalizeIsActive(value: unknown): boolean {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") return value.toLowerCase() === "true";
+  if (typeof value === "number") return value === 1;
+  return false;
+}
+
+function normalizeStaff(staff: StaffDto): StaffDto {
+  return {
+    ...staff,
+    isActive: normalizeIsActive(
+      (staff as StaffDto & { isActive: unknown }).isActive,
+    ),
+  };
+}
+
 export default function UsersPage() {
   const { user } = useAuth();
   const [staffs, setStaffs] = useState<StaffDto[]>([]);
@@ -63,9 +79,31 @@ export default function UsersPage() {
           `${API.STAFF.GET_ALL}?restaurantId=${selectedRestaurant.id}&page=1&pageSize=100`,
         );
 
-        console.log("Response from API:", response);
         if (response.status === 200 && response.data.items) {
-          setStaffs(response.data.items);
+          const normalizedStaffs = response.data.items.map((staff: StaffDto) =>
+            normalizeStaff(staff),
+          );
+
+          if (process.env.NODE_ENV !== "production") {
+            console.log(
+              "[staff-fetch] Raw response items:",
+              response.data.items,
+            );
+            console.table(
+              response.data.items.map(
+                (staff: StaffDto & { isActive?: unknown }, index: number) => ({
+                  index,
+                  id: staff.id,
+                  name: staff.name,
+                  rawIsActive: staff.isActive,
+                  rawType: typeof staff.isActive,
+                  normalizedIsActive: normalizeIsActive(staff.isActive),
+                }),
+              ),
+            );
+          }
+
+          setStaffs(normalizedStaffs);
         }
       } catch (error: unknown) {
         const backendMessage = (
@@ -98,7 +136,7 @@ export default function UsersPage() {
   };
 
   const handleCreateStaff = async (
-    restaurantId: number,
+    _restaurantId: number,
     formData: FormData,
   ) => {
     if (!selectedRestaurant) {
@@ -117,7 +155,7 @@ export default function UsersPage() {
       });
 
       if (response.data.isSuccess) {
-        setStaffs((prev) => [...prev, response.data.data]);
+        setStaffs((prev) => [...prev, normalizeStaff(response.data.data)]);
         toast.success("Tạo nhân viên thành công");
 
         setShowStaffModal(false);
@@ -138,28 +176,31 @@ export default function UsersPage() {
     }
   };
 
-  const handleUpdateStaff = async () => {
+  const handleUpdateStaff = async (
+    staffId: string,
+    _restaurantId: number,
+    formData: FormData,
+  ) => {
     setLoading(true);
     try {
-      // TODO: Implement update staff API
-      // const response = await apiClient.put(
-      //   API.STAFF.UPDATE_STAFF(staffId),
-      //   formData,
-      //   {
-      //     headers: {
-      //       'Content-Type': 'multipart/form-data',
-      //     },
-      //   }
-      // );
-      // if (response.data.isSuccess) {
-      // setStaffs((prev) =>
-      //   prev.map((staff) => (staff.id === staffId ? response.data.data : staff))
-      // );
-      // toast.success("Cập nhật nhân viên thành công");
-      // setShowStaffModal(false);
-      // } else {
-      // toast.error(response.data.message || "Không thể cập nhật nhân viên");
-      // }
+      const response = await apiClient.put(API.STAFF.UPDATE_STAFF(staffId), {
+        name: formData.get("name") as string,
+        phone: formData.get("phone") as string,
+        isActive: String(formData.get("isActive")).toLowerCase() === "true",
+        role: Number(formData.get("role")),
+      });
+
+      if (response.data?.isSuccess) {
+        const updatedStaff = normalizeStaff(response.data.data);
+        setStaffs((prev) =>
+          prev.map((staff) => (staff.id === staffId ? updatedStaff : staff)),
+        );
+        toast.success(response.data.message || "Cập nhật nhân viên thành công");
+        setShowStaffModal(false);
+        setSelectedStaff(null);
+      } else {
+        toast.error(response.data?.message || "Không thể cập nhật nhân viên");
+      }
     } catch (error: unknown) {
       const backendMessage = (
         error as { response?: { data?: { message?: string } } }

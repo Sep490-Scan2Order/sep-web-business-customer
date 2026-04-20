@@ -153,7 +153,6 @@ async function updateRestaurantActiveStatus(
       isSuccess: false,
       message:
         error instanceof Error ? error.message : "Lỗi khi cập nhật trạng thái",
-      data: null,
       errors: null,
       timestamp: new Date().toISOString(),
     };

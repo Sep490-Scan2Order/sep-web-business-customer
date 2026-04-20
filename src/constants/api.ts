@@ -30,6 +30,7 @@ export const API = {
   STAFF: {
     CREATE: "/Staff/create-staff",
     GET_ALL: "/Staff/get-all",
+    UPDATE_STAFF: (staffId: string) => `/Staff/update-staff/${staffId}`,
   },
   AUTH: {
     TENANT_LOGIN: "/Auth/tenant-login",
