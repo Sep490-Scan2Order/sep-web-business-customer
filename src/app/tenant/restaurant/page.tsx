@@ -129,12 +129,35 @@ async function updateRestaurantActiveStatus(
   id: number,
   isActive: boolean,
 ): Promise<ApiResponse<Restaurant>> {
-  const response = await apiClient.put<ApiResponse<Restaurant>>(
-    API.RESTAURANT.UPDATE_ISACTIVE(id, isActive),
-    null,
-  );
+  try {
+    const response = await apiClient.put<ApiResponse<Restaurant>>(
+      API.RESTAURANT.UPDATE_ISACTIVE(id, isActive),
+      null,
+    );
+    return response.data;
+  } catch (error: unknown) {
+    // Handle axios error response
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "response" in error &&
+      (error as { response?: { data?: unknown } }).response?.data
+    ) {
+      const errorData = (error as { response: { data: unknown } }).response
+        .data as ApiResponse<Restaurant>;
+      return errorData;
+    }
 
-  return response.data;
+    // Return error response format
+    return {
+      isSuccess: false,
+      message:
+        error instanceof Error ? error.message : "Lỗi khi cập nhật trạng thái",
+      data: null,
+      errors: null,
+      timestamp: new Date().toISOString(),
+    };
+  }
 }
 
 export default function RestaurantPage() {
@@ -311,50 +334,57 @@ export default function RestaurantPage() {
 
       if (!Number.isFinite(parsedId) || parsedId <= 0) {
         toast.error("ID nhà hàng không hợp lệ");
-        return;
+        throw new Error("ID nhà hàng không hợp lệ");
       }
 
-      const response = await updateRestaurantActiveStatus(
-        parsedId,
-        nextIsActive,
-      );
-
-      if (!response.isSuccess) {
-        toast.error(
-          response.message || "Cập nhật trạng thái nhà hàng thất bại",
+      try {
+        const response = await updateRestaurantActiveStatus(
+          parsedId,
+          nextIsActive,
         );
-        return;
-      }
 
-      setRestaurants((prev) =>
-        prev.map((restaurant) => {
-          if (restaurant.id !== parsedId) {
-            return restaurant;
-          }
+        if (!response.isSuccess) {
+          toast.error(
+            response.message || "Cập nhật trạng thái nhà hàng thất bại",
+          );
+          throw new Error(
+            response.message || "Cập nhật trạng thái nhà hàng thất bại",
+          );
+        }
 
-          if (response.data) {
+        setRestaurants((prev) =>
+          prev.map((restaurant) => {
+            if (restaurant.id !== parsedId) {
+              return restaurant;
+            }
+
+            if (response.data) {
+              return {
+                ...restaurant,
+                ...response.data,
+                id: restaurant.id,
+                isActive:
+                  typeof response.data.isActive === "boolean"
+                    ? response.data.isActive
+                    : nextIsActive,
+              };
+            }
+
             return {
               ...restaurant,
-              ...response.data,
-              id: restaurant.id,
-              isActive:
-                typeof response.data.isActive === "boolean"
-                  ? response.data.isActive
-                  : nextIsActive,
+              isActive: nextIsActive,
             };
-          }
+          }),
+        );
 
-          return {
-            ...restaurant,
-            isActive: nextIsActive,
-          };
-        }),
-      );
-
-      toast.success(
-        response.message ||
-          `${nextIsActive ? "Mở" : "Đóng"} nhà hàng thành công`,
-      );
+        toast.success(
+          response.message ||
+            `${nextIsActive ? "Mở" : "Đóng"} nhà hàng thành công`,
+        );
+      } catch (error) {
+        console.error("Error updating restaurant status:", error);
+        throw error;
+      }
     },
     [],
   );

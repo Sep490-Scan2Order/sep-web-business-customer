@@ -110,7 +110,11 @@ export default function RestaurantList({
     setIsSubmittingStatus(true);
     try {
       await onUpdateStatus(pendingStatusRestaurant.id, nextIsActive);
+      // Chỉ close popup khi thành công
       setPendingStatusRestaurant(null);
+    } catch (error) {
+      // Giữ popup mở khi có lỗi, toast error đã được show
+      console.error("Error updating status:", error);
     } finally {
       setIsSubmittingStatus(false);
     }
@@ -151,8 +155,8 @@ export default function RestaurantList({
         <>
           {inactiveRestaurantCount > 0 ? (
             <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-              Có {inactiveRestaurantCount} nhà hàng đang không hoạt
-              động. Bạn có thể bật lại bằng nút Mở nhà hàng.
+              Có {inactiveRestaurantCount} nhà hàng đang không hoạt động. Bạn có
+              thể bật lại bằng nút Mở nhà hàng.
             </div>
           ) : null}
 
