@@ -1,15 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
+  PieChart,
+  Pie,
   Tooltip,
   ResponsiveContainer,
-  CartesianGrid,
   Cell,
 } from "recharts";
 import { Package } from "lucide-react";
@@ -65,26 +62,49 @@ export default function RestaurantRevenuePage() {
 
   const formatVND = (v: number) => v.toLocaleString("vi-VN") + " ₫";
 
-  const orderTypeChartData = data
-    ? [
-        {
-          name: "Đơn hàng thường",
-          revenue: data.orderTypes.regular.revenue,
-          count: data.orderTypes.regular.count,
-          fill: "#10b981",
-        },
-        ...(data.summary.totalRefund > 0 || data.orderTypes.refund.count > 0
-          ? [
-              {
-                name: "Hoàn tiền",
-                revenue: data.summary.totalRefund,
-                count: data.orderTypes.refund.count,
-                fill: "#f43f5e",
-              },
-            ]
-          : []),
-      ]
-    : [];
+  const orderTypeChartData = useMemo(() => {
+    if (!data) return [];
+    const stats: { name: string; value: number; color: string }[] = [
+      {
+        name: "Đơn thành công",
+        value: data.orderTypes.regular.revenue,
+        color: "#10b981",
+      },
+    ];
+
+    const { refund } = data.orderTypes;
+    if (refund.objective && refund.objective.revenue > 0) {
+      stats.push({
+        name: "Hoàn tiền (Khách quan)",
+        value: refund.objective.revenue,
+        color: "#f59e0b",
+      });
+    }
+    if (refund.staffError && refund.staffError.revenue > 0) {
+      stats.push({
+        name: "Hoàn tiền (Lỗi NV)",
+        value: refund.staffError.revenue,
+        color: "#ef4444",
+      });
+    }
+    if (refund.systemError && refund.systemError.revenue > 0) {
+      stats.push({
+        name: "Hoàn tiền (Lỗi HT)",
+        value: refund.systemError.revenue,
+        color: "#6366f1",
+      });
+    }
+
+    if (stats.length === 1 && refund.revenue > 0) {
+      stats.push({
+        name: "Hoàn tiền",
+        value: refund.revenue,
+        color: "#f43f5e",
+      });
+    }
+
+    return stats;
+  }, [data]);
 
   return (
     <div className="p-6 space-y-6">
@@ -175,48 +195,55 @@ export default function RestaurantRevenuePage() {
                 <Package className="w-5 h-5 text-emerald-500" />
                 Phân tích loại đơn hàng
               </h3>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={orderTypeChartData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                    <XAxis
-                      dataKey="name"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: "#64748b", fontSize: 12 }}
-                    />
-                    <YAxis
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: "#64748b", fontSize: 12 }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        borderRadius: "12px",
-                        border: "none",
-                        boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
-                      }}
-                      cursor={{ fill: "#f8fafc" }}
-                      formatter={(value, name) => {
-                        if (name === "Doanh thu") return [formatVND(Number(value)), "Doanh thu"];
-                        return [value, name];
-                      }}
-                    />
-                    <Bar
-                      dataKey="revenue"
-                      name="Doanh thu"
-                      radius={[6, 6, 0, 0]}
-                      barSize={40}
+              <div className="h-80 flex flex-col md:flex-row items-center gap-6">
+                <div className="w-full md:w-1/2 h-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={orderTypeChartData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={70}
+                        outerRadius={100}
+                        paddingAngle={4}
+                        dataKey="value"
+                      >
+                        {orderTypeChartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(val: any) => [formatVND(Number(val || 0)), "Doanh thu"]}
+                        contentStyle={{
+                          borderRadius: "12px",
+                          border: "none",
+                          boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="w-full md:w-1/2 space-y-3">
+                  {orderTypeChartData.map((item, index) => (
+                    <div
+                      key={`order-type-list-${index}`}
+                      className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100/50"
                     >
-                      {orderTypeChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: item.color }}
+                        ></div>
+                        <span className="text-sm font-medium text-slate-600">
+                          {item.name}
+                        </span>
+                      </div>
+                      <span className="text-sm font-bold text-slate-800">
+                        {formatVND(item.value)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
