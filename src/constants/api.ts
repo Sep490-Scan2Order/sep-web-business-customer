@@ -154,7 +154,7 @@ export const API = {
   ADMIN: {
     SUMMARY_METRICS: "/Admin/summary-metrics",
     REVENUE_TRENDS: (months: number = 6) =>
-      `/Admin/revenue-trends?months=${months}`,
+      `/Admin/subscription-revenue-trends?months=${months}`,
     PLAN_DISTRIBUTION: "/Admin/plan-distribution",
     TOP_PERFORMING_RESTAURANTS: (top: number = 5) =>
       `/Admin/top-performing-restaurants?top=${top}`,
