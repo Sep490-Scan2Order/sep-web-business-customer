@@ -915,3 +915,15 @@ export interface SubscriptionRevenueByPlan {
   errors: null;
   timestamp: string;
 }
+
+export interface ShiftDto {
+  id: number;
+  restaurantId: number;
+  staffId: string;
+  startDate: string;
+  endDate: string | null;
+  status: number;
+  type: number;
+  note: string;
+  parentShiftId: number | null;
+}

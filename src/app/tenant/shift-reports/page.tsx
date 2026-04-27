@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { API } from "@/src/constants/api";
 import { useAuth } from "@/src/hooks/useAuth";
 import apiClient from "@/src/services/apiClient";
-import { Restaurant, ShiftReportDto } from "@/src/types/type";
+import { Restaurant, ShiftReportDto, ShiftDto } from "@/src/types/type";
 import {
   Calendar,
   Search,
@@ -12,6 +12,8 @@ import {
   Eye,
   Clock,
   FileText,
+  AlertCircle,
+  Filter,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import TablePagination from "@/src/components/ui/common/TablePagination";
@@ -58,6 +60,23 @@ export default function ShiftReportsPage() {
     null,
   );
 
+  const [isTransferredFilter, setIsTransferredFilter] = useState<string>("all");
+  const [cashierNameFilter, setCashierNameFilter] = useState<string>("");
+  const [debouncedCashierName, setDebouncedCashierName] = useState<string>("");
+
+  const [activeShifts, setActiveShifts] = useState<ShiftDto[]>([]);
+  const [showActiveShiftsModal, setShowActiveShiftsModal] = useState(false);
+  const [isActiveShiftsLoading, setIsActiveShiftsLoading] = useState(false);
+
+  // Debounce for cashier name
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedCashierName(cashierNameFilter);
+      setCurrentPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [cashierNameFilter]);
+
   // Fetch restaurants
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -96,6 +115,8 @@ export default function ShiftReportsPage() {
             pageSize,
             fromDate || undefined,
             toDate || undefined,
+            isTransferredFilter === "all" ? undefined : isTransferredFilter === "true",
+            debouncedCashierName || undefined
           ),
         );
 
@@ -118,7 +139,48 @@ export default function ShiftReportsPage() {
     if (selectedRestaurant) {
       fetchReports();
     }
-  }, [selectedRestaurant, currentPage, pageSize, fromDate, toDate]);
+  }, [selectedRestaurant, currentPage, pageSize, fromDate, toDate, isTransferredFilter, debouncedCashierName]);
+
+  const fetchActiveShifts = async () => {
+    if (!selectedRestaurant?.id) return;
+    setIsActiveShiftsLoading(true);
+    try {
+      const response = await apiClient.get(
+        API.SHIFT.GET_ACTIVE_SHIFTS(selectedRestaurant.id)
+      );
+      if (response.data.isSuccess && response.data.data) {
+        setActiveShifts(response.data.data);
+      } else {
+        setActiveShifts([]);
+      }
+    } catch (error: any) {
+      toast.error("Có lỗi xảy ra khi tải danh sách ca đang mở");
+    } finally {
+      setIsActiveShiftsLoading(false);
+    }
+  };
+
+  const handleOpenActiveShifts = () => {
+    setShowActiveShiftsModal(true);
+    fetchActiveShifts();
+  };
+
+  const handleForceCheckout = async (shiftId: number) => {
+    if (!confirm("Bạn có chắc chắn muốn ép kết ca này không? Hành động này không thể hoàn tác.")) return;
+    
+    try {
+      const response = await apiClient.post(API.SHIFT.FORCE_CHECKOUT(shiftId), { note: "Quản lý ép kết ca" });
+      if (response.data.isSuccess) {
+        toast.success("Đã kết ca thành công!");
+        fetchActiveShifts();
+        setCurrentPage(1); // triggers fetchReports
+      } else {
+        toast.error(response.data.message || "Không thể kết ca");
+      }
+    } catch (error: any) {
+      toast.error("Có lỗi xảy ra khi kết ca");
+    }
+  };
 
   const handleUpdateClick = (report: ShiftReportDto) => {
     setSelectedReport(report);
@@ -230,34 +292,70 @@ export default function ShiftReportsPage() {
                 </div>
               </div>
 
-              {/* Date Filters */}
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 focus-within:border-slate-300">
-                  <Calendar className="h-4 w-4 text-slate-400" />
-                  <input
-                    type="date"
-                    value={fromDate}
-                    onChange={(e) => {
-                      setFromDate(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="bg-transparent text-sm text-slate-700 outline-none"
-                    placeholder="Từ ngày"
-                  />
+              {/* Date & Additional Filters */}
+              <div className="flex flex-col gap-3 sm:items-end">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 focus-within:border-slate-300">
+                    <Calendar className="h-4 w-4 text-slate-400" />
+                    <input
+                      type="date"
+                      value={fromDate}
+                      onChange={(e) => {
+                        setFromDate(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      className="bg-transparent text-sm text-slate-700 outline-none"
+                      placeholder="Từ ngày"
+                    />
+                  </div>
+                  <span className="text-slate-400">-</span>
+                  <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 focus-within:border-slate-300">
+                    <Calendar className="h-4 w-4 text-slate-400" />
+                    <input
+                      type="date"
+                      value={toDate}
+                      onChange={(e) => {
+                        setToDate(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      className="bg-transparent text-sm text-slate-700 outline-none"
+                      placeholder="Đến ngày"
+                    />
+                  </div>
                 </div>
-                <span className="text-slate-400">-</span>
-                <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 focus-within:border-slate-300">
-                  <Calendar className="h-4 w-4 text-slate-400" />
-                  <input
-                    type="date"
-                    value={toDate}
-                    onChange={(e) => {
-                      setToDate(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="bg-transparent text-sm text-slate-700 outline-none"
-                    placeholder="Đến ngày"
-                  />
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 focus-within:border-slate-300">
+                    <Search className="h-4 w-4 text-slate-400" />
+                    <input
+                      type="text"
+                      value={cashierNameFilter}
+                      onChange={(e) => setCashierNameFilter(e.target.value)}
+                      className="bg-transparent text-sm text-slate-700 outline-none w-32"
+                      placeholder="Tên NV..."
+                    />
+                  </div>
+                  <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 focus-within:border-slate-300">
+                    <Filter className="h-4 w-4 text-slate-400" />
+                    <select
+                      value={isTransferredFilter}
+                      onChange={(e) => {
+                        setIsTransferredFilter(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      className="bg-transparent text-sm text-slate-700 outline-none cursor-pointer"
+                    >
+                      <option value="all">Trạng thái (Tất cả)</option>
+                      <option value="true">Đã nộp tiền</option>
+                      <option value="false">Chưa nộp tiền</option>
+                    </select>
+                  </div>
+                  <button
+                    onClick={handleOpenActiveShifts}
+                    className="flex items-center gap-2 rounded-xl bg-orange-100 px-3 py-1.5 text-sm font-medium text-orange-700 hover:bg-orange-200 transition-colors border border-orange-200"
+                  >
+                    <AlertCircle className="h-4 w-4" />
+                    Quản lý ca đang mở
+                  </button>
                 </div>
               </div>
             </div>
@@ -279,6 +377,9 @@ export default function ShiftReportsPage() {
                       Thực tế (Tiền mặt)
                     </th>
                     <th className="whitespace-nowrap px-6 py-4">Chênh lệch</th>
+                    <th className="whitespace-nowrap px-6 py-4">
+                      Trạng thái
+                    </th>
                     <th className="whitespace-nowrap px-6 py-4 text-center">
                       Thao tác
                     </th>
@@ -302,6 +403,9 @@ export default function ShiftReportsPage() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="h-4 w-24 animate-pulse rounded bg-slate-200" />
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="h-5 w-20 animate-pulse rounded-full bg-slate-200" />
                         </td>
                         <td className="px-6 py-4">
                           <div className="h-5 w-20 animate-pulse rounded-full bg-slate-200" />
@@ -349,6 +453,17 @@ export default function ShiftReportsPage() {
                             {formatCurrency(report.difference)}
                           </span>
                         </td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${
+                              report.isTransferred
+                                ? "bg-emerald-50 text-emerald-700"
+                                : "bg-rose-50 text-rose-700"
+                            }`}
+                          >
+                            {report.isTransferred ? "Đã nộp tiền" : "Chưa nộp tiền"}
+                          </span>
+                        </td>
                         <td className="px-6 py-4 text-center">
                           <button
                             onClick={() => handleUpdateClick(report)}
@@ -362,7 +477,7 @@ export default function ShiftReportsPage() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center">
+                      <td colSpan={8} className="px-6 py-12 text-center">
                         <div className="flex flex-col items-center justify-center">
                           <div className="rounded-full bg-slate-100 p-3">
                             <FileText className="h-6 w-6 text-slate-400" />
@@ -526,6 +641,104 @@ export default function ShiftReportsPage() {
               <button
                 onClick={() => setShowModal(false)}
                 className="w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Active Shifts Modal */}
+      {showActiveShiftsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 transition-opacity">
+          <div className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+              <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                <AlertCircle className="h-5 w-5 text-orange-500" />
+                Các ca làm việc đang mở
+              </h3>
+              <button
+                onClick={() => setShowActiveShiftsModal(false)}
+                className="rounded-full p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+              >
+                <svg
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div className="p-6">
+              <div className="overflow-x-auto rounded-xl border border-slate-200">
+                <table className="w-full text-left text-sm text-slate-600">
+                  <thead className="bg-slate-50 text-xs font-semibold uppercase text-slate-500 border-b border-slate-200">
+                    <tr>
+                      <th className="px-4 py-3">ID Ca</th>
+                      <th className="px-4 py-3">Loại ca</th>
+                      <th className="px-4 py-3">Giờ bắt đầu</th>
+                      <th className="px-4 py-3 text-right">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {isActiveShiftsLoading ? (
+                      <tr>
+                        <td colSpan={4} className="px-4 py-8 text-center text-slate-500">
+                          Đang tải danh sách...
+                        </td>
+                      </tr>
+                    ) : activeShifts.length > 0 ? (
+                      activeShifts.map((shift) => (
+                        <tr key={shift.id} className="hover:bg-slate-50">
+                          <td className="px-4 py-3 font-medium text-slate-900">
+                            #{shift.id}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${shift.type === 1 ? 'bg-purple-50 text-purple-700' : 'bg-blue-50 text-blue-700'}`}>
+                              {shift.type === 1 ? 'Thu ngân' : 'Nhân viên'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            {formatDate(shift.startDate)}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <button
+                              onClick={() => handleForceCheckout(shift.id)}
+                              className="inline-flex items-center justify-center rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-medium text-rose-700 transition-colors hover:bg-rose-100"
+                            >
+                              Ép kết ca
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={4} className="px-4 py-8 text-center">
+                          <div className="flex flex-col items-center">
+                            <div className="rounded-full bg-slate-100 p-2 mb-2">
+                              <Store className="h-5 w-5 text-slate-400" />
+                            </div>
+                            <p className="text-slate-500">Không có ca làm việc nào đang mở.</p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <div className="border-t border-slate-100 p-4 bg-slate-50 flex justify-end">
+              <button
+                onClick={() => setShowActiveShiftsModal(false)}
+                className="rounded-xl bg-white border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
               >
                 Đóng
               </button>

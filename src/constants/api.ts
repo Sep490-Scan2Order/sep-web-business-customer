@@ -195,13 +195,19 @@ export const API = {
       pageSize: number = 10,
       from?: string,
       to?: string,
+      isTransferred?: boolean,
+      cashierName?: string
     ) => {
       let url = `/Shift/reports?restaurantId=${restaurantId}&pageIndex=${pageIndex}&pageSize=${pageSize}`;
       if (from) url += `&from=${from}`;
       if (to) url += `&to=${to}`;
+      if (isTransferred !== undefined) url += `&isTransferred=${isTransferred}`;
+      if (cashierName) url += `&cashierName=${encodeURIComponent(cashierName)}`;
       return url;
     },
     GET_REPORT_BY_ID: (shiftId: number) => `/Shift/${shiftId}/report`,
+    GET_ACTIVE_SHIFTS: (restaurantId: number) => `/Shift/active?restaurantId=${restaurantId}`,
+    FORCE_CHECKOUT: (shiftId: number) => `/Shift/${shiftId}/force-checkout`,
   },
   ORDER: {
     GET_TENANT_ORDERS: (
