@@ -800,6 +800,7 @@ export interface ShiftReportDto {
   expectedTotalAmount: number;
   note: string;
   cashierName: string;
+  isTransferred: boolean;
 }
 
 export interface ShiftReportPagedResponse {
