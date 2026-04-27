@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { API } from "@/src/constants/api";
 import { useAuth } from "@/src/hooks/useAuth";
+import { useRealtime } from "@/src/hooks/useRealtime";
 import apiClient from "@/src/services/apiClient";
 import { Restaurant, ShiftReportDto, ShiftDto } from "@/src/types/type";
 import {
@@ -77,6 +78,34 @@ export default function ShiftReportsPage() {
     return () => clearTimeout(timer);
   }, [cashierNameFilter]);
 
+  const fetchActiveShifts = async () => {
+    if (!selectedRestaurant?.id) return;
+    setIsActiveShiftsLoading(true);
+    try {
+      const response = await apiClient.get(
+        API.SHIFT.GET_ACTIVE_SHIFTS(selectedRestaurant.id)
+      );
+      if (response.data.isSuccess && response.data.data) {
+        setActiveShifts(response.data.data);
+      } else {
+        setActiveShifts([]);
+      }
+    } catch (error: any) {
+      toast.error("Có lỗi xảy ra khi tải danh sách ca đang mở");
+    } finally {
+      setIsActiveShiftsLoading(false);
+    }
+  };
+
+  useRealtime({
+    tenantId: user?.id,
+    onListChanged: () => {
+      if (showActiveShiftsModal) {
+        fetchActiveShifts();
+      }
+    },
+  });
+
   // Fetch restaurants
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -141,24 +170,7 @@ export default function ShiftReportsPage() {
     }
   }, [selectedRestaurant, currentPage, pageSize, fromDate, toDate, isTransferredFilter, debouncedCashierName]);
 
-  const fetchActiveShifts = async () => {
-    if (!selectedRestaurant?.id) return;
-    setIsActiveShiftsLoading(true);
-    try {
-      const response = await apiClient.get(
-        API.SHIFT.GET_ACTIVE_SHIFTS(selectedRestaurant.id)
-      );
-      if (response.data.isSuccess && response.data.data) {
-        setActiveShifts(response.data.data);
-      } else {
-        setActiveShifts([]);
-      }
-    } catch (error: any) {
-      toast.error("Có lỗi xảy ra khi tải danh sách ca đang mở");
-    } finally {
-      setIsActiveShiftsLoading(false);
-    }
-  };
+
 
   const handleOpenActiveShifts = () => {
     setShowActiveShiftsModal(true);
