@@ -160,7 +160,7 @@ export default function RegisterPage() {
       });
 
       if (response.isSuccess) {
-        toast.success(response.message);
+        toast.success("Đăng ký thành công");
         router.push(ROUTES.PAGES.PUBLIC.LOGIN);
       }
     } catch (error) {

@@ -67,7 +67,7 @@ export default function RestaurantRevenuePage() {
     const stats: { name: string; value: number; color: string }[] = [
       {
         name: "Đơn thành công",
-        value: data.orderTypes.regular.revenue,
+        value: data.summary.netRevenue,
         color: "#10b981",
       },
     ];
