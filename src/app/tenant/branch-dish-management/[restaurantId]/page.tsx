@@ -39,6 +39,9 @@ export default function BranchDishRestaurantDetailPage() {
   const [togglingDishIds, setTogglingDishIds] = useState<Set<number>>(
     new Set(),
   );
+  const [togglingCategoryIds, setTogglingCategoryIds] = useState<Set<number>>(
+    new Set(),
+  );
 
   const loadData = useCallback(async () => {
     if (!restaurantId) {
@@ -138,6 +141,53 @@ export default function BranchDishRestaurantDetailPage() {
     }
   };
 
+  const handleToggleCategory = async (
+    restaurantId: number,
+    categoryId: number,
+    isSelling: boolean,
+  ) => {
+    setTogglingCategoryIds((prev) => {
+      const next = new Set(prev);
+      next.add(categoryId);
+      return next;
+    });
+
+    try {
+      const response = await apiClient.put<ApiResponse<unknown>>(
+        API.BRANCH_DISH_CONFIG.UPDATE_IS_SELLING_BY_CATEGORY(
+          restaurantId,
+          categoryId,
+          isSelling,
+        ),
+      );
+
+      if (response.data.isSuccess) {
+        await loadData();
+        toast.success("Cập nhật trạng thái danh mục thành công");
+      } else {
+        toast.error(
+          response.data.message || "Không thể cập nhật trạng thái danh mục",
+        );
+      }
+    } catch (error: unknown) {
+      const backendMessage = (
+        error as { response?: { data?: { message?: string } } }
+      ).response?.data?.message;
+
+      toast.error(
+        backendMessage ||
+          (error as { message?: string }).message ||
+          "Có lỗi xảy ra khi cập nhật trạng thái danh mục",
+      );
+    } finally {
+      setTogglingCategoryIds((prev) => {
+        const next = new Set(prev);
+        next.delete(categoryId);
+        return next;
+      });
+    }
+  };
+
   const handleSyncDishes = async () => {
     try {
       const response = await apiClient.post<ApiResponse<unknown>>(
@@ -179,8 +229,10 @@ export default function BranchDishRestaurantDetailPage() {
       categories={menuCategories}
       isLoading={isLoading}
       togglingDishIds={togglingDishIds}
+      togglingCategoryIds={togglingCategoryIds}
       onBack={() => router.push("/tenant/branch-dish-management")}
       onToggleDish={handleToggleDish}
+      onToggleCategory={handleToggleCategory}
       onSyncDishes={handleSyncDishes}
     />
   );

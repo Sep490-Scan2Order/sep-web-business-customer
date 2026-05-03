@@ -186,6 +186,12 @@ export const API = {
       isSelling: boolean,
     ) =>
       `/BranchDishConfig/update-is-selling/${restaurantId}/${dishId}?isSelling=${isSelling}`,
+    UPDATE_IS_SELLING_BY_CATEGORY: (
+      restaurantId: number,
+      categoryId: number,
+      isSelling: boolean,
+    ) =>
+      `/BranchDishConfig/update-is-selling-by-category/${restaurantId}/${categoryId}?isSelling=${isSelling}`,
     SYNC_DISHES_TO_BRANCH: "/BranchDishConfig/sync-dishes-to-branches",
   },
   SHIFT: {

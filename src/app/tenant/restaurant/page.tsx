@@ -315,12 +315,15 @@ export default function RestaurantPage() {
       } else {
         toast.error(response.message || "Tạo nhà hàng thất bại");
       }
-    } catch (error) {
-      console.error("Error creating restaurant:", error);
+    } catch (error: unknown) {
+      const backendMessage = (
+        error as { response?: { data?: { message?: string } } }
+      ).response?.data?.message;
+
       toast.error(
-        error instanceof Error
-          ? error.message
-          : "Có lỗi xảy ra khi tạo nhà hàng",
+        backendMessage ||
+          (error as { message?: string }).message ||
+          "Có lỗi xảy ra khi tạo nhà hàng",
       );
     } finally {
       setIsLoading(false);
