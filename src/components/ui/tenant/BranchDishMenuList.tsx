@@ -16,6 +16,7 @@ interface BranchDishMenuListProps {
   restaurant: Restaurant | null;
   categories: MenuCategoryDto[];
   isLoading: boolean;
+  togglingDishIds: Set<number>;
   togglingCategoryIds: Set<number>;
   onBack: () => void;
   onToggleDish: (
