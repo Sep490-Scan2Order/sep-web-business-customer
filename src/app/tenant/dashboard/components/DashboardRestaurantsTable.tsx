@@ -34,7 +34,7 @@ export default function DashboardRestaurantsTable({
           </thead>
           <tbody>
             {restaurants.length === 0 ? (
-              <tr>9
+              <tr>
                 <td colSpan={8} className="px-2 py-8 text-center text-slate-500">
                   Chưa có nhà hàng hoặc chưa có đơn hàng trong bộ lọc hiện tại.
                 </td>

@@ -2,7 +2,7 @@
 import { API, BANK_API } from '@/src/constants/api';
 import apiClient from '@/src/services/apiClient';
 import { useAuth } from '@/src/hooks/useAuth';
-import { BankInfo } from '@/src/types/type';
+import { BankInfo, UserInfo } from '@/src/types/type';
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-toastify';
 import { Search, X, Check, BookOpen, Link2, Settings2Icon } from 'lucide-react';
@@ -26,14 +26,15 @@ export default function TenantVerifyBankModelPopup({
   onSubmit,
   isLoading = false,
 }: TenantVerifyBankModelPopupProps) {
-  const { refreshUserInfo } = useAuth();
+  const { refreshUserInfo, user } = useAuth();
+  const userInfo = (user ?? null) as UserInfo | null;
   const [banks, setBanks] = useState<BankInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedBank, setSelectedBank] = useState<BankInfo | null>(null);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
-  const [qrMessage, setQrMessage] = useState<string | null>(null);
+  const [paymentCode, setPaymentCode] = useState<string | null>(null);
   const [formData, setFormData] = useState<BankVerifyFormData>({
     cardNumber: '',
     bankId: '',
@@ -73,7 +74,7 @@ export default function TenantVerifyBankModelPopup({
     setSearchQuery('');
     setFormData({ cardNumber: '', bankId: '' });
     setQrUrl(null);
-    setQrMessage(null);
+    setPaymentCode(null);
     setIsSubmitting(false);
   }, [isOpen]);
 
@@ -112,22 +113,46 @@ export default function TenantVerifyBankModelPopup({
     }
     try {
       setIsSubmitting(true);
+      
       const bankNameResponse = await apiClient.post(API.TENANT.SEARCH_BANK_NAME_BY_CARD_NUMBER, {
           bank: formData.bankCode,
           account: formData.cardNumber,
       });
 
-      const lookupResult = bankNameResponse.data?.data;
-      if (!bankNameResponse.data?.isSuccess || !lookupResult?.success) {
-        toast.error(lookupResult?.msg || 'Thông tin tài khoản ngân hàng không hợp lệ');
+      const lookupResult = bankNameResponse.data?.data as Record<string, unknown>;
+      const isLookupSuccess = lookupResult?.success || lookupResult?.Success;
+      const lookupMsg = (lookupResult?.msg as string) || (lookupResult?.Msg as string);
+      
+      if (!bankNameResponse.data?.isSuccess || !isLookupSuccess) {
+        toast.error(lookupMsg || 'Thông tin tài khoản ngân hàng không hợp lệ');
         return;
       }
 
       const updateUrl = `${API.TENANT.UPDATE_BANK_INFO}${formData.bankId}&accountNumber=${formData.cardNumber}`;
       const updateResponse = await apiClient.put(updateUrl);
+      
       if (updateResponse.data?.isSuccess) {
-        setQrUrl(updateResponse.data?.data || null);
-        setQrMessage(updateResponse.data?.message || null);
+        // Handle both old backend response (string) and new backend response (object)
+        let newQrUrl: string | null = null;
+        let newPaymentCode: string | null = null;
+
+        if (typeof updateResponse.data.data === 'string') {
+          newQrUrl = updateResponse.data.data;
+          // Try to extract paymentCode from the URL if it's the old response format
+          try {
+            const urlObj = new URL(newQrUrl as string);
+            newPaymentCode = urlObj.searchParams.get('des');
+          } catch (e) {
+            console.error("Could not parse QR URL");
+          }
+        } else {
+          const responseData = updateResponse.data.data as Record<string, unknown>;
+          newQrUrl = (responseData?.qrUrl as string) || (responseData?.QrUrl as string) || null;
+          newPaymentCode = (responseData?.paymentCode as string) || (responseData?.PaymentCode as string) || null;
+        }
+        
+        setQrUrl(newQrUrl);
+        setPaymentCode(newPaymentCode);
         await refreshUserInfo();
         onSubmit({ ...formData, bank: selectedBank });
       } else {
@@ -145,7 +170,7 @@ export default function TenantVerifyBankModelPopup({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-70 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-lg">
         {/* Header */}
         <div className="sticky top-0 flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4 z-10">
@@ -188,23 +213,44 @@ export default function TenantVerifyBankModelPopup({
         </div>
 
         <div className="p-6">
+          {!qrUrl && (
+            <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              <p className="font-semibold mb-2">⚠️ Lưu ý quy tắc đối soát chéo:</p>
+              <div className="mb-2 p-2 bg-white rounded-lg border border-amber-100">
+                <p className="text-xs text-amber-600 mb-1">Thông tin ĐKKD hiện tại:</p>
+                <p className="font-medium text-slate-900">Mã số thuế: {userInfo?.taxNumber || 'Chưa cập nhật'}</p>
+                <p className="font-medium text-slate-900">Đại diện pháp luật: <span className="text-emerald-700">{userInfo?.name || 'Chưa cập nhật'}</span></p>
+              </div>
+              <p>
+                Tên chủ tài khoản ngân hàng phải <strong>trùng khớp hoàn toàn</strong> với Tên đại diện pháp luật <strong>({userInfo?.name || 'Chưa có'})</strong> trên Cục Thuế. 
+                Hệ thống sẽ tự động xác thực cả Ngân Hàng và Thuế nếu thông tin khớp nhau.
+              </p>
+              <p className="mt-2 text-amber-700 text-xs">
+                <em>Lưu ý: Nếu không khớp (ví dụ do viết tắt), hệ thống sẽ chỉ xác thực phần Ngân hàng. Trong trường hợp này, vui lòng liên hệ đội ngũ Admin/Support để được duyệt phần Thuế thủ công.</em>
+              </p>
+            </div>
+          )}
+
           {qrUrl ? (
             <div className="space-y-6">
               <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-center">
                 <p className="text-sm font-semibold text-emerald-700">QR xác thực ngân hàng</p>
-                <p className="mt-2 text-sm text-emerald-700">Quét mã để hoàn tất xác thực</p>
+                <p className="mt-2 text-sm text-emerald-700">Quét mã để tự động điền nội dung chuyển khoản</p>
               </div>
               <div className="flex items-center justify-center rounded-2xl border border-slate-200 bg-white p-6">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={qrUrl} alt="Mã QR xác thực" className="h-56 w-56 object-contain" />
               </div>
-              {qrMessage ? (
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                  {qrMessage}
+              
+              {paymentCode && (
+                <div className="text-center rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <p className="text-sm text-slate-600 mb-1">Mã nội dung chuyển khoản:</p>
+                  <p className="text-lg font-bold text-slate-900 tracking-wider">{paymentCode}</p>
                 </div>
-              ) : null}
-              <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-                Vui lòng chuyển đúng 10.000 VND theo QR. Sau khi giao dịch được xác nhận, trạng thái sẽ đồng bộ tự động.
+              )}
+              
+              <div className="rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800 text-center">
+                <p className="font-medium">Vui lòng chuyển đúng <strong>10.000 VND</strong> theo nội dung trên. Trạng thái sẽ được đồng bộ ngay lập tức!</p>
               </div>
               <div className="flex gap-3">
                 <button
@@ -212,7 +258,7 @@ export default function TenantVerifyBankModelPopup({
                   onClick={onClose}
                   className="flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
                 >
-                  Đóng
+                  Xong, tôi đã chuyển khoản
                 </button>
               </div>
             </div>
