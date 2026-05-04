@@ -11,10 +11,10 @@ import apiClient from "@/src/services/apiClient";
 export default function GlobalSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeConfig, setActiveConfig] = useState<ConfigurationResponse | null>(null);
+  const [activeConfig, setActiveConfig] =
+    useState<ConfigurationResponse | null>(null);
   const [commissionRateInput, setCommissionRateInput] = useState<string>("");
   const [isRunningCronTest, setIsRunningCronTest] = useState(false);
-
 
   useEffect(() => {
     const load = async () => {
@@ -43,7 +43,7 @@ export default function GlobalSettingsPage() {
       const response = await apiClient.post(API.ADMIN.TEST_CRONJOBS);
       if (response.data?.isSuccess) {
         toast.success(
-          response.data?.message || "Đã chạy test cronjob thành công."
+          response.data?.message || "Đã chạy test cronjob thành công.",
         );
         return;
       }
@@ -95,7 +95,9 @@ export default function GlobalSettingsPage() {
     <div className="space-y-6 p-6">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Cài đặt hệ thống</h1>
-        <p className="mt-2 text-slate-600">Cấu hình các thiết lập dùng chung toàn hệ thống</p>
+        <p className="mt-2 text-slate-600">
+          Cấu hình các thiết lập dùng chung toàn hệ thống
+        </p>
       </div>
 
       {loading ? (
@@ -113,7 +115,7 @@ export default function GlobalSettingsPage() {
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-slate-700">
-                Commission Rate (%)
+                Tỉ lệ hoa hồng (%)
               </label>
               <input
                 inputMode="decimal"
@@ -122,7 +124,6 @@ export default function GlobalSettingsPage() {
                 className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Ví dụ: 3"
               />
-
             </div>
           </div>
 
@@ -140,10 +141,12 @@ export default function GlobalSettingsPage() {
       )}
 
       <div className="max-w-2xl rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-900">Kiểm thử cronjob</h2>
+        <h2 className="text-lg font-semibold text-slate-900">
+          Kiểm thử cronjob
+        </h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          Chạy test thủ công cho luồng cronjob tính phí hoa hồng và giám sát công
-          nợ tenant.
+          Chạy test thủ công cho luồng cronjob tính phí hoa hồng và giám sát
+          công nợ tenant.
         </p>
 
         <button
