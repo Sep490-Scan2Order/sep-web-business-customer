@@ -376,9 +376,17 @@ export default function RestaurantPage() {
           }),
         );
 
+        const backendMessage = (response.message ?? "").trim();
+        const isGenericSuccess =
+          backendMessage.length === 0 ||
+          backendMessage.toLowerCase() === "success";
+
         toast.success(
-          response.message ||
-            `${nextIsActive ? "Mở" : "Đóng"} nhà hàng thành công`,
+          isGenericSuccess
+            ? nextIsActive
+              ? "Mở khóa nhà hàng thành công"
+              : "Đóng nhà hàng thành công"
+            : backendMessage,
         );
       } catch (error) {
         console.error("Error updating restaurant status:", error);
