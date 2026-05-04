@@ -51,6 +51,7 @@ export function useRealtime({
         accessTokenFactory: () => token || '',
         transport: signalR.HttpTransportType.WebSockets,
       })
+      .configureLogging(signalR.LogLevel.None) // Ẩn log nội bộ của SignalR để tránh Next.js bung popup đen
       .withAutomaticReconnect()
       .build();
 
@@ -78,7 +79,11 @@ export function useRealtime({
         await connection.start();
         await connection.invoke('JoinGroup', tenantId);
       } catch (error) {
-        console.error('SignalR connection failed:', error);
+        // Bỏ qua lỗi do React Strict Mode ngắt kết nối quá nhanh (component unmount)
+        if (error instanceof Error && error.message.includes('stopped during negotiation')) {
+          return;
+        }
+        console.warn('SignalR connection failed:', error);
       }
     };
 

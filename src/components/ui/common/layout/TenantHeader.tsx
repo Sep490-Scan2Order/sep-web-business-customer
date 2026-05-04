@@ -4,6 +4,7 @@ import { useRealtime } from "@/src/hooks/useRealtime";
 import { notificationService } from "@/src/services/notificationService";
 import { NotifyTenantDetailItem, UserInfo } from "@/src/types/type";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "react-toastify";
 
 const IconBell = () => (
   <svg
@@ -106,8 +107,9 @@ export default function TenantHeader() {
     tenantId: tenantInfo?.id,
     onCountChanged: handleCountChanged,
     onListChanged: handleListChanged,
-    onProfileChanged: () => {
-      refreshUserInfo();
+    onProfileChanged: async () => {
+      await refreshUserInfo();
+      toast.success("Thông tin hồ sơ của bạn đã được cập nhật thành công!");
     },
   });
 
