@@ -213,13 +213,27 @@ export default function TenantHeader() {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
+            className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm ${
+              tenantInfo?.isSuspended
+                ? "border-rose-300 bg-rose-50 text-rose-700 hover:bg-rose-100"
+                : "border-slate-200 text-slate-600 hover:bg-slate-50"
+            }`}
           >
             <span
-              className={`h-2 w-2 rounded-full ${tenantInfo?.isActive ? "bg-emerald-500" : "bg-red-500"}`}
+              className={`h-2 w-2 rounded-full ${
+                tenantInfo?.isSuspended
+                  ? "bg-rose-500"
+                  : tenantInfo?.isActive
+                    ? "bg-emerald-500"
+                    : "bg-red-500"
+              }`}
             />
             <span>
-              {tenantInfo?.isActive ? "Đang hoạt động" : "Ngưng hoạt động"}
+              {tenantInfo?.isSuspended
+                ? "Bị đình chỉ"
+                : tenantInfo?.isActive
+                  ? "Đang hoạt động"
+                  : "Ngưng hoạt động"}
             </span>
           </button>
 
