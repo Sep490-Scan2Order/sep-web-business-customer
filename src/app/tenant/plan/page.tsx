@@ -252,12 +252,12 @@ export default function PlanPage() {
         </div>
 
         {/* Bảng dữ liệu */}
-        <div className="mx-auto max-w-8xl mt-2">
-          <table className=" w-full table-auto border-collapse text-left">
+        <div className="mx-auto max-w-8xl mt-2 overflow-x-auto">
+          <table className="w-full min-w-[900px] table-fixed border-collapse text-left">
             <thead>
               {/* Giữ nguyên Thead của bạn */}
               <tr>
-                <th className="w-12 px-4 py-3 border-b-2 border-gray-200">
+                <th className="w-8 px-4 py-3 border-b-2 border-gray-200">
                   <input
                     type="checkbox"
                     className="cursor-pointer rounded border-gray-300"
@@ -268,25 +268,25 @@ export default function PlanPage() {
                     onChange={(e) => checkAllCheckBox(e.target.checked)}
                   />
                 </th>
-                <th className=" border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
+                <th className="w-10 border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
                   ID
                 </th>
-                <th className="border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
+                <th className="w-44 border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
                   Tên nhà hàng
                 </th>
-                <th className="border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
+                <th className="w-40 border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
                   Địa chỉ
                 </th>
-                <th className="border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
+                <th className="w-32 border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
                   Tên gói
                 </th>
-                <th className="border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
+                <th className="w-28 border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
                   Ngày bắt đầu
                 </th>
-                <th className="border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
+                <th className="w-28 border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
                   Ngày hết hạn
                 </th>
-                <th className="border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
+                <th className="w-24 border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
                   Trạng thái
                 </th>
                 <th className="border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 text-center">
@@ -365,29 +365,30 @@ export default function PlanPage() {
                     <td className="px-4 py-2 text-sm text-gray-600">
                       {index + 1}
                     </td>
-                    <td className="px-4 py-2 text-sm text-gray-600">
-                      {info.restaurantName}
+                    <td className="px-4 py-2 text-sm text-gray-600 max-w-0">
+                      <div className="truncate" title={info.restaurantName}>
+                        {info.restaurantName}
+                      </div>
                     </td>
-                    <td
-                      className="px-4 py-2 text-sm text-gray-600 truncate max-w-50"
-                      title={info.address}
-                    >
-                      {info.address}
+                    <td className="px-4 py-2 text-sm text-gray-600 max-w-0">
+                      <div className="truncate" title={info.address}>
+                        {info.address}
+                      </div>
                     </td>
                     <td className="px-4 py-2 text-sm text-gray-600">
                       {info.isTrialPlan ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
-                          <span className="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                        <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                          <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-amber-500"></span>
                           {info.currentPlanName} (Dùng thử)
                         </span>
                       ) : info.currentPlanName ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
-                          <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>{" "}
+                        <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                          <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-500"></span>
                           {info.currentPlanName}
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
-                          <span className="h-1.5 w-1.5 rounded-full bg-red-500"></span>{" "}
+                        <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
+                          <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-500"></span>
                           Chưa đăng ký
                         </span>
                       )}
@@ -404,30 +405,25 @@ export default function PlanPage() {
                     </td>
                     <td className="px-4 py-2 text-sm text-gray-600">
                       {info.isActive ? (
-                        <span className="text-xs font-medium text-green-800">
-                          Hoạt động
-                        </span>
+                        <span className="whitespace-nowrap text-xs font-medium text-green-800">Hoạt động</span>
                       ) : (
-                        <span className="text-xs font-medium text-red-800">
-                          Tạm ngưng
-                        </span>
+                        <span className="whitespace-nowrap text-xs font-medium text-red-800">Tạm ngưng</span>
                       )}
                     </td>
                     <td className="px-4 py-2 text-sm text-gray-600">
-                      <div className="flex items-center justify-center gap-2">
-                        {/* Trial button: only show if tenant hasn't used trial AND restaurant has no plan */}
+                      <div className="flex flex-wrap items-center justify-center gap-1.5">
                         {!user?.hasUsedTrial && !info.currentPlanId && (
                           <button
                             id={`btn-trial-${info.restaurantId}`}
-                            className="cursor-pointer inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-100 disabled:opacity-50"
+                            className="cursor-pointer whitespace-nowrap inline-flex items-center rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-100 disabled:opacity-50"
                             disabled={isActivatingTrial}
                             onClick={() => handleActivateTrial(info.restaurantId)}
                           >
-                            Dùng thử miễn phí
+                            Dùng thử
                           </button>
                         )}
                         <button
-                          className=" cursor-pointer inline-flex items-center rounded-md border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100"
+                          className="cursor-pointer whitespace-nowrap inline-flex items-center rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100"
                           onClick={() =>
                             handleActionChangePlan(
                               [info],
@@ -439,17 +435,15 @@ export default function PlanPage() {
                         </button>
                         <button
                           disabled={!info.currentPlanId}
-                          onClick={() =>
-                            handleActionChangePlan([info], "DOWNGRADE")
-                          }
-                          className="cursor-pointer inline-flex items-center rounded-md border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs font-medium text-orange-700 disabled:opacity-50 hover:bg-orange-100"
+                          onClick={() => handleActionChangePlan([info], "DOWNGRADE")}
+                          className="cursor-pointer whitespace-nowrap inline-flex items-center rounded-md border border-orange-200 bg-orange-50 px-2.5 py-1.5 text-xs font-medium text-orange-700 disabled:opacity-50 hover:bg-orange-100"
                         >
                           Hạ cấp
                         </button>
                         <button
                           disabled={!info.currentPlanId || info.isTrialPlan}
                           onClick={() => handleActionRenew([info])}
-                          className="cursor-pointer inline-flex items-center rounded-md border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 disabled:opacity-50 hover:bg-green-100"
+                          className="cursor-pointer whitespace-nowrap inline-flex items-center rounded-md border border-green-200 bg-green-50 px-2.5 py-1.5 text-xs font-medium text-green-700 disabled:opacity-50 hover:bg-green-100"
                         >
                           Gia hạn
                         </button>
