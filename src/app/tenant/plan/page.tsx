@@ -280,16 +280,16 @@ export default function PlanPage() {
                 <th className="w-32 border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
                   Tên gói
                 </th>
-                <th className="w-28 border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
+                <th className="w-28 border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 whitespace-nowrap">
                   Ngày bắt đầu
                 </th>
-                <th className="w-28 border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
+                <th className="w-28 border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 whitespace-nowrap">
                   Ngày hết hạn
                 </th>
                 <th className="w-24 border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
                   Trạng thái
                 </th>
-                <th className="border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 text-center">
+                <th className="border-b-2 border-gray-200 px-4 py-2 text-sm font-medium text-gray-700">
                   Hành động
                 </th>
               </tr>
@@ -411,7 +411,7 @@ export default function PlanPage() {
                       )}
                     </td>
                     <td className="px-4 py-2 text-sm text-gray-600">
-                      <div className="flex flex-wrap items-center justify-center gap-1.5">
+                      <div className="flex flex-wrap items-center justify-start gap-1.5">
                         {!user?.hasUsedTrial && !info.currentPlanId && (
                           <button
                             id={`btn-trial-${info.restaurantId}`}
