@@ -10,6 +10,8 @@ export type PlanDetailResponse = {
   dailyRateYear: number;
   level: number;
   status: string;
+  isTrial?: boolean;
+  isCommissionExempt?: boolean;
   features: {
     maxStaff?: number;
     canUseCombo?: boolean;
@@ -26,6 +28,8 @@ export const defaultPlanForm = (): PlanUpsertRequest => ({
   yearlyPrice: 0,
   durationInDays: 30,
   level: 1,
+  isTrial: false,
+  isCommissionExempt: false,
   features: {
     canUseAIUpsell: false,
     canRecommendationOnTop: false,

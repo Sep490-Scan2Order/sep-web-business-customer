@@ -70,6 +70,7 @@ export interface User {
   lastWarningSentAt?: string | null;
   totalDebtAmount?: number;
   planName?: string;
+  hasUsedTrial?: boolean;
 
   // Stats
   totalRestaurants?: number;
@@ -483,6 +484,8 @@ export type PlanApiItem = {
   dailyRateYear: number;
   level: number;
   status: string;
+  isTrial?: boolean;
+  isCommissionExempt?: boolean;
   features: {
     canUseAIUpsell: boolean;
     canRecommendationOnTop: boolean;
@@ -497,6 +500,8 @@ export type PlanUpsertRequest = {
   yearlyPrice: number;
   durationInDays: number;
   level: number;
+  isTrial?: boolean;
+  isCommissionExempt?: boolean;
   features: {
     canUseAIUpsell: boolean;
     canRecommendationOnTop: boolean;
@@ -516,6 +521,7 @@ export type SubscriptionTenantInfo = {
   startDate: string;
   endDate: string;
   status: string;
+  isTrialPlan: boolean;
 };
 
 export type PreviewSubscriptionResponse = {

@@ -51,7 +51,8 @@ export default function PlanPopUpInfo({
         <div className="max-h-[65vh] overflow-y-auto p-6">
           {planData && planData.length > 0 ? (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {planData.map((plan) => {
+              {/* Filter out Trial plans — must be activated separately, not purchased */}
+              {planData.filter((p) => !p.isTrial).map((plan) => {
                 const isSelected = selectedId === plan.id;
                 const isCurrentPlan = planId === plan.id;
                 const isLowerThanCurrent =

@@ -40,6 +40,11 @@ export default function PlanPopUpConfirm({
   });
 
   const handlePreview = async () => {
+    // Guard: Trial plans cannot be purchased via payment flow
+    if (selectedPlan?.isTrial) {
+      toast.error("Gói trải nghiệm không thể mua qua thanh toán. Vui lòng dùng nút 'Dùng thử miễn phí'.");
+      return;
+    }
     setIsLoading(true);
     try {
       const response = await apiClient.post(

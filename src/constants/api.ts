@@ -121,6 +121,8 @@ export const API = {
     CREATE_COMMISSION_FEE_PAYMENT:
       "/subscription/create-commission-fee-payment",
     VIEW_HISTORY: "/subscription/payment-transactions",
+    ACTIVATE_TRIAL: (restaurantId: number) =>
+      `/subscription/activate-trial/${restaurantId}`,
   },
   EMAIL: {
     SEND: "/Email/send",

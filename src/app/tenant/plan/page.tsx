@@ -6,14 +6,20 @@ import { toast } from "react-toastify";
 import PlanPopUpConfirm from "@/src/components/ui/tenant/PlanPopUpConfirm";
 import { PlanApiItem, SubscriptionTenantInfo } from "@/src/types/type";
 import PlanPopUpInfo from "@/src/components/ui/tenant/PlanPopUpInfo";
-import { ArrowUpDown, Plus, Search, SlidersHorizontal } from "lucide-react";
+import { ArrowUpDown, Check, Plus, Search, SlidersHorizontal, X } from "lucide-react";
+import { useAuthStore } from "@/src/store/authStore";
+import { getApiErrorMessage } from "@/src/utils/utils";
 
 export default function PlanPage() {
+  const { user, refreshUserInfo } = useAuthStore();
   const [activePlans, setActivePlans] = useState<PlanApiItem[]>([]);
   const [subscriptionTenantInfo, setSubscriptionTenantInfo] = useState<
     SubscriptionTenantInfo[]
   >([]);
   const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
+  const [isActivatingTrial, setIsActivatingTrial] = useState<boolean>(false);
+  const [showTrialModal, setShowTrialModal] = useState(false);
+  const [trialTargetRestaurantId, setTrialTargetRestaurantId] = useState<number | null>(null);
 
   // State cho Modal
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -34,22 +40,27 @@ export default function PlanPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   // Tải Dữ liệu ban đầu
+  const fetchSubscriptions = async () => {
+    try {
+      const [subRes, planRes] = await Promise.all([
+        apiClient.get(API.SUBSCRIPTION.GET_SUBSCRIPTION_BY_TENANT),
+        apiClient.get(API.PLAN.GETALL),
+      ]);
+      if (subRes.data.isSuccess) setSubscriptionTenantInfo(subRes.data.data);
+      if (planRes.data.isSuccess) setActivePlans(planRes.data.data);
+    } catch {
+      toast.error("Không thể tải thông tin hệ thống");
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [subRes, planRes] = await Promise.all([
-          apiClient.get(API.SUBSCRIPTION.GET_SUBSCRIPTION_BY_TENANT),
-          apiClient.get(API.PLAN.GETALL),
-        ]);
-        if (subRes.data.isSuccess) setSubscriptionTenantInfo(subRes.data.data);
-        if (planRes.data.isSuccess) setActivePlans(planRes.data.data);
-      } catch {
-        toast.error("Không thể tải thông tin hệ thống");
-      } finally {
-        setIsInitialLoading(false);
-      }
+    const init = async () => {
+      setIsInitialLoading(true);
+      await fetchSubscriptions();
+      setIsInitialLoading(false);
     };
-    fetchData();
+    init();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Filter
@@ -150,6 +161,30 @@ export default function PlanPage() {
     );
     if (type === "CHANGE_PLAN") handleActionChangePlan(targets, "CHANGE");
     else handleActionRenew(targets);
+  };
+
+  // Mở modal xác nhận gói trải nghiệm
+  const handleActivateTrial = (restaurantId: number) => {
+    setTrialTargetRestaurantId(restaurantId);
+    setShowTrialModal(true);
+  };
+
+  // Thực sự gọi API sau khi Tenant xác nhận
+  const confirmActivateTrial = async () => {
+    if (!trialTargetRestaurantId) return;
+    setIsActivatingTrial(true);
+    try {
+      const res = await apiClient.post(API.SUBSCRIPTION.ACTIVATE_TRIAL(trialTargetRestaurantId));
+      if (res.data.isSuccess) {
+        toast.success("Kích hoạt gói trải nghiệm thành công! Nhà hàng đã được kích hoạt.");
+        setShowTrialModal(false);
+        await Promise.all([fetchSubscriptions(), refreshUserInfo()]);
+      }
+    } catch (error) {
+      toast.error(getApiErrorMessage(error));
+    } finally {
+      setIsActivatingTrial(false);
+    }
   };
 
   return (
@@ -340,7 +375,12 @@ export default function PlanPage() {
                       {info.address}
                     </td>
                     <td className="px-4 py-2 text-sm text-gray-600">
-                      {info.currentPlanName ? (
+                      {info.isTrialPlan ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                          <span className="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                          {info.currentPlanName} (Dùng thử)
+                        </span>
+                      ) : info.currentPlanName ? (
                         <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                           <span className="h-1.5 w-1.5 rounded-full bg-green-500"></span>{" "}
                           {info.currentPlanName}
@@ -375,6 +415,17 @@ export default function PlanPage() {
                     </td>
                     <td className="px-4 py-2 text-sm text-gray-600">
                       <div className="flex items-center justify-center gap-2">
+                        {/* Trial button: only show if tenant hasn't used trial AND restaurant has no plan */}
+                        {!user?.hasUsedTrial && !info.currentPlanId && (
+                          <button
+                            id={`btn-trial-${info.restaurantId}`}
+                            className="cursor-pointer inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-100 disabled:opacity-50"
+                            disabled={isActivatingTrial}
+                            onClick={() => handleActivateTrial(info.restaurantId)}
+                          >
+                            Dùng thử miễn phí
+                          </button>
+                        )}
                         <button
                           className=" cursor-pointer inline-flex items-center rounded-md border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-100"
                           onClick={() =>
@@ -396,7 +447,7 @@ export default function PlanPage() {
                           Hạ cấp
                         </button>
                         <button
-                          disabled={!info.currentPlanId}
+                          disabled={!info.currentPlanId || info.isTrialPlan}
                           onClick={() => handleActionRenew([info])}
                           className="cursor-pointer inline-flex items-center rounded-md border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 disabled:opacity-50 hover:bg-green-100"
                         >
@@ -434,6 +485,99 @@ export default function PlanPage() {
           targetRestaurants={targetRestaurants}
         />
       )}
+
+      {/* MODAL 3: Xác nhận kích hoạt gói Trải nghiệm */}
+      {showTrialModal && (() => {
+        const trialPlan = activePlans.find((p) => p.isTrial);
+        const featureList = trialPlan ? [
+          { label: "AI gợi ý món đi kèm (AI Upsell)", enabled: trialPlan.features.canUseAIUpsell },
+          { label: "Gợi ý món ưu tiên trên đầu trang", enabled: trialPlan.features.canRecommendationOnTop },
+          { label: "Chương trình khuyến mãi", enabled: trialPlan.features.canUsePromotions },
+          { label: "Tùy chỉnh mẫu menu", enabled: trialPlan.features.canCustomMenuTemplate },
+        ] : [];
+
+        return (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            onClick={() => !isActivatingTrial && setShowTrialModal(false)}
+          >
+            <div
+              className="w-full max-w-md rounded-2xl bg-white shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+                <div>
+                  <h2 className="text-base font-semibold text-slate-900">Kích hoạt gói trải nghiệm</h2>
+                  <p className="mt-0.5 text-xs text-slate-500">Miễn phí · 30 ngày · Không thu phí hoa hồng</p>
+                </div>
+                <button
+                  onClick={() => setShowTrialModal(false)}
+                  disabled={isActivatingTrial}
+                  className="cursor-pointer rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 disabled:opacity-40"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* Plan info */}
+              <div className="px-6 py-5 space-y-4">
+                {trialPlan && (
+                  <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+                    <div className="text-sm font-semibold text-amber-900">{trialPlan.name}</div>
+                    <div className="mt-1 text-xs text-amber-700">Thời hạn: <strong>30 ngày</strong></div>
+                  </div>
+                )}
+
+                {/* Feature list */}
+                <div>
+                  <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Tính năng bao gồm</div>
+                  <ul className="space-y-2">
+                    {featureList.map((f) => (
+                      <li key={f.label} className="flex items-center gap-2.5 text-sm">
+                        <span className={`flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full ${
+                          f.enabled ? "bg-emerald-100 text-emerald-600" : "bg-slate-100 text-slate-400"
+                        }`}>
+                          {f.enabled ? <Check className="h-2.5 w-2.5" strokeWidth={3} /> : <X className="h-2.5 w-2.5" strokeWidth={3} />}
+                        </span>
+                        <span className={f.enabled ? "text-slate-700" : "text-slate-400 line-through"}>
+                          {f.label}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Notice */}
+                <p className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs text-slate-500">
+                  Mỗi tài khoản chỉ được kích hoạt gói trải nghiệm <strong>1 lần duy nhất</strong>.
+                  Sau khi hết hạn, nhà hàng sẽ tự động ngừng hoạt động cho đến khi bạn đăng ký gói mới.
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-end gap-2 border-t border-slate-100 px-6 py-4">
+                <button
+                  type="button"
+                  onClick={() => setShowTrialModal(false)}
+                  disabled={isActivatingTrial}
+                  className="cursor-pointer rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-40"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmActivateTrial}
+                  disabled={isActivatingTrial}
+                  className="cursor-pointer inline-flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600 disabled:opacity-60"
+                >
+                  {isActivatingTrial ? "Đang kích hoạt..." : "Kích hoạt ngay"}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

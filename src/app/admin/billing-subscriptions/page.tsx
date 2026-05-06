@@ -79,6 +79,8 @@ export default function BillingSubscriptionsPage() {
         yearlyPrice: Number(detail.yearlyPrice) || 0,
         durationInDays: Number(detail.durationInDays) || 30,
         level: Number(detail.level) || 1,
+        isTrial: Boolean(detail.isTrial),
+        isCommissionExempt: Boolean(detail.isCommissionExempt),
         features: {
           canUseAIUpsell: Boolean(detail.features?.canUseAIUpsell),
           canRecommendationOnTop: Boolean(detail.features?.canRecommendationOnTop),

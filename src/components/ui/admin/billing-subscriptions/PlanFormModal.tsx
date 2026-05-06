@@ -146,6 +146,48 @@ export default function PlanFormModal({
             </div>
           </div>
 
+          {/* Special Plan Properties */}
+          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-amber-800">
+              <span>Thuộc tính đặc biệt</span>
+            </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-amber-200 bg-white p-3 text-sm text-slate-700 hover:border-amber-400 transition">
+                <input
+                  type="checkbox"
+                  checked={formData.isTrial ?? false}
+                  onChange={(e) => {
+                    onFieldChange("isTrial", e.target.checked);
+                    if (e.target.checked) onFieldChange("isCommissionExempt", true);
+                  }}
+                  className="mt-0.5 h-4 w-4 rounded border-slate-300 accent-amber-600"
+                />
+                <div>
+                  <div className="font-medium text-amber-800">Gói trải nghiệm (Trial)</div>
+                  <div className="mt-0.5 text-xs text-slate-500">Tenant tự kích hoạt 1 lần, miễn phí, không qua thanh toán</div>
+                </div>
+              </label>
+
+              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-amber-200 bg-white p-3 text-sm text-slate-700 hover:border-amber-400 transition">
+                <input
+                  type="checkbox"
+                  checked={formData.isCommissionExempt ?? false}
+                  onChange={(e) => onFieldChange("isCommissionExempt", e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-slate-300 accent-amber-600"
+                />
+                <div>
+                  <div className="font-medium text-amber-800">Miễn phí hoa hồng</div>
+                  <div className="mt-0.5 text-xs text-slate-500">Không thu phí hoa hồng trong thời gian dùng gói này</div>
+                </div>
+              </label>
+            </div>
+            {formData.isTrial && (
+              <p className="mt-3 text-xs text-amber-700 bg-amber-100 rounded-lg px-3 py-2 border border-amber-200">
+                Lưu ý: Hệ thống chỉ dùng <strong>Thời hạn (ngày)</strong> để kích hoạt. Giá tháng/năm sẽ bị bỏ qua.
+              </p>
+            )}
+          </div>
+
           <div className=" flex items-center justify-end gap-2 border-t border-slate-200 pt-4">
             <button
               type="button"

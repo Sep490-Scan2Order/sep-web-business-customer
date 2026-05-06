@@ -71,8 +71,18 @@ export default function PlanTable({
             plans.map((plan) => (
               <tr key={plan.id} className="hover:bg-slate-50">
                 <td className="px-4 py-3">
-                  <div className="font-semibold text-slate-900">
-                    {plan.name}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <div className="font-semibold text-slate-900">{plan.name}</div>
+                    {plan.isTrial && (
+                      <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 border border-amber-200">
+                        Trial
+                      </span>
+                    )}
+                    {plan.isCommissionExempt && !plan.isTrial && (
+                      <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 border border-green-200">
+                        Miễn HH
+                      </span>
+                    )}
                   </div>
                   <div className="text-xs text-slate-500">Mã: {plan.id}</div>
                 </td>
